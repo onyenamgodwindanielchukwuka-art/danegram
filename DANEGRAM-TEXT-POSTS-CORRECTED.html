@@ -1,0 +1,449 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#1769e0">
+<title>DANEGRAM — Connect with your world</title>
+<style>
+:root{--blue:#1769e0;--blue2:#0f5bc7;--bg:#f0f2f5;--card:#fff;--text:#1c1e21;--muted:#65676b;--line:#e4e6eb;--soft:#e7f3ff;--green:#31a24c;--shadow:0 1px 2px rgba(0,0,0,.12);--radius:12px}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:15px/1.4 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}button,input,textarea,select{font:inherit}button{cursor:pointer;border:0}a{color:inherit;text-decoration:none}
+.topbar{height:60px;background:var(--card);display:flex;align-items:center;justify-content:space-between;padding:0 18px;position:sticky;top:0;z-index:20;box-shadow:var(--shadow);gap:16px}
+.brand-area{display:flex;align-items:center;gap:10px;min-width:250px}.logo{width:42px;height:42px;border-radius:50%;background:var(--blue);color:white;display:grid;place-items:center;font-weight:900;font-size:25px;letter-spacing:-2px}.brand{font-size:25px;font-weight:850;letter-spacing:-1.3px;color:var(--blue)}.searchbox{height:40px;background:var(--bg);border-radius:24px;display:flex;align-items:center;padding:0 14px;gap:8px;width:250px}.searchbox input{border:0;outline:0;background:transparent;width:100%;min-width:0}.topnav{display:flex;align-items:center;justify-content:center;gap:8px;flex:1;height:100%}.topnav button{height:48px;min-width:68px;background:transparent;color:var(--muted);font-size:23px;border-radius:9px;position:relative}.topnav button.active{color:var(--blue)}.topnav button.active:after{content:"";height:3px;background:var(--blue);position:absolute;bottom:-6px;left:8px;right:8px;border-radius:4px}.top-actions{display:flex;gap:8px;align-items:center;min-width:250px;justify-content:flex-end}.circle-btn{width:40px;height:40px;border-radius:50%;background:#e4e6eb;color:#202124;font-size:19px;position:relative}.badge{position:absolute;right:-3px;top:-4px;background:#e41e3f;color:white;border:2px solid white;border-radius:12px;padding:1px 5px;font-size:10px;font-weight:700}.avatar{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,#8bb9ff,#315eaa);color:#fff;font-weight:800;flex:none;overflow:hidden}.avatar img{width:100%;height:100%;object-fit:cover}.layout{max-width:1440px;margin:18px auto;display:grid;grid-template-columns:260px minmax(0,680px) 300px;gap:22px;padding:0 16px}.leftcol,.rightcol{position:sticky;top:78px;align-self:start;max-height:calc(100vh - 90px);overflow:auto}.sideitem{display:flex;align-items:center;gap:12px;padding:10px;border-radius:9px;font-weight:650;color:#303238;cursor:pointer}.sideitem:hover{background:#e4e6eb}.sideicon{width:30px;text-align:center;font-size:21px}.side-section{border-top:1px solid #d5d8de;margin-top:12px;padding-top:12px}.side-title{font-weight:750;color:var(--muted);padding:5px 10px 8px}.maincol{min-width:0}.card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:16px;overflow:hidden}.composer{padding:14px}.composer-top{display:flex;align-items:center;gap:10px}.composer-input{flex:1;border:0;background:var(--bg);border-radius:22px;padding:11px 16px;text-align:left;color:var(--muted)}.composer-actions{display:flex;border-top:1px solid var(--line);margin-top:13px;padding-top:10px;justify-content:space-around}.composer-actions button{background:transparent;color:var(--muted);font-weight:650;padding:7px 10px;border-radius:8px}.composer-actions button:hover{background:var(--bg)}.stories{padding:12px;display:flex;gap:10px;overflow:auto}.story{width:112px;height:175px;border-radius:12px;flex:none;position:relative;overflow:hidden;background:linear-gradient(145deg,#4267b2,#9bc1f4);color:white;display:flex;align-items:flex-end;padding:10px;font-weight:750;box-shadow:inset 0 -65px 55px rgba(0,0,0,.35);cursor:pointer}.story:nth-child(2){background:linear-gradient(145deg,#a54e88,#f3a6c5)}.story:nth-child(3){background:linear-gradient(145deg,#218c82,#8ad4bc)}.story:nth-child(4){background:linear-gradient(145deg,#a66a28,#e7c07b)}.story:nth-child(5){background:linear-gradient(145deg,#454d65,#9da7c5)}.story .story-avatar{position:absolute;top:9px;left:9px;width:37px;height:37px;border:3px solid var(--blue);border-radius:50%;background:#fff;color:var(--blue);display:grid;place-items:center}.story.add{background:#fff;color:var(--text);box-shadow:var(--shadow);padding:0;display:block}.story.add .addcircle{height:42px;width:42px;background:var(--blue);color:#fff;border-radius:50%;display:grid;place-items:center;font-size:27px;margin:85px auto 5px}.story.add strong{display:block;text-align:center}.post{padding:14px}.post-head{display:flex;align-items:center;gap:10px}.post-author{font-weight:750}.post-meta{font-size:12px;color:var(--muted)}.more{margin-left:auto;background:transparent;color:var(--muted);font-size:22px}.post-text{white-space:pre-wrap;margin:13px 0;font-size:15px}.post-media{width:100%;max-height:470px;object-fit:cover;background:#dfe5ee;display:block;border-radius:4px}.post-stats{display:flex;justify-content:space-between;color:var(--muted);font-size:13px;padding:10px 2px;border-bottom:1px solid var(--line)}.post-actions{display:flex;justify-content:space-around;padding-top:7px}.post-actions button{background:transparent;color:var(--muted);font-weight:700;flex:1;padding:8px;border-radius:7px}.post-actions button:hover{background:var(--bg)}.post-actions button.liked{color:var(--blue)}.comment-box{display:flex;gap:8px;margin-top:10px}.comment-box input{border:0;background:var(--bg);border-radius:20px;padding:9px 13px;flex:1;outline:0}.comment-list{margin-top:9px}.comment{background:var(--bg);border-radius:14px;padding:8px 12px;margin:6px 0;font-size:13px}.comment b{display:block;margin-bottom:2px}.right-card{padding:14px}.right-title{font-weight:800;margin-bottom:12px}.contact{display:flex;align-items:center;gap:10px;padding:7px 0;font-weight:650}.online{width:10px;height:10px;background:#31a24c;border:2px solid white;border-radius:50%;position:absolute;bottom:0;right:0}.avatar-wrap{position:relative}.muted{color:var(--muted)}.small{font-size:12px}.primary{background:var(--blue);color:white;border-radius:7px;padding:9px 15px;font-weight:700}.primary:hover{background:var(--blue2)}.secondary{background:#e4e6eb;color:#202124;border-radius:7px;padding:9px 15px;font-weight:700}.full{width:100%}.empty{padding:32px;text-align:center;color:var(--muted)}.section-heading{font-size:21px;font-weight:850;margin:8px 0 14px}.modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.48);z-index:200;display:none;align-items:center;justify-content:center;padding:16px}.modal-backdrop.show{display:flex;z-index:200}.modal{width:min(560px,100%);max-height:90vh;overflow:auto;background:white;border-radius:14px;box-shadow:0 8px 35px rgba(0,0,0,.25)}.modal-head{padding:15px 18px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;font-weight:850;font-size:19px}.close{background:#e4e6eb;border-radius:50%;width:34px;height:34px;font-size:20px}.modal-body{padding:17px}.field{margin-bottom:13px}.field label{display:block;font-weight:700;margin-bottom:6px}.field input,.field textarea,.field select{width:100%;border:1px solid #ccd0d5;border-radius:8px;padding:11px;outline-color:var(--blue)}.field textarea{min-height:110px;resize:vertical}.modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:12px}.tabs{display:flex;gap:5px;border-bottom:1px solid var(--line);margin-bottom:12px}.tabs button{background:transparent;padding:10px;color:var(--muted);font-weight:750}.tabs button.active{color:var(--blue);border-bottom:3px solid var(--blue)}.notice{background:#fff8e1;border:1px solid #f0d98b;color:#705b16;padding:11px;border-radius:8px;font-size:13px;margin:10px 0}.gridcards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.feature-card{padding:16px;min-height:125px}.feature-card .bigicon{font-size:28px}.feature-card h3{margin:7px 0 4px}.feature-card p{margin:0;color:var(--muted);font-size:13px}.profile-cover{height:150px;background:linear-gradient(120deg,#1769e0,#8bb9ff)}.profile-info{padding:0 18px 18px}.profile-info .avatar{width:90px;height:90px;border:4px solid white;margin-top:-45px;font-size:26px}.profile-stats{display:flex;gap:20px;color:var(--muted);font-size:13px;margin-top:10px}.chat-layout{display:grid;grid-template-columns:190px 1fr;min-height:350px}.chat-list{border-right:1px solid var(--line);padding:10px}.chat-window{padding:12px;display:flex;flex-direction:column;min-height:350px}.chat-messages{flex:1;overflow:auto;max-height:260px}.bubble{padding:9px 12px;border-radius:15px;background:var(--bg);margin:7px 0;max-width:85%;width:max-content}.bubble.mine{background:#dceaff;margin-left:auto}.chat-send{display:flex;gap:7px}.chat-send input{flex:1;border:0;background:var(--bg);border-radius:20px;padding:10px}.mobile-menu{display:none}
+.topbar{display:flex;align-items:center;gap:18px;min-height:70px;padding:8px 22px}
+.brand-area{display:flex;align-items:center;gap:12px;flex:1;min-width:260px}
+.brand-area>div:nth-child(2){white-space:nowrap}
+.brand{font-weight:900;letter-spacing:-1px}
+.searchbox{flex:1;max-width:360px;min-width:150px}
+.topnav{flex:0 0 auto;display:flex;align-items:center;gap:10px}
+.topnav button{font-weight:900;font-size:25px;min-width:54px;height:48px}
+.top-actions{min-width:48px;flex:0 0 auto}
+.bottom-nav{position:fixed;left:0;right:0;bottom:0;z-index:40;display:flex;justify-content:center;align-items:stretch;gap:0;background:#fff;border-top:1px solid #dfe3e9;box-shadow:0 -2px 10px rgba(0,0,0,.08);padding:5px max(8px,env(safe-area-inset-right)) calc(5px + env(safe-area-inset-bottom)) max(8px,env(safe-area-inset-left))}
+.bottom-nav button{position:relative;display:flex;flex:1;max-width:180px;min-width:0;min-height:54px;flex-direction:column;align-items:center;justify-content:center;gap:1px;background:transparent;color:#303846;font-size:23px;font-weight:900;border-radius:10px}
+.bottom-nav button span{position:relative;line-height:1.1;font-weight:900}
+.bottom-nav button small{font-size:10px;font-weight:800;color:#535d6b}
+.bottom-nav button:hover,.bottom-nav button.active{background:#edf4ff;color:var(--blue)}
+.auth-gate{position:fixed;inset:0;z-index:100;background:linear-gradient(145deg,#eaf2ff,#f7f9fc 55%,#e8f0ff);display:none;align-items:center;justify-content:center;padding:22px}
+body.auth-required .auth-gate{display:flex}
+body.auth-required .topbar,body.auth-required .bottom-nav,body.auth-required .layout{visibility:hidden}
+.auth-gate-card{width:min(420px,100%);background:#fff;border-radius:22px;padding:30px 24px;box-shadow:0 12px 45px rgba(24,62,120,.16);text-align:center}
+.auth-gate-logo{width:64px;height:64px;border-radius:19px;background:var(--blue);color:#fff;display:grid;place-items:center;margin:0 auto 12px;font-size:38px;font-weight:950}
+.auth-gate-card h1{color:var(--blue);font-size:32px;letter-spacing:-1.5px;margin:0}
+.auth-tagline{font-weight:850;margin:0 0 16px}
+.auth-intro{color:var(--muted);line-height:1.55;margin:0 0 22px}
+.auth-gate-card .primary,.auth-gate-card .secondary{margin:6px 0;padding:13px}
+.auth-disclaimer{font-size:11px;color:#777f8c;line-height:1.45;margin:16px 0 0}
+.bottom-nav .badge{font-style:normal;right:-10px;top:-5px}
+body{padding-bottom:82px}
+footer{color:#8a8d91;font-size:12px;text-align:center;padding:12px}
+@media(max-width:1100px){.layout{grid-template-columns:220px minmax(0,680px)}.rightcol{display:none}.brand-area,.top-actions{min-width:190px}.searchbox{width:150px}}
+@media(max-width:760px){
+ .topbar{padding:7px 10px;height:auto;min-height:62px;gap:8px;flex-wrap:wrap}
+ .brand-area{min-width:0;flex:1;gap:8px}
+ .brand-area>div:nth-child(2){min-width:0}
+ .brand{font-size:20px;line-height:1.1}
+ .logo{width:35px;height:35px;flex:none}
+ .brand-area .small{font-size:10px;white-space:nowrap}
+ .searchbox{width:38px;min-width:38px;max-width:38px;height:38px;flex:0 0 38px;padding:0 10px;justify-content:center}
+ .searchbox input{display:none}
+ .topnav{gap:2px;flex:0 0 auto}
+ .topnav button{min-width:38px;width:38px;height:42px;font-size:22px}
+ .top-actions{min-width:38px}
+ .top-actions .circle-btn{width:36px;height:36px}
+ .layout{display:block;margin:10px auto;padding:0 8px 12px}
+ .leftcol{display:none}.maincol{width:100%}
+ .stories .story{width:100px;height:155px}
+ .composer-actions button{font-size:12px;padding:6px 3px}
+ .gridcards{grid-template-columns:1fr}
+ .chat-layout{grid-template-columns:110px 1fr}
+ .topnav button.active:after{bottom:-3px}
+ .bottom-nav{justify-content:space-around}
+ .bottom-nav button{min-height:52px;font-size:21px}
+ .bottom-nav button small{font-size:9px}
+}
+
+.group-card{padding:14px;display:flex;gap:12px;align-items:center}
+.group-art{width:76px;height:76px;border-radius:10px;background:linear-gradient(135deg,#1769e0,#9bc1f4);display:grid;place-items:center;color:white;font-size:30px;flex:none}
+.group-card h3{margin:0 0 4px}.group-card p{margin:0 0 8px;color:var(--muted);font-size:13px}
+.group-card .group-actions{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap}
+.call-panel{padding:20px;text-align:center;background:linear-gradient(145deg,#102b54,#1769e0);color:white;border-radius:12px;min-height:340px;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.call-avatar{width:110px;height:110px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.2);border:4px solid rgba(255,255,255,.65);font-size:38px;font-weight:850;margin:18px}
+.call-controls{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:22px}
+.call-controls button{width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,.2);color:white;font-size:20px}
+.call-controls button.end{background:#e53945}.call-status{font-size:13px;color:#d9e7ff}
+.group-room{padding:15px}.group-room-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+</style>
+</head>
+<body>
+<header class="topbar">
+ <div class="brand-area"><div class="logo">D</div><div><div class="brand">DANEGRAM</div><div class="small muted" style="margin-top:-5px">Connect with your world</div></div><label class="searchbox">⌕ <input id="globalSearch" placeholder="Search DANEGRAM" aria-label="Search DANEGRAM"></label></div>
+ <nav class="topnav" aria-label="Main navigation">
+  <button class="active" data-page="home" title="Home" aria-label="Home">⌂</button>
+  <button data-page="watch" title="Watch" aria-label="Watch">▶</button>
+ </nav>
+ <div class="top-actions"><button class="circle-btn" id="createBtn" title="Create a post" aria-label="Create a post">＋</button></div>
+</header>
+<nav class="bottom-nav" aria-label="More DANEGRAM navigation">
+ <button data-page="marketplace" title="Marketplace" aria-label="Marketplace"><span>▦</span><small>Market</small></button>
+ <button data-page="groups" title="Groups" aria-label="Groups"><span>♧</span><small>Groups</small></button>
+ <button id="messengerBtn" title="Messenger" aria-label="Messenger"><span>▤<i class="badge">2</i></span><small>Messages</small></button>
+ <button id="notifyBtn" title="Notifications" aria-label="Notifications"><span>♧<i class="badge">3</i></span><small>Alerts</small></button>
+ <button id="accountBtn" title="Account" aria-label="Account"><span>⌄</span><small>Account</small></button>
+</nav>
+<div class="layout">
+ <aside class="leftcol">
+  <div class="sideitem" data-page="profile"><span class="avatar" id="sideAvatar">DG</span><span id="sideName">DANEGRAM Member</span></div>
+  <div class="sideitem" data-page="friends"><span class="sideicon">👥</span>Friends</div>
+  <div class="sideitem" data-page="memories"><span class="sideicon">◷</span>Memories</div>
+  <div class="sideitem" data-page="saved"><span class="sideicon">🔖</span>Saved</div>
+  <div class="sideitem" data-page="groups"><span class="sideicon">♧</span>Groups</div>
+  <div class="sideitem" data-page="calls"><span class="sideicon">📹</span>Voice & video calls</div>
+  <div class="sideitem" data-page="video"><span class="sideicon">▶</span>Video</div>
+  <div class="sideitem" data-page="marketplace"><span class="sideicon">▦</span>Marketplace</div>
+  <div class="sideitem" data-page="events"><span class="sideicon">▣</span>Events</div>
+  <div class="sideitem" data-page="pages"><span class="sideicon">▤</span>Pages</div>
+  <div class="sideitem" data-page="gaming"><span class="sideicon">♟</span>Gaming</div>
+  <div class="side-section"><div class="side-title">Your shortcuts</div>
+   <div class="sideitem" data-page="communities"><span class="sideicon">🌍</span>Community Hub</div>
+   <div class="sideitem" data-page="creators"><span class="sideicon">⭐</span>Creator Connect</div>
+   <div class="sideitem" data-page="business"><span class="sideicon">🏪</span>Business Manager</div>
+   <div class="sideitem" data-page="learn"><span class="sideicon">📚</span>Learn & Earn</div>
+   <div class="sideitem" data-page="booking"><span class="sideicon">📅</span>Booking Manager</div>
+   <div class="sideitem" data-page="support"><span class="sideicon">🎧</span>Support Connect</div>
+   <div class="sideitem" data-page="marketplace"><span class="sideicon">🛍️</span>Digital Marketplace</div>
+  </div>
+  <footer>Privacy · Terms · Help · About DANEGRAM<br>© 2026 DANEGRAM</footer>
+ </aside>
+ <main class="maincol" id="mainContent"></main>
+ <aside class="rightcol">
+  <div class="card right-card"><div class="right-title">Sponsored</div><div style="height:100px;border-radius:9px;background:linear-gradient(120deg,#dceaff,#a8c9f5);display:grid;place-items:center;font-size:34px">📣</div><b>Grow with DANEGRAM</b><div class="small muted">Business promotions and creator opportunities are coming soon.</div></div>
+  <div class="card right-card"><div class="right-title">Contacts <span class="muted" style="float:right">•••</span></div>
+   <div class="contact"><span class="avatar">AM</span>Amara M.</div><div class="contact"><span class="avatar" style="background:#b46d9b">JO</span>Joseph O.</div><div class="contact"><span class="avatar" style="background:#4f947d">FK</span>Fatima K.</div><div class="contact"><span class="avatar" style="background:#b88743">DA</span>Daniel A.</div>
+  </div>
+  <div class="card right-card"><div class="right-title">Community guidelines</div><p class="small muted">Be respectful. Share authentic content. Do not impersonate others, harass people, or post harmful material.</p><button class="secondary full" id="reportHelp">Safety & reporting</button></div>
+ </aside>
+</div>
+<section class="auth-gate" id="authGate" aria-label="DANEGRAM welcome and sign in">
+ <div class="auth-gate-card">
+  <div class="auth-gate-logo">D</div>
+  <h1>DANEGRAM</h1>
+  <p class="auth-tagline">Connect with your world</p>
+  <p class="auth-intro">Share moments, discover creators, meet people and build communities.</p>
+  <button class="primary full" id="gateSignup">Create your account</button>
+  <button class="secondary full" id="gateLogin">Log in</button>
+  <p class="auth-disclaimer">Secure member registration and login are powered by DANEGRAM’s Supabase account service. Some social features are still being connected.</p>
+ </div>
+</section>
+<div class="modal-backdrop" id="modalBackdrop"><div class="modal" role="dialog" aria-modal="true"><div class="modal-head"><span id="modalTitle">Create post</span><button class="close" id="modalClose">×</button></div><div class="modal-body" id="modalBody"></div></div></div>
+<script>
+(async function(){
+// Load Supabase from more than one CDN. If the SDK cannot load, keep the
+// DANEGRAM interface responsive and show a clear authentication message.
+async function loadSupabaseSdk(){
+  if(window.supabase && typeof window.supabase.createClient === 'function') return true;
+  const sources = [
+    'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2',
+    'https://unpkg.com/@supabase/supabase-js@2'
+  ];
+  for(const src of sources){
+    try{
+      await new Promise((resolve,reject)=>{
+        const script=document.createElement('script');
+        script.src=src; script.async=true;
+        script.onload=resolve; script.onerror=()=>reject(new Error('Could not load '+src));
+        document.head.appendChild(script);
+      });
+      if(window.supabase && typeof window.supabase.createClient === 'function') return true;
+    }catch(error){ console.warn('DANEGRAM Supabase SDK fallback:',error.message); }
+  }
+  return false;
+}
+const SUPABASE_SDK_READY = await loadSupabaseSdk();
+window.addEventListener('error', event => console.error('DANEGRAM interface error:', event.message));
+window.addEventListener('unhandledrejection', event => console.error('DANEGRAM background error:', event.reason));
+const SUPABASE_URL = 'https://sleyfngpotttsfzwlikq.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_98Z4hCVNhz8IOR0YNKuIwQ_NNxmzfby';
+const supabaseClient = SUPABASE_SDK_READY ? window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY) : null;
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const store={get(k,d){try{return JSON.parse(localStorage.getItem('danegram_'+k))??d}catch{return d}},set(k,v){localStorage.setItem('danegram_'+k,JSON.stringify(v))}};
+let user=null, currentSession=null;
+document.body.classList.add('auth-required');
+let posts=[], currentPage='home', saved=store.get('saved',[]), following=store.get('following',[]), notifications=store.get('notifications',[]), groups=store.get('groups',[]), activeGroup=null;
+function safe(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function name(){return user?.name||'DANEGRAM Member'} function initials(n){return (n||'DG').split(/\s+/).slice(0,2).map(x=>x[0]).join('').toUpperCase()}
+function avatar(n,cl=''){return `<span class="avatar ${cl}">${safe(initials(n))}</span>`}
+function openModal(title,body){$('#modalTitle').textContent=title;$('#modalBody').innerHTML=body;$('#modalBackdrop').classList.add('show')}
+function closeModal(){$('#modalBackdrop').classList.remove('show')}
+window.closeModal=closeModal;
+function postCard(p){return `<article class="card post" data-post="${p.id}"><div class="post-head">${avatar(p.name)}<div><div class="post-author">${safe(p.name)}</div><div class="post-meta">${safe(p.time)} · 🌐</div></div><button class="more" data-action="more" data-id="${p.id}">•••</button></div><div class="post-text">${safe(p.text)}</div>${p.media?`<img class="post-media" src="${p.media}" alt="Post media">`:''}<div class="post-stats"><span>👍 ${p.likes} reactions</span><span>${p.comments.length} comments · 0 shares</span></div><div class="post-actions"><button data-action="like" data-id="${p.id}" class="${p.liked?'liked':''}">${p.liked?'👍 Liked':'👍 Like'}</button><button data-action="comment" data-id="${p.id}">▢ Comment</button><button data-action="share" data-id="${p.id}">↗ Share</button><button data-action="save" data-id="${p.id}">🔖 Save</button></div><div class="comment-list">${p.comments.slice(-3).map(c=>`<div class="comment"><b>${safe(c.name)}</b>${safe(c.text)}</div>`).join('')}</div><div class="comment-box">${avatar(name())}<input aria-label="Write a comment" placeholder="Write a comment…" data-comment-input="${p.id}"><button class="primary" data-action="sendcomment" data-id="${p.id}">Send</button></div></article>`}
+function homePage(){return `<section class="card stories"><div class="story add" id="addStory"><div class="addcircle">＋</div><strong>Create story</strong></div><div class="story" data-story="Amara M."><span class="story-avatar">AM</span>Amara M.</div><div class="story" data-story="Joseph O."><span class="story-avatar">JO</span>Joseph O.</div><div class="story" data-story="Fatima K."><span class="story-avatar">FK</span>Fatima K.</div><div class="story" data-story="Daniel A."><span class="story-avatar">DA</span>Daniel A.</div></section><section class="card composer"><div class="composer-top">${avatar(name())}<button class="composer-input" id="composerOpen">What's on your mind, ${safe(name().split(' ')[0])}?</button></div><div class="composer-actions"><button id="photoPost">▧ Photo/video</button><button id="livePost">🔴 Live video</button><button id="feelingPost">☺ Feeling/activity</button></div></section><div class="section-heading">Your feed</div>${posts.slice().reverse().map(postCard).join('')}`}
+
+function groupsPage(){
+ return `<div class="section-heading">Groups & Communities</div>
+ <div class="card right-card"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><div><b>Find your people</b><div class="small muted">Create a group or join a community around shared interests.</div></div><button class="primary" id="createGroup">＋ Create group</button></div>
+ <div class="field" style="margin-top:13px;margin-bottom:0"><input id="groupSearch" placeholder="Search groups by name or category…"></div></div>
+ <div id="groupsList">${groups.map(groupCard).join('')}</div>`;
+}
+function groupCard(g){
+ return `<div class="card group-card"><div class="group-art">♧</div><div style="min-width:0;flex:1"><h3>${safe(g.title)}</h3><p>${safe(g.description)}</p><div class="small muted">${safe(g.category)} · ${g.members} members</div></div><div class="group-actions"><button class="secondary" data-group-open="${g.id}">View</button><button class="${g.joined?'secondary':'primary'}" data-group-join="${g.id}">${g.joined?'Joined':'Join'}</button></div></div>`;
+}
+function groupRoomPage(){
+ const g=groups.find(x=>x.id===activeGroup)||groups[0];
+ if(!g)return `<div class="card empty">Choose a group first.</div>`;
+ return `<div class="card group-room"><div class="group-room-head"><div><div class="section-heading" style="margin:0">${safe(g.title)}</div><div class="small muted">${g.members} members · ${safe(g.category)}</div></div><button class="secondary" id="backGroups">← All groups</button></div><p>${safe(g.description)}</p><div class="notice">Group posts, member roles, group chat, files and announcements will become shared real-time features after Supabase is connected. This preview stores group membership only in this browser.</div><button class="${g.joined?'secondary':'primary'}" id="roomJoin">${g.joined?'Leave group':'Join group'}</button></div><div class="card composer"><div class="composer-top">${avatar(name())}<button class="composer-input" id="groupPostOpen">Write something to this group…</button></div></div><div class="card empty">No group posts yet. Be the first to start a conversation.</div>`;
+}
+function callsPage(){
+ return `<div class="section-heading">Voice & Video Calls</div><div class="card right-card"><p class="muted">Start a one-to-one voice or video call. Group calling can be added in the calling phase.</p><div class="gridcards"><div class="card feature-card"><div class="bigicon">📹</div><h3>Video call</h3><p>Camera and microphone call interface.</p><button class="primary full" style="margin-top:12px" id="startVideoCall">Start video call</button></div><div class="card feature-card"><div class="bigicon">📞</div><h3>Voice call</h3><p>Microphone-only call interface.</p><button class="primary full" style="margin-top:12px" id="startVoiceCall">Start voice call</button></div></div><div class="notice">Important: the call screen below can request camera/microphone permission, but a real call between two different users requires a signalling service, STUN/TURN servers and authenticated call invitations. Those backend pieces are not connected in this HTML preview.</div></div>`;
+}
+function startCall(kind){
+ openModal(kind==='video'?'Start video call':'Start voice call',`<div class="call-panel"><div class="call-status" id="callStatus">Ready to start · ${kind==='video'?'Video':'Voice'} call</div><div class="call-avatar">${safe(initials(name()))}</div><h2 style="margin:0">DANEGRAM Call</h2><p class="call-status">Waiting for backend signalling connection</p><div class="call-controls"><button id="toggleMic" title="Microphone">🎙️</button>${kind==='video'?'<button id="toggleCam" title="Camera">📷</button>':''}<button id="endCall" class="end" title="End call">☎</button></div></div><div class="notice">This is a call-interface preview. It does not yet connect to another person. We will implement real WebRTC calling after Supabase signalling and TURN configuration.</div>`);
+ let stream=null, micOn=true, camOn=kind==='video';
+ const status=$('#callStatus');
+ const stop=()=>{if(stream)stream.getTracks().forEach(t=>t.stop());closeModal()};
+ const media=kind==='video'?{audio:true,video:true}:{audio:true};
+ if(navigator.mediaDevices?.getUserMedia){
+  navigator.mediaDevices.getUserMedia(media).then(s=>{stream=s;if(status)status.textContent='Local microphone/camera permission granted · No remote participant connected';}).catch(()=>{if(status)status.textContent='Permission not granted. You can still close this preview.'});
+ }else if(status)status.textContent='Camera/microphone API unavailable in this browser context.';
+ $('#toggleMic')?.addEventListener('click',e=>{micOn=!micOn;if(stream)stream.getAudioTracks().forEach(t=>t.enabled=micOn);e.currentTarget.textContent=micOn?'🎙️':'🔇'});
+ $('#toggleCam')?.addEventListener('click',e=>{camOn=!camOn;if(stream)stream.getVideoTracks().forEach(t=>t.enabled=camOn);e.currentTarget.textContent=camOn?'📷':'🚫'});
+ $('#endCall')?.addEventListener('click',stop);
+}
+
+function pageTemplate(title,sub,items){return `<div class="section-heading">${title}</div><div class="card right-card"><p class="muted">${sub}</p><div class="gridcards">${items.map(x=>`<div class="card feature-card"><div class="bigicon">${x[0]}</div><h3>${x[1]}</h3><p>${x[2]}</p></div>`).join('')}</div></div>`}
+function render(){let m=$('#mainContent');if(currentPage==='home')m.innerHTML=homePage();else if(currentPage==='profile')m.innerHTML=`<div class="card"><div class="profile-cover"></div><div class="profile-info">${avatar(name())}<h2>${safe(name())}</h2><div class="muted">@${safe((user?.username||'danegrammember'))}</div><p>${safe(user?.bio||'Welcome to my DANEGRAM profile.')}</p><div class="profile-stats"><span><b>${posts.length}</b> posts</span><span><b>${following.length}</b> following</span><span><b>0</b> followers</span></div><button class="primary" id="editProfile">Edit profile</button></div></div><div class="section-heading">Your posts</div>${posts.filter(p=>p.name===name()).map(postCard).join('')||'<div class="card empty">Your posts will appear here.</div>'}`;
+else if(currentPage==='friends')m.innerHTML=pageTemplate('Friends','Find people, follow their updates and build real connections.',[['👥','Friend requests','Review connection requests.'],['🔎','Find friends','Discover people you may know.'],['➕','Suggested people','Meet members with shared interests.']]);
+else if(['groups','communities'].includes(currentPage))m.innerHTML=groupsPage();
+else if(currentPage==='group-room')m.innerHTML=groupRoomPage(); 
+else if(currentPage==='calls')m.innerHTML=callsPage();
+else if(['watch','video'].includes(currentPage))m.innerHTML=pageTemplate('DANEGRAM Watch','Discover short videos and video posts from the community.',[['▶','Short videos','A dedicated vertical video experience will connect here.'],['🎬','Following','Videos from creators you follow.'],['🔥','Trending','Popular videos and topics.']]);
+else if(currentPage==='marketplace')m.innerHTML=pageTemplate('Marketplace','Discover products and services from businesses and community sellers.',[['🛍️','Browse items','Explore products listed by sellers.'],['＋','Create listing','Seller tools will be enabled after backend setup.'],['📦','Your orders','Track purchases and sales.'],['🏪','Business Manager','Manage your business presence.']]);
+else if(currentPage==='events')m.innerHTML=pageTemplate('Events','Discover online and local events and manage your invitations.',[['📅','Upcoming events','See events from your communities.'],['＋','Create event','Create an event for your audience.']]);
+else if(currentPage==='pages')m.innerHTML=pageTemplate('Pages','Follow public figures, creators, organisations and businesses.',[['⭐','Creator pages','Discover creators and their work.'],['🏢','Business pages','Connect with brands and services.']]);
+else if(currentPage==='gaming')m.innerHTML=pageTemplate('Gaming','A place for game communities, streams and friendly competition.',[['🎮','Game communities','Join gaming conversations.'],['🏆','Tournaments','Competition features are planned.']]);
+else if(currentPage==='saved')m.innerHTML=`<div class="section-heading">Saved</div><div class="card empty">Saved posts will appear here. Use Save on any post to keep it for later.</div>`;
+else if(currentPage==='memories')m.innerHTML=pageTemplate('Memories','Look back on moments and posts you choose to revisit.',[['◷','On this day','Your memories will appear here.']]);
+else if(currentPage==='creators')m.innerHTML=pageTemplate('Creator Connect','Creator profiles, brand collaborations and monetization tools.',[['⭐','Creator profile','Build your public creator presence.'],['🤝','Collaboration opportunities','Connect with brands and other creators.'],['💰','Creator earnings','Gifts, subscriptions and payouts will require secure payment integration.']]);
+else if(currentPage==='business')m.innerHTML=pageTemplate('Business Manager','Manage customers, orders, promotions and business activities.',[['🏪','Business profile','Create and manage your business page.'],['📣','Promotions','Reach audiences with sponsored content.'],['📊','Insights','Understand your audience and performance.']]);
+else if(currentPage==='learn')m.innerHTML=pageTemplate('Learn & Earn','Courses, learning paths and progress tracking. Rewards will only apply to funded, approved activities.',[['📚','Courses','Learn useful skills at your own pace.'],['🎓','Learning progress','Track your course progress.'],['🏅','Eligible rewards','Clear rules and genuine funding required.']]);
+else if(currentPage==='booking')m.innerHTML=pageTemplate('Booking Manager','Manage appointments, reservations and service availability.',[['📅','My bookings','View and manage appointments.'],['🗓️','Availability','Set available booking times.']]);
+else if(currentPage==='support')m.innerHTML=pageTemplate('Support Connect','Get help, receive important updates and track support requests.',[['🎧','Help centre','Find answers and contact support.'],['📩','My requests','Track your support cases.']]);
+else if(currentPage==='notifications')m.innerHTML=`<div class="section-heading">Notifications</div><div class="card right-card">${(notifications.length?notifications:['Welcome to DANEGRAM. Complete your profile to get started.','Your community is waiting — make your first post.']).map(n=>`<div class="contact">🔔 <span>${safe(n)}</span></div>`).join('')}</div>`;
+else if(currentPage==='messages')m.innerHTML=`<div class="section-heading">Messenger</div><div class="card chat-layout"><div class="chat-list"><b>Chats</b><p class="small muted">Your conversations</p><button class="secondary full" id="newChat">＋ New chat</button></div><div class="chat-window"><div class="empty">Select a conversation or start a new chat.</div><div class="chat-send"><input placeholder="Message…" disabled><button class="primary" disabled>Send</button></div></div></div>`;
+else m.innerHTML=pageTemplate('DANEGRAM','Connect, share and grow together.',[['🌍','Community','Find your people.']]);
+$$('[data-page]').forEach(b=>b.classList.toggle('active',b.dataset.page===currentPage));bindPage()}
+function bindPage(){
+$('#createGroup')?.addEventListener('click',createGroup);
+$('#groupSearch')?.addEventListener('input',e=>{let q=e.target.value.toLowerCase();$('#groupsList').innerHTML=groups.filter(g=>(g.title+' '+g.category+' '+g.description).toLowerCase().includes(q)).map(groupCard).join('')||'<div class="card empty">No matching groups found.</div>';bindGroupButtons()});
+bindGroupButtons();
+$('#backGroups')?.addEventListener('click',()=>go('groups'));
+$('#roomJoin')?.addEventListener('click',()=>{let g=groups.find(x=>x.id===activeGroup);if(g){g.joined=!g.joined;g.members+=g.joined?1:-1;store.set('groups',groups);render()}});
+$('#groupPostOpen')?.addEventListener('click',()=>openModal('Group post','<p class="muted">Group posting will be enabled when shared group data is connected.</p>'));
+$('#startVideoCall')?.addEventListener('click',()=>startCall('video'));
+$('#startVoiceCall')?.addEventListener('click',()=>startCall('voice'));
+$('#composerOpen')?.addEventListener('click',()=>createPost());$('#photoPost')?.addEventListener('click',()=>createPost(true));$('#addStory')?.addEventListener('click',()=>openModal('Create a story','<p class="muted">Stories will be enabled when media storage is connected.</p><button class="primary full" onclick="closeModal()">Got it</button>'));
+$('#editProfile')?.addEventListener('click',editProfile);$('#newChat')?.addEventListener('click',()=>openModal('Start a conversation','<div class="field"><label>Find a member</label><input placeholder="Search by name or username"></div><p class="muted small">Real member search and messaging will be connected to the backend.</p>'));
+$$('[data-action]').forEach(b=>b.addEventListener('click',()=>postAction(b.dataset.action,b.dataset.id)));
+$$('[data-comment-input]').forEach(i=>i.addEventListener('keydown',e=>{if(e.key==='Enter')sendComment(i.dataset.commentInput,i.value)}));
+$$('[data-story]').forEach(s=>s.addEventListener('click',()=>openModal('Story',`<p>${safe(s.dataset.story)}'s story viewer will be available when stories are connected.</p>`)));
+}
+function bindGroupButtons(){
+ $$('[data-group-open]').forEach(b=>b.addEventListener('click',()=>{activeGroup=+b.dataset.groupOpen;go('group-room')}));
+ $$('[data-group-join]').forEach(b=>b.addEventListener('click',()=>{let g=groups.find(x=>x.id===+b.dataset.groupJoin);if(g){g.joined=!g.joined;g.members+=g.joined?1:-1;store.set('groups',groups);render()}}));
+}
+function createGroup(){
+ openModal('Create a group',`<div class="field"><label>Group name</label><input id="newGroupName" maxlength="60" placeholder="e.g. DANEGRAM Creators"></div><div class="field"><label>Description</label><textarea id="newGroupDescription" maxlength="240" placeholder="What is this group about?"></textarea></div><div class="field"><label>Category</label><select id="newGroupCategory"><option>General</option><option>Creators</option><option>Learning</option><option>Business</option><option>Sports</option><option>Arts & culture</option><option>Technology</option></select></div><div class="notice">Demo groups are stored in this browser only. Real public/private groups, roles, moderation and member lists will use Supabase.</div><button class="primary full" id="saveNewGroup">Create group</button>`);
+ $('#saveNewGroup').onclick=()=>{let title=$('#newGroupName').value.trim();if(!title){alert('Enter a group name.');return}let g={id:Date.now(),title,description:$('#newGroupDescription').value.trim()||'A new DANEGRAM community.',category:$('#newGroupCategory').value,members:1,joined:true};groups.unshift(g);store.set('groups',groups);activeGroup=g.id;closeModal();go('group-room')};
+}
+function createPost(){
+ if(!user || !currentSession){openModal('Sign in required','<p>Please log in to publish a post.</p>');return}
+ openModal('Create post',`<div class="composer-top" style="margin-bottom:12px">${avatar(name())}<b>${safe(name())}</b></div><div class="field"><textarea id="postText" maxlength="5000" placeholder="What's on your mind? Share an update with your community…"></textarea></div><div class="notice">Text posts are saved to your DANEGRAM account and shared feed. Photo and video posting will be connected separately.</div><div id="postMessage" class="small muted" role="status"></div><div class="modal-actions"><button class="primary" id="publishPost">Publish post</button></div>`);
+ $('#publishPost').onclick=publishPost;
+}
+async function publishPost(){
+ const text=$('#postText')?.value.trim()||'';
+ const message=$('#postMessage'),button=$('#publishPost');
+ if(!text){message.textContent='Write something before publishing.';return}
+ if(!supabaseClient || !currentSession || !user){message.textContent='Your secure session is unavailable. Please log in again.';return}
+ button.disabled=true;button.textContent='Publishing…';message.textContent='Saving your post…';
+ try{
+  const {error}=await supabaseClient.from('posts').insert({user_id:user.id,content:text,media_type:'text',visibility:'public'});
+  if(error) throw error;
+  await loadSharedPosts();
+  closeModal();currentPage='home';render();
+ }catch(error){message.textContent=error.message||'Could not publish your post. Please try again.';button.disabled=false;button.textContent='Publish post'}
+}
+async function loadSharedPosts(){
+ if(!supabaseClient || !currentSession || !user){posts=[];return}
+ const {data,error}=await supabaseClient.from('posts').select('id,user_id,content,media_url,media_type,created_at').order('created_at',{ascending:false}).limit(50);
+ if(error){console.error('DANEGRAM feed load:',error.message);posts=[];return}
+ const rows=data||[];
+ const ids=[...new Set(rows.map(row=>row.user_id).filter(Boolean))];
+ let profiles=[];
+ if(ids.length){const result=await supabaseClient.from('profiles').select('id,display_name,username').in('id',ids);if(!result.error)profiles=result.data||[];else console.warn('DANEGRAM post author lookup:',result.error.message)}
+ const byId=new Map(profiles.map(profile=>[profile.id,profile]));
+ posts=rows.map((row,index)=>{
+  const profile=byId.get(row.user_id)||{};
+  const author=profile.display_name||profile.username||'DANEGRAM Member';
+  const date=row.created_at?new Date(row.created_at):new Date();
+  return {id:index+1,dbId:row.id,userId:row.user_id,name:author,initial:initials(author),time:date.toLocaleString(),text:row.content||'',likes:0,liked:false,comments:[],media:'',mediaType:row.media_type||'text'};
+ });
+}
+function postAction(action,id){let p=posts.find(x=>x.id===id);if(!p)return;if(action==='like'){p.liked=!p.liked;p.likes+=p.liked?1:-1;store.set('posts',posts);render()}if(action==='comment'){document.querySelector(`[data-comment-input="${id}"]`)?.focus()}if(action==='sendcomment'){let input=document.querySelector(`[data-comment-input="${id}"]`);sendComment(id,input?.value||'')}if(action==='save'){if(!saved.includes(id))saved.push(id);store.set('saved',saved);alert('Saved to your list.')}if(action==='share'){if(navigator.share)navigator.share({title:'DANEGRAM post',text:p.text}).catch(()=>{});else{navigator.clipboard?.writeText(p.text);alert('Post text copied (if clipboard access is available).')}}if(action==='more')openModal('Post options',`<p>Choose an action for this post.</p><button class="secondary full" id="reportPost">Report post</button><br><br><button class="secondary full" id="hidePost">Hide post</button>`)}
+function sendComment(id,text){if(!text.trim())return;let p=posts.find(x=>x.id===id);p.comments.push({name:name(),text:text.trim()});store.set('posts',posts);render()}
+function editProfile(){
+ openModal('Edit profile',`<div class="field"><label>Full name</label><input id="editName" maxlength="80" value="${safe(user?.name||'')}"></div><div class="field"><label>Username</label><input id="editUsername" minlength="3" maxlength="24" value="${safe(user?.username||'')}"><div class="small muted">3–24 letters, numbers or underscores.</div></div><div class="field"><label>Bio</label><textarea id="editBio" maxlength="300">${safe(user?.bio||'')}</textarea></div><button class="primary full" id="saveProfile">Save changes</button><div id="profileSaveMessage" class="small muted" style="margin-top:8px"></div>`);
+ $('#saveProfile').onclick=async()=>{
+   const display_name=$('#editName').value.trim(),username=$('#editUsername').value.trim().toLowerCase(),bio=$('#editBio').value.trim();
+   const message=$('#profileSaveMessage'),button=$('#saveProfile');
+   if(!display_name){message.textContent='Enter your full name.';return}
+   if(!/^[a-z0-9_]{3,24}$/.test(username)){message.textContent='Username must contain 3–24 letters, numbers or underscores.';return}
+   if(!supabaseClient){message.textContent='The secure profile service is not available. Refresh and try again.';return}
+   button.disabled=true;message.textContent='Saving your profile…';
+   const {data,error}=await supabaseClient.from('profiles').update({display_name,username,bio})
+     .eq('id',user.id).select('id,username,display_name,bio,avatar_url,cover_url').single();
+   if(error){message.textContent=error.message;button.disabled=false;return}
+   user={...user,name:data.display_name,username:data.username,bio:data.bio||''};
+   $('#sideName').textContent=name();closeModal();render();
+ };
+}
+function showAccount(){
+ openModal('Your account',`${user?`<p>Signed in as <b>${safe(name())}</b>.</p><p class="small muted">${safe(user.email||'')}</p><button class="secondary full" id="profileGo">View profile</button><br><br><button class="secondary full" id="securityGo">Security & privacy</button><br><br><button class="secondary full" id="logoutBtn">Log out</button>`:`<p>Join DANEGRAM to create a profile and start connecting.</p><button class="primary full" id="signupOpen">Create account</button><br><br><button class="secondary full" id="loginOpen">Log in</button>`}<div class="notice">Your DANEGRAM account is managed by Supabase Authentication. Feed, messaging and other shared social features are being connected in stages.</div>`);
+ $('#signupOpen')?.addEventListener('click',()=>authForm('signup'));
+ $('#loginOpen')?.addEventListener('click',()=>authForm('login'));
+ $('#profileGo')?.addEventListener('click',()=>{closeModal();go('profile')});
+ $('#securityGo')?.addEventListener('click',securityModal);
+ $('#logoutBtn')?.addEventListener('click',async()=>{
+   if(!supabaseClient){alert('The secure sign-in service is not available. Refresh and try again.');return}
+   const {error}=await supabaseClient.auth.signOut();
+   if(error){alert('Could not log out: '+error.message);return}
+   user=null;currentSession=null;document.body.classList.add('auth-required');
+   $('#sideName').textContent='DANEGRAM Member';closeModal();render();
+ });
+}
+async function syncMemberProfile(authUser){
+ const metadata=authUser.user_metadata||{};
+ let {data:profile,error:readError}=await supabaseClient.from('profiles')
+   .select('id,username,display_name,bio,avatar_url,cover_url')
+   .eq('id',authUser.id).maybeSingle();
+ if(readError) console.warn('DANEGRAM profile lookup:',readError.message);
+ const fallbackUsername=('member_'+authUser.id.replace(/-/g,'').slice(0,10)).toLowerCase();
+ const wantedUsername=(profile?.username||metadata.username||fallbackUsername).toLowerCase();
+ const wantedName=profile?.display_name||metadata.display_name||metadata.full_name||
+   (authUser.email?authUser.email.split('@')[0]:'DANEGRAM Member');
+ if(profile && (!profile.username || !profile.display_name)){
+   const updates={};
+   if(!profile.username) updates.username=wantedUsername;
+   if(!profile.display_name) updates.display_name=wantedName;
+   const {data:updated,error:updateError}=await supabaseClient.from('profiles')
+     .update(updates).eq('id',authUser.id)
+     .select('id,username,display_name,bio,avatar_url,cover_url').maybeSingle();
+   if(updateError) console.warn('DANEGRAM profile update:',updateError.message);
+   if(updated) profile=updated;
+ }
+ return {
+   id:authUser.id,
+   name:profile?.display_name||wantedName,
+   username:profile?.username||wantedUsername,
+   email:authUser.email||'',
+   bio:profile?.bio||'',
+   avatar_url:profile?.avatar_url||'',
+   cover_url:profile?.cover_url||''
+ };
+}
+async function applyAuthSession(session){
+ currentSession=session||null;
+ if(session?.user){
+   user=await syncMemberProfile(session.user);
+   document.body.classList.remove('auth-required');
+   $('#sideName').textContent=name();
+   await loadSharedPosts();
+ }else{
+   user=null;posts=[];
+   document.body.classList.add('auth-required');
+   $('#sideName').textContent='DANEGRAM Member';
+ }
+ render();
+}
+async function initializeSupabaseAuth(){
+ if(!supabaseClient){
+   document.body.classList.add('auth-required');
+   render();
+   console.error('DANEGRAM could not load the Supabase library. Check your internet connection and try again.');
+   return;
+ }
+ const {data,error}=await supabaseClient.auth.getSession();
+ if(error) console.error('DANEGRAM session check:',error.message);
+ await applyAuthSession(data?.session||null);
+ supabaseClient.auth.onAuthStateChange((_event,session)=>{
+   setTimeout(()=>applyAuthSession(session),0);
+ });
+}
+function authForm(type){
+ const isSignup=type==='signup';
+ openModal(isSignup?'Create your DANEGRAM account':'Log in to DANEGRAM',
+ `<form id="authForm" novalidate>
+  ${isSignup?`<div class="field"><label for="authName">Full name</label><input id="authName" autocomplete="name" maxlength="80" placeholder="Your full name" required></div>
+  <div class="field"><label for="authUser">Username</label><input id="authUser" autocomplete="username" minlength="3" maxlength="24" pattern="[A-Za-z0-9_]+" placeholder="Choose a username" required><div class="small muted">Use 3–24 letters, numbers or underscores.</div></div>`:''}
+  <div class="field"><label for="authEmail">Email address</label><input id="authEmail" type="email" autocomplete="email" placeholder="name@example.com" required></div>
+  <div class="field"><label for="authPass">Password</label><input id="authPass" type="password" autocomplete="${isSignup?'new-password':'current-password'}" minlength="8" placeholder="${isSignup?'At least 8 characters':'Your password'}" required></div>
+  <button class="primary full" id="authSubmit" type="submit">${isSignup?'Create DANEGRAM account':'Log in'}</button>
+  <div id="authMessage" class="notice" role="status">Use an email address you can access. ${isSignup?'Email confirmation may be required before your first login.':''}</div>
+ </form>`);
+ $('#authForm').addEventListener('submit',async e=>{
+   e.preventDefault();
+   if(!supabaseClient){ $('#authMessage').textContent='DANEGRAM could not load its secure sign-in service. Check your internet connection, refresh, and try again.'; return; }
+   const button=$('#authSubmit'),message=$('#authMessage');
+   const email=$('#authEmail').value.trim().toLowerCase();
+   const password=$('#authPass').value;
+   const fullName=$('#authName')?.value.trim()||'';
+   const username=$('#authUser')?.value.trim().toLowerCase()||'';
+   if(!email||!password){message.textContent='Enter your email address and password.';return}
+   if(password.length<8){message.textContent='Your password must contain at least 8 characters.';return}
+   if(isSignup){
+     if(!fullName){message.textContent='Enter your full name.';return}
+     if(!/^[a-z0-9_]{3,24}$/.test(username)){message.textContent='Choose a username using 3–24 letters, numbers or underscores.';return}
+   }
+   button.disabled=true;button.textContent=isSignup?'Creating account…':'Logging in…';
+   message.textContent='Please wait while DANEGRAM securely checks your account.';
+   try{
+     if(isSignup){
+       const {data,error}=await supabaseClient.auth.signUp({
+         email,password,
+         options:{
+           data:{display_name:fullName,full_name:fullName,username},
+           emailRedirectTo:'https://danegram.pages.dev'
+         }
+       });
+       if(error) throw error;
+       if(data.session){
+         await applyAuthSession(data.session);
+         closeModal();
+         alert('Your DANEGRAM account has been created and you are signed in.');
+       }else{
+         message.textContent='Your registration was submitted. Check your email for the confirmation link. After confirming, return to DANEGRAM and log in. Keep your password private.';
+         button.disabled=false;button.textContent='Create DANEGRAM account';
+       }
+     }else{
+       const {data,error}=await supabaseClient.auth.signInWithPassword({email,password});
+       if(error) throw error;
+       await applyAuthSession(data.session);
+       closeModal();
+     }
+   }catch(error){
+     message.textContent=error.message||'We could not complete that request. Please check your details and try again.';
+     button.disabled=false;button.textContent=isSignup?'Create DANEGRAM account':'Log in';
+   }
+ });
+}
+function securityModal(){openModal('Security & Trust Centre',`<div class="contact">🛡️ Fake-account detection <span class="muted small">Planned</span></div><div class="contact">🚩 Impersonation reporting <span class="muted small">Planned</span></div><div class="contact">⛔ Account blocking <span class="muted small">Planned</span></div><div class="contact">🔐 Two-factor authentication <span class="muted small">Planned</span></div><div class="contact">🔔 Suspicious-login alerts <span class="muted small">Planned</span></div><div class="contact">🧑 Human verification appeals <span class="muted small">Planned</span></div><div class="contact">📱 Active session management <span class="muted small">Planned</span></div><div class="notice">These protections require server-side authentication, database policies, risk checks and human moderation workflows. A front-end switch alone cannot secure an account.</div>`)}
+function go(p){currentPage=p;render();window.scrollTo({top:0,behavior:'smooth'})}
+$$('[data-page]').forEach(b=>b.addEventListener('click',()=>go(b.dataset.page)));
+$('#createBtn').onclick=()=>createPost();$('#messengerBtn').onclick=()=>go('messages');$('#notifyBtn').onclick=()=>go('notifications');$('#accountBtn').onclick=showAccount;$('#gateSignup').onclick=()=>authForm('signup');$('#gateLogin').onclick=()=>authForm('login');$('#modalClose').onclick=closeModal;$('#modalBackdrop').addEventListener('click',e=>{if(e.target.id==='modalBackdrop')closeModal()});
+$('#globalSearch').addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.value.trim()){openModal('Search DANEGRAM',`<p>Search for <b>${safe(e.target.value.trim())}</b></p><p class="muted">People, posts, pages, groups and marketplace search will be connected to Supabase.</p>`)}});
+$('#reportHelp').onclick=()=>openModal('Safety & reporting',`<p>Report impersonation, harassment, scams, harmful content or suspicious accounts.</p><div class="field"><label>What would you like to report?</label><select><option>Impersonation</option><option>Harassment or bullying</option><option>Scam or fraud</option><option>Harmful content</option><option>Other safety concern</option></select></div><div class="field"><label>Details</label><textarea placeholder="Tell us what happened…"></textarea></div><div class="notice">Report submission and human review will be connected to the secure backend.</div><button class="primary full" onclick="closeModal()">Close preview</button>`);
+render();
+initializeSupabaseAuth();
+})().catch(error=>{console.error('DANEGRAM startup error:',error);document.body.classList.add('auth-required');const gate=document.querySelector('.auth-gate');if(gate){const note=document.createElement('p');note.className='auth-disclaimer';note.textContent='DANEGRAM could not finish loading. Please refresh and try again.';gate.querySelector('.auth-card')?.appendChild(note);}});
+</script>
+</body>
+</html>
