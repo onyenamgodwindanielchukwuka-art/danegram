@@ -1,0 +1,1303 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#ffffff">
+<title>DANEGRAM — Connect with your world</title>
+<style>
+:root{--blue:#1769e0;--blue2:#0f5bc7;--bg:#f0f2f5;--card:#fff;--text:#1c1e21;--muted:#65676b;--line:#e4e6eb;--soft:#e7f3ff;--green:#31a24c;--shadow:0 1px 2px rgba(0,0,0,.12);--radius:12px}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:15px/1.4 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}button,input,textarea,select{font:inherit}button{cursor:pointer;border:0}a{color:inherit;text-decoration:none}
+.topbar{height:60px;background:var(--card);display:flex;align-items:center;justify-content:space-between;padding:0 18px;position:sticky;top:0;z-index:20;box-shadow:var(--shadow);gap:16px}
+.brand-area{display:flex;align-items:center;gap:10px;min-width:250px}.logo{width:42px;height:42px;border-radius:50%;background:var(--blue);color:white;display:grid;place-items:center;font-weight:900;font-size:25px;letter-spacing:-2px}.brand{font-size:25px;font-weight:850;letter-spacing:-1.3px;color:var(--blue)}.searchbox{height:40px;background:var(--bg);border-radius:24px;display:flex;align-items:center;padding:0 14px;gap:8px;width:250px}.searchbox input{border:0;outline:0;background:transparent;width:100%;min-width:0}.topnav{display:flex;align-items:center;justify-content:center;gap:8px;flex:1;height:100%}.topnav button{height:48px;min-width:68px;background:transparent;color:var(--muted);font-size:23px;border-radius:9px;position:relative}.topnav button.active{color:var(--blue)}.topnav button.active:after{content:"";height:3px;background:var(--blue);position:absolute;bottom:-6px;left:8px;right:8px;border-radius:4px}.top-actions{display:flex;gap:8px;align-items:center;min-width:250px;justify-content:flex-end}.premium-name-line{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.premium-star{display:inline-flex;align-items:center;justify-content:center;width:23px;height:23px;vertical-align:middle;flex:none}.premium-star svg{display:block;width:22px;height:22px;filter:drop-shadow(0 1px 1px rgba(40,90,180,.18))}.profile-info h2{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin:8px 0 2px}.circle-btn{width:40px;height:40px;border-radius:50%;background:#e4e6eb;color:#202124;font-size:19px;position:relative}.badge{position:absolute;right:-3px;top:-4px;background:#e41e3f;color:white;border:2px solid white;border-radius:12px;padding:1px 5px;font-size:10px;font-weight:700}.avatar{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,#8bb9ff,#315eaa);color:#fff;font-weight:800;flex:none;overflow:hidden}.avatar img{width:100%;height:100%;object-fit:cover}.layout{max-width:1440px;margin:18px auto;display:grid;grid-template-columns:260px minmax(0,680px) 300px;gap:22px;padding:0 16px}.leftcol,.rightcol{position:sticky;top:78px;align-self:start;max-height:calc(100vh - 90px);overflow:auto}.sideitem{display:flex;align-items:center;gap:12px;padding:10px;border-radius:9px;font-weight:650;color:#303238;cursor:pointer}.sideitem:hover{background:#e4e6eb}.sideicon{width:30px;text-align:center;font-size:21px}.side-section{border-top:1px solid #d5d8de;margin-top:12px;padding-top:12px}.side-title{font-weight:750;color:var(--muted);padding:5px 10px 8px}.maincol{min-width:0}.card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:16px;overflow:hidden}.composer{padding:14px}.composer-top{display:flex;align-items:center;gap:10px}.composer-input{flex:1;border:0;background:var(--bg);border-radius:22px;padding:11px 16px;text-align:left;color:var(--muted)}.composer-actions{display:flex;border-top:1px solid var(--line);margin-top:13px;padding-top:10px;justify-content:space-around}.composer-actions button{background:transparent;color:var(--muted);font-weight:650;padding:7px 10px;border-radius:8px}.composer-actions button:hover{background:var(--bg)}.stories{padding:12px;display:flex;gap:10px;overflow:auto}.story{width:112px;height:175px;border-radius:12px;flex:none;position:relative;overflow:hidden;background:linear-gradient(145deg,#4267b2,#9bc1f4);color:white;display:flex;align-items:flex-end;padding:10px;font-weight:750;box-shadow:inset 0 -65px 55px rgba(0,0,0,.35);cursor:pointer}.story:nth-child(2){background:linear-gradient(145deg,#a54e88,#f3a6c5)}.story:nth-child(3){background:linear-gradient(145deg,#218c82,#8ad4bc)}.story:nth-child(4){background:linear-gradient(145deg,#a66a28,#e7c07b)}.story:nth-child(5){background:linear-gradient(145deg,#454d65,#9da7c5)}.story .story-avatar{position:absolute;top:9px;left:9px;width:37px;height:37px;border:3px solid var(--blue);border-radius:50%;background:#fff;color:var(--blue);display:grid;place-items:center}.story.add{background:#fff;color:var(--text);box-shadow:var(--shadow);padding:0;display:block}.story.add .addcircle{height:42px;width:42px;background:var(--blue);color:#fff;border-radius:50%;display:grid;place-items:center;font-size:27px;margin:85px auto 5px}.story.add strong{display:block;text-align:center}.post{padding:14px}.post-head{display:flex;align-items:center;gap:10px}.post-author{font-weight:750}.post-meta{font-size:12px;color:var(--muted)}.more{margin-left:auto;background:transparent;color:var(--muted);font-size:22px}.post-text{white-space:pre-wrap;margin:13px 0;font-size:15px}.post-media{width:100%;max-height:470px;object-fit:cover;background:#dfe5ee;display:block;border-radius:4px}.post-stats{display:flex;justify-content:space-between;color:var(--muted);font-size:13px;padding:10px 2px;border-bottom:1px solid var(--line)}.post-actions{display:flex;justify-content:space-around;padding-top:7px}.post-actions button{background:transparent;color:var(--muted);font-weight:700;flex:1;padding:8px;border-radius:7px}.post-actions button:hover{background:var(--bg)}.post-actions button.liked{color:var(--blue)}.comment-box{display:flex;gap:8px;margin-top:10px}.comment-box input{border:0;background:var(--bg);border-radius:20px;padding:9px 13px;flex:1;outline:0}.comment-list{margin-top:9px}.comment{background:var(--bg);border-radius:14px;padding:8px 12px;margin:6px 0;font-size:13px}.comment b{display:block;margin-bottom:2px}.right-card{padding:14px}.right-title{font-weight:800;margin-bottom:12px}.contact{display:flex;align-items:center;gap:10px;padding:7px 0;font-weight:650}.online{width:10px;height:10px;background:#31a24c;border:2px solid white;border-radius:50%;position:absolute;bottom:0;right:0}.avatar-wrap{position:relative}.muted{color:var(--muted)}.small{font-size:12px}.primary{background:var(--blue);color:white;border-radius:7px;padding:9px 15px;font-weight:700}.primary:hover{background:var(--blue2)}.secondary{background:#e4e6eb;color:#202124;border-radius:7px;padding:9px 15px;font-weight:700}.full{width:100%}.empty{padding:32px;text-align:center;color:var(--muted)}.section-heading{font-size:21px;font-weight:850;margin:8px 0 14px}.modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.48);z-index:200;display:none;align-items:center;justify-content:center;padding:16px}.modal-backdrop.show{display:flex;z-index:200}.modal{width:min(560px,100%);max-height:90vh;overflow:auto;background:white;border-radius:14px;box-shadow:0 8px 35px rgba(0,0,0,.25)}.modal-head{padding:15px 18px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;font-weight:850;font-size:19px}.close{background:#e4e6eb;border-radius:50%;width:34px;height:34px;font-size:20px}.modal-body{padding:17px}.field{margin-bottom:13px}.field label{display:block;font-weight:700;margin-bottom:6px}.field input,.field textarea,.field select{width:100%;border:1px solid #ccd0d5;border-radius:8px;padding:11px;outline-color:var(--blue)}.field textarea{min-height:110px;resize:vertical}.modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:12px}.tabs{display:flex;gap:5px;border-bottom:1px solid var(--line);margin-bottom:12px}.tabs button{background:transparent;padding:10px;color:var(--muted);font-weight:750}.tabs button.active{color:var(--blue);border-bottom:3px solid var(--blue)}.notice{background:#fff8e1;border:1px solid #f0d98b;color:#705b16;padding:11px;border-radius:8px;font-size:13px;margin:10px 0}.gridcards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.feature-card{padding:16px;min-height:125px}.feature-card .bigicon{font-size:28px}.feature-card h3{margin:7px 0 4px}.feature-card p{margin:0;color:var(--muted);font-size:13px}.profile-cover{height:150px;background:linear-gradient(120deg,#1769e0,#8bb9ff)}.profile-info{padding:0 18px 18px}.profile-info .avatar{width:90px;height:90px;border:4px solid white;margin-top:-45px;font-size:26px}.profile-stats{display:flex;gap:20px;color:var(--muted);font-size:13px;margin-top:10px}.chat-layout{display:grid;grid-template-columns:190px 1fr;min-height:350px}.chat-list{border-right:1px solid var(--line);padding:10px}.chat-window{padding:12px;display:flex;flex-direction:column;min-height:350px}.chat-messages{flex:1;overflow:auto;max-height:260px}.bubble{padding:9px 12px;border-radius:15px;background:var(--bg);margin:7px 0;max-width:85%;width:max-content}.bubble.mine{background:#dceaff;margin-left:auto}.chat-send{display:flex;gap:7px}.chat-send input{flex:1;min-width:0;border:0;background:var(--bg);border-radius:20px;padding:10px}.conversation-item{cursor:pointer}.chat-messages .bubble{overflow-wrap:anywhere}@media(max-width:650px){.chat-layout{grid-template-columns:1fr}.chat-list{border-right:0;border-bottom:1px solid var(--line);max-height:180px;overflow:auto}.chat-window{min-height:320px}.chat-messages{max-height:300px}}.mobile-menu{display:none}
+.topbar{display:flex;align-items:center;gap:18px;min-height:70px;padding:8px 22px}
+.brand-area{display:flex;align-items:center;gap:12px;flex:1;min-width:260px}
+.brand-area>div:nth-child(2){white-space:nowrap}
+.brand{font-weight:900;letter-spacing:-1px}
+.searchbox{flex:1;max-width:360px;min-width:150px}
+.topnav{flex:0 0 auto;display:flex;align-items:center;gap:10px}
+.topnav button{font-weight:900;font-size:25px;min-width:54px;height:48px}
+.top-actions{min-width:48px;flex:0 0 auto}
+.bottom-nav{position:fixed;left:0;right:0;bottom:0;z-index:40;display:flex;justify-content:center;align-items:stretch;gap:0;background:#fff;border-top:1px solid #dfe3e9;box-shadow:0 -2px 10px rgba(0,0,0,.08);padding:5px max(8px,env(safe-area-inset-right)) calc(5px + env(safe-area-inset-bottom)) max(8px,env(safe-area-inset-left))}
+.bottom-nav button{position:relative;display:flex;flex:1;max-width:180px;min-width:0;min-height:54px;flex-direction:column;align-items:center;justify-content:center;gap:1px;background:transparent;color:#303846;font-size:23px;font-weight:900;border-radius:10px}
+.bottom-nav button span{position:relative;line-height:1.1;font-weight:900}
+.bottom-nav button small{font-size:10px;font-weight:800;color:#535d6b}
+.bottom-nav button:hover,.bottom-nav button.active{background:#edf4ff;color:var(--blue)}
+.auth-gate{position:fixed;inset:0;z-index:100;background:linear-gradient(145deg,#eaf2ff,#f7f9fc 55%,#e8f0ff);display:none;align-items:center;justify-content:center;padding:22px}
+body.auth-required .auth-gate{display:flex}
+body.auth-required .topbar,body.auth-required .bottom-nav,body.auth-required .layout{visibility:hidden}
+.auth-gate-card{width:min(420px,100%);background:#fff;border-radius:22px;padding:30px 24px;box-shadow:0 12px 45px rgba(24,62,120,.16);text-align:center}
+.auth-gate-logo{width:64px;height:64px;border-radius:19px;background:var(--blue);color:#fff;display:grid;place-items:center;margin:0 auto 12px;font-size:38px;font-weight:950}
+.auth-gate-card h1{color:var(--blue);font-size:32px;letter-spacing:-1.5px;margin:0}
+.auth-tagline{font-weight:850;margin:0 0 16px}
+.auth-intro{color:var(--muted);line-height:1.55;margin:0 0 22px}
+.auth-gate-card .primary,.auth-gate-card .secondary{margin:6px 0;padding:13px}
+.auth-disclaimer{font-size:11px;color:#777f8c;line-height:1.45;margin:16px 0 0}
+.bottom-nav .badge{font-style:normal;right:-10px;top:-5px}
+body{padding-bottom:82px}
+footer{color:#8a8d91;font-size:12px;text-align:center;padding:12px}
+@media(max-width:1100px){.layout{grid-template-columns:220px minmax(0,680px)}.rightcol{display:none}.brand-area,.top-actions{min-width:190px}.searchbox{width:150px}}
+@media(max-width:760px){
+ .topbar{padding:7px 10px;height:auto;min-height:62px;gap:8px;flex-wrap:wrap}
+ .brand-area{min-width:0;flex:1;gap:8px}
+ .brand-area>div:nth-child(2){min-width:0}
+ .brand{font-size:20px;line-height:1.1}
+ .logo{width:35px;height:35px;flex:none}
+ .brand-area .small{font-size:10px;white-space:nowrap}
+ .searchbox{width:38px;min-width:38px;max-width:38px;height:38px;flex:0 0 38px;padding:0 10px;justify-content:center}
+ .searchbox input{display:none}
+ .topnav{gap:2px;flex:0 0 auto}
+ .topnav button{min-width:38px;width:38px;height:42px;font-size:22px}
+ .top-actions{min-width:38px}
+ .top-actions .circle-btn{width:36px;height:36px}
+ .layout{display:block;margin:10px auto;padding:0 8px 12px}
+ .leftcol{display:none}.maincol{width:100%}
+ .stories .story{width:100px;height:155px}
+ .composer-actions button{font-size:12px;padding:6px 3px}
+ .gridcards{grid-template-columns:1fr}
+ .chat-layout{grid-template-columns:110px 1fr}
+ .topnav button.active:after{bottom:-3px}
+ .bottom-nav{justify-content:space-around}
+ .bottom-nav button{min-height:52px;font-size:21px}
+ .bottom-nav button small{font-size:9px}
+}
+
+.group-card{padding:14px;display:flex;gap:12px;align-items:center}
+.group-art{width:76px;height:76px;border-radius:10px;background:linear-gradient(135deg,#1769e0,#9bc1f4);display:grid;place-items:center;color:white;font-size:30px;flex:none}
+.group-card h3{margin:0 0 4px}.group-card p{margin:0 0 8px;color:var(--muted);font-size:13px}
+.group-card .group-actions{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap}
+.call-panel{padding:20px;text-align:center;background:linear-gradient(145deg,#102b54,#1769e0);color:white;border-radius:12px;min-height:340px;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.call-avatar{width:110px;height:110px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.2);border:4px solid rgba(255,255,255,.65);font-size:38px;font-weight:850;margin:18px}
+.call-controls{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:22px}
+.call-controls button{width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,.2);color:white;font-size:20px}
+.call-controls button.end{background:#e53945}.call-status{font-size:13px;color:#d9e7ff}
+.group-room{padding:15px}.group-room-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+
+.topnav .topnav-symbol{display:inline-block;font-size:25px;line-height:1;font-weight:700;color:currentColor}
+.topnav .market-symbol{font-size:27px}
+
+/* Header action order: Create, Watch, Market, Settings (last). */
+.top-actions{display:flex!important;align-items:center!important;justify-content:flex-end!important;gap:12px!important;}
+.top-actions .top-action-icon{display:inline-flex!important;align-items:center!important;justify-content:center!important;}
+.top-actions .top-action-icon svg{width:23px!important;height:23px!important;fill:none!important;stroke:currentColor!important;stroke-width:1.8!important;stroke-linecap:round!important;stroke-linejoin:round!important;}
+</style>
+
+<style>
+/* DANEGRAM Premium visual system */
+.premium-star{width:22px;height:22px;margin-left:3px;filter:drop-shadow(0 0 5px rgba(218,160,20,.55));animation:dngStarGlow 2.2s ease-in-out infinite}
+.premium-star svg{width:22px;height:22px}
+@keyframes dngStarGlow{0%,100%{filter:drop-shadow(0 0 3px rgba(44,145,255,.55))}50%{filter:drop-shadow(0 0 9px rgba(44,145,255,.95))}}
+.premium-page-hero{padding:24px;border-radius:18px;background:radial-gradient(circle at 85% 15%,rgba(255,255,255,.28),transparent 30%),linear-gradient(135deg,#1356c8,#318df4 60%,#74c5ff);color:#fff;box-shadow:0 8px 24px rgba(23,105,224,.22);margin-bottom:16px}
+.premium-page-hero h1{margin:0 0 7px;font-size:27px}.premium-page-hero p{margin:0;max-width:620px;color:rgba(255,255,255,.9)}
+.premium-status-pill{display:inline-flex;align-items:center;gap:6px;border-radius:30px;padding:6px 11px;background:rgba(255,255,255,.18);font-size:12px;font-weight:800;margin-bottom:12px}
+.premium-feature-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.premium-feature{background:#fff;border:1px solid var(--line);border-radius:13px;padding:15px;min-height:138px;box-shadow:var(--shadow)}
+.premium-feature-top{display:flex;align-items:center;gap:10px;margin-bottom:8px}.premium-feature-icon{width:38px;height:38px;border-radius:11px;background:#e8f2ff;display:grid;place-items:center;font-size:21px;flex:none}
+.premium-feature h3{font-size:15px;margin:0}.premium-feature p{font-size:13px;color:var(--muted);margin:0 0 10px}
+.premium-feature-state{display:inline-block;border-radius:20px;padding:4px 8px;font-size:11px;font-weight:800;background:#fff3d6;color:#805b00}.premium-feature-state.live{background:#e7f7ed;color:#16733a}
+.premium-page-actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:14px}.premium-section-title{font-size:17px;font-weight:850;margin:20px 0 10px}
+.premium-note{border:1px solid #d7e6fb;background:#f2f7ff;color:#34506f;border-radius:11px;padding:12px;font-size:13px;margin:14px 0}
+.premium-active .rightcol .right-card:first-child{display:none}
+@media(max-width:650px){.premium-feature-grid{grid-template-columns:1fr}.premium-page-hero{padding:19px}.premium-page-hero h1{font-size:23px}}
+</style>
+
+<style>
+/* DANEGRAM original Messenger identity */
+</style>
+
+<style>
+/* Restored DANEGRAM Direct inbox — matched to the user's supplied screenshot */
+.dg-inbox-page{min-height:calc(100vh - 170px);margin:18px 0 84px;padding:30px 32px 34px;border:1px solid #dce7e5;border-radius:32px;background:linear-gradient(135deg,#f8fcfb 0%,#f7fbfa 68%,#fff0ec 100%);box-shadow:0 4px 18px rgba(22,67,61,.08);color:#172d32}
+.dg-brandline{display:flex;align-items:center;gap:18px;min-height:72px}.dg-mark{width:72px;height:72px;border-radius:25px;background:linear-gradient(135deg,#078b7c,#29b69e);display:grid;place-items:center;color:white;font-size:40px;font-weight:900;box-shadow:inset 0 1px 2px #ffffff55}.dg-brandline strong{font-size:25px;letter-spacing:4px;color:#203238}.dg-brandline>span{margin-left:auto;color:#87918f;font-size:18px;letter-spacing:1px}
+.dg-inbox-title{display:flex;align-items:center;justify-content:space-between;gap:15px;margin:25px 0 30px}.dg-inbox-title h1{font-size:clamp(29px,5vw,48px);line-height:1.1;letter-spacing:-1.5px;margin:0;color:#182e34}.dg-newchat{width:82px;height:82px;flex:none;border-radius:29px;background:#078b7c;color:#fff;font-size:48px;font-weight:300;line-height:1;box-shadow:0 5px 14px rgba(7,139,124,.13)}
+.dg-search{height:90px;border:2px solid #e4ecea;border-radius:28px;background:#fff;display:flex;align-items:center;gap:22px;padding:0 26px;color:#8a9a97}.dg-search span{font-size:36px;line-height:1}.dg-search input{width:100%;min-width:0;border:0;outline:0;background:transparent;color:#26383b;font-size:27px}.dg-search input::placeholder{color:#858585;opacity:1}
+.dg-inbox-caption{margin:50px 0 26px;color:#8b9c98;font-size:18px;font-weight:850;letter-spacing:2px;text-transform:uppercase}.dg-chat-list{display:flex;flex-direction:column;gap:28px}
+.dg-conversation{width:100%;display:flex;align-items:center;gap:23px;padding:12px 5px;border:0;background:transparent;text-align:left;color:#1b3036;border-radius:20px;cursor:pointer}.dg-conversation:active,.dg-conversation:hover{background:rgba(7,139,124,.055)}
+.dg-conversation-avatar{width:94px;height:94px;flex:none;border-radius:31px;display:grid;place-items:center;background:linear-gradient(135deg,#078b7c,#55c5ad);color:white;font-size:28px;font-weight:850}.dg-conversation-avatar.alt{background:linear-gradient(135deg,#7482b4,#aeb7d7)}
+.dg-conversation-copy{min-width:0;flex:1;display:flex;flex-direction:column}.dg-conversation-name{font-size:24px;font-weight:850;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.dg-conversation-preview{font-size:21px;color:#8b9996;margin-top:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.dg-conversation-time{font-size:17px;color:#a1aeab;white-space:nowrap;align-self:center}
+.dg-empty{padding:28px 8px;color:#82918e;font-size:16px}.dg-room{display:none;flex-direction:column;min-height:520px;margin-top:4px}.dg-inbox-page.dg-show-room .dg-inbox-head,.dg-inbox-page.dg-show-room .dg-inbox-caption,.dg-inbox-page.dg-show-room .dg-chat-list{display:none}.dg-inbox-page.dg-show-room .dg-room{display:flex}
+.dg-room-head{display:flex;align-items:center;gap:14px;padding:8px 0 18px;border-bottom:1px solid #e2eae8}.dg-back-inbox{width:42px;height:42px;border-radius:50%;background:#e7f2ef;color:#087f73;font-size:30px}.dg-room-avatar{width:54px;height:54px;border-radius:18px;background:linear-gradient(135deg,#078b7c,#55c5ad);display:grid;place-items:center;color:white;font-weight:850}.dg-room-heading{min-width:0}.dg-room-name{font-size:19px;font-weight:850}.dg-room-sub{font-size:12px;color:#899895}
+.dg-chat-body{flex:1;min-height:300px;max-height:55vh;overflow:auto;padding:18px 0}.dg-chat-body .bubble{max-width:82%;padding:12px 15px;border-radius:18px;background:#e9f2ef;margin:8px 0;overflow-wrap:anywhere}.dg-chat-body .bubble.mine{margin-left:auto;background:#d9f2eb}
+.dg-compose{display:flex;gap:10px;padding-top:14px;border-top:1px solid #e2eae8}.dg-compose input{min-width:0;flex:1;border:1px solid #e1e9e7;background:white;border-radius:24px;padding:14px 17px;outline-color:#078b7c}.dg-send{padding:0 22px;border-radius:22px;background:#078b7c;color:white;font-weight:800}.dg-status{font-size:12px;color:#899895;padding-top:5px}
+@media(max-width:760px){.dg-inbox-page{min-height:calc(100vh - 170px);margin:18px 0 84px;padding:32px 32px 34px;border-radius:32px}.dg-brandline{min-height:72px;gap:18px}.dg-mark{width:72px;height:72px;border-radius:25px;font-size:40px}.dg-brandline strong{font-size:25px;letter-spacing:4px}.dg-brandline>span{font-size:18px}.dg-inbox-title{margin:25px 0 30px}.dg-inbox-title h1{font-size:clamp(29px,5vw,48px)}.dg-newchat{width:82px;height:82px;border-radius:29px;font-size:48px}.dg-search{height:90px;border-radius:28px;padding:0 26px;gap:22px}.dg-search span{font-size:36px}.dg-search input{font-size:27px}.dg-inbox-caption{margin:50px 0 26px;font-size:18px;letter-spacing:2px}.dg-chat-list{gap:28px}.dg-conversation{gap:23px;padding:12px 5px}.dg-conversation-avatar{width:94px;height:94px;border-radius:31px;font-size:28px}.dg-conversation-name{font-size:24px}.dg-conversation-preview{font-size:21px;margin-top:8px}.dg-conversation-time{font-size:17px}}
+@media(max-width:430px){.dg-inbox-page{padding:24px 20px 30px}.dg-brandline{gap:12px}.dg-mark{width:58px;height:58px;border-radius:20px;font-size:33px}.dg-brandline strong{font-size:19px;letter-spacing:3px}.dg-brandline>span{font-size:13px}.dg-inbox-title h1{font-size:32px}.dg-newchat{width:64px;height:64px;border-radius:23px;font-size:39px}.dg-search{height:72px;padding:0 18px;gap:14px}.dg-search input{font-size:19px}.dg-inbox-caption{margin:38px 0 18px;font-size:14px}.dg-chat-list{gap:18px}.dg-conversation{gap:14px}.dg-conversation-avatar{width:68px;height:68px;border-radius:23px;font-size:22px}.dg-conversation-name{font-size:17px}.dg-conversation-preview{font-size:16px;margin-top:5px}.dg-conversation-time{font-size:13px}}
+</style>
+
+
+<style>
+/* Compact, app-like DANEGRAM mobile shell */
+.brand-profile-btn{display:flex;align-items:center;gap:9px;padding:0;background:transparent;text-align:left;color:inherit;min-width:0}
+.brand-copy{display:flex;flex-direction:column;align-items:flex-start;min-width:0}
+.brand-tagline{display:block;margin-top:-4px;white-space:nowrap}
+.bottom-nav svg{width:23px;height:23px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.bottom-nav button{gap:3px}
+.bottom-nav button>span{display:grid;place-items:center;min-width:28px;min-height:27px}
+.bottom-nav button.active{color:var(--blue)}
+.bottom-nav button.active:after{content:"";position:absolute;top:0;left:15%;right:15%;height:3px;border-radius:0 0 4px 4px;background:var(--blue)}
+@media(max-width:760px){
+ body{font-size:14px}
+ .topbar{height:58px;min-height:58px;flex-wrap:nowrap;padding:0 12px;gap:8px}
+ .brand-area{flex:1;min-width:0;gap:8px}
+ .brand-profile-btn{gap:7px}
+ .logo{width:34px;height:34px;font-size:21px}
+ .brand{font-size:19px;letter-spacing:-.7px}
+ .brand-tagline{display:none}
+ .searchbox{width:36px;min-width:36px;max-width:36px;height:36px;flex:0 0 36px;padding:0;justify-content:center;font-size:20px}
+ .topnav{gap:1px}
+ .topnav button{width:34px;min-width:34px;height:38px;font-size:20px}
+ .top-actions{min-width:34px}
+ .top-actions .circle-btn{width:35px;height:35px}
+ .layout{display:block;margin:7px auto 0;padding:0 8px 74px}
+ .leftcol,.rightcol{display:none}
+ .maincol{width:100%;min-width:0}
+ .bottom-nav{position:fixed;left:0;right:0;bottom:0;z-index:80;display:flex;justify-content:space-around;align-items:center;gap:0;height:62px;padding:4px 5px calc(4px + env(safe-area-inset-bottom));background:#fff;border-top:1px solid #e4e6eb;box-shadow:0 -2px 12px rgba(0,0,0,.07)}
+ .bottom-nav button{flex:1;max-width:none;min-width:0;min-height:50px;height:50px;border-radius:9px;font-size:20px;gap:2px}
+ .bottom-nav button small{font-size:10px;font-weight:700;color:inherit}
+ .bottom-nav button.active{background:#eaf2ff}
+ .bottom-nav button.active:after{display:none}
+ .bottom-nav svg{width:22px;height:22px}
+ .bottom-nav .badge{right:-8px;top:-4px}
+ .dg-inbox-page{min-height:calc(100vh - 135px);margin:7px 0 70px;padding:14px 13px 18px;border-radius:15px;border:1px solid #e1e8e6;box-shadow:0 1px 5px rgba(0,0,0,.05);background:#fff;color:#1c1e21}
+ .dg-brandline{min-height:38px;gap:9px}
+ .dg-mark{width:36px;height:36px;border-radius:11px;font-size:21px}
+ .dg-brandline strong{font-size:14px;letter-spacing:2px;color:#1c1e21}
+ .dg-brandline>span{font-size:10px;letter-spacing:.6px}
+ .dg-inbox-title{margin:15px 0 13px;gap:9px}
+ .dg-inbox-title h1{font-size:23px;letter-spacing:-.6px;color:#1c1e21}
+ .dg-newchat{width:43px;height:43px;border-radius:13px;font-size:27px;background:var(--blue);box-shadow:none}
+ .dg-search{height:45px;border:1px solid #e4e6eb;border-radius:23px;padding:0 13px;gap:10px;background:#f0f2f5}
+ .dg-search span{font-size:21px}
+ .dg-search input{font-size:14px;color:#1c1e21}
+ .dg-inbox-caption{margin:22px 0 10px;font-size:10px;letter-spacing:1.1px;color:#65676b}
+ .dg-chat-list{gap:2px}
+ .dg-conversation{gap:11px;padding:9px 3px;border-radius:10px}
+ .dg-conversation-avatar{width:52px;height:52px;border-radius:50%;font-size:17px}
+ .dg-conversation-copy{gap:2px}
+ .dg-conversation-name{font-size:14px;font-weight:750;color:#1c1e21}
+ .dg-conversation-preview{font-size:12px;margin-top:1px;color:#65676b}
+ .dg-conversation-time{font-size:10px;color:#8a8d91}
+ .dg-empty{padding:20px 5px;font-size:13px}
+ .dg-room{min-height:calc(100dvh - 150px);margin-top:0}
+ .dg-room-head{gap:9px;padding:5px 0 10px}
+ .dg-back-inbox{width:34px;height:34px;font-size:24px}
+ .dg-room-avatar{width:40px;height:40px;border-radius:50%}
+ .dg-room-name{font-size:15px}
+ .dg-chat-body{min-height:180px;max-height:calc(100dvh - 250px);padding:12px 0}
+ .dg-chat-body .bubble{padding:9px 11px;font-size:13px}
+ .dg-compose{gap:7px;padding-top:9px}
+ .dg-compose input{padding:10px 13px;font-size:14px}
+ .dg-send{padding:0 15px;font-size:13px}
+}
+@media(max-width:380px){
+ .brand{font-size:17px}
+ .topnav button{width:30px;min-width:30px}
+ .dg-inbox-page{padding:12px 10px 16px}
+ .dg-conversation-avatar{width:47px;height:47px}
+ .dg-conversation-name{font-size:13px}
+ .dg-conversation-preview{font-size:11px}
+}
+</style>
+
+
+<style>
+/* DANEGRAM Facebook-style compact blue header; preserve existing page and chat layouts. */
+:root{--blue:#1877f2;--blue2:#166fe5;--soft:#e7f3ff;--line:#e4e6eb;--bg:#f0f2f5}
+.logo,.auth-gate-logo{background:#1877f2}
+.brand{color:#1877f2;background:none;-webkit-text-fill-color:#1877f2}
+.primary,.dg-newchat{background:#1877f2}
+.topbar{height:60px;min-height:60px;padding:5px 14px;gap:14px;background:#fff;border-bottom:1px solid #e4e6eb}
+.brand-area{flex:0 1 330px;min-width:210px;gap:9px}
+.brand-profile-btn{display:flex;align-items:center;gap:8px;background:transparent;padding:0;white-space:nowrap}
+.brand{font-size:23px;font-weight:850;letter-spacing:-.9px}
+.logo{width:38px;height:38px;font-size:23px}
+.searchbox{width:205px;max-width:205px;min-width:130px;height:38px;background:#f0f2f5;border-radius:22px}
+.topnav{flex:1;justify-content:center;gap:clamp(2px,1vw,14px)}
+.topnav button{width:clamp(44px,6vw,76px);min-width:40px;height:50px;color:#65676b;border-radius:9px;display:grid;place-items:center}
+.topnav button svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.topnav button.active{color:#1877f2;background:transparent}.topnav button.active:after{background:#1877f2;bottom:-5px;left:8px;right:8px}
+.top-actions{min-width:0;flex:0 0 auto;gap:7px}
+.circle-btn{background:#e4e6eb;color:#1c1e21}
+.top-action-icon{font-size:20px;display:grid;place-items:center}
+.top-profile{display:flex;align-items:center;gap:2px;padding:2px 5px 2px 2px;border-radius:22px;background:#f0f2f5}
+.top-profile .avatar{width:34px;height:34px;background:#1877f2}
+.profile-chevron{font-size:15px;padding:0 4px;color:#454950}
+.dg-inbox-page{background:#fff}
+.dg-mark,.dg-room-avatar,.dg-conversation-avatar{background:#1877f2}
+.dg-conversation-avatar.alt{background:#64748b}
+.dg-compose{align-items:center;gap:9px;padding:10px 0 0;border-top:1px solid #e4e6eb}
+.dg-compose-field{flex:1;min-width:0;display:flex;align-items:center;background:#f0f2f5;border:1px solid #e4e6eb;border-radius:24px;padding:0 15px;min-height:48px}
+.dg-compose input{width:100%;min-width:0;border:0!important;outline:0!important;background:transparent!important;border-radius:0!important;padding:11px 0!important;font-size:14px;color:#1c1e21}
+.dg-compose input::placeholder{color:#65676b}
+.dg-send{width:44px;height:44px;flex:none;padding:0;border-radius:50%;display:grid;place-items:center;background:#1877f2;box-shadow:none}
+.dg-send svg{width:21px;height:21px;fill:none;stroke:#fff;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.dg-send:disabled{opacity:.5}
+.settings-menu-item{display:flex;align-items:center;gap:12px;width:100%;padding:12px;text-align:left;background:#fff;border-radius:9px;color:#1c1e21;font-weight:650;margin:3px 0}
+.settings-menu-item:hover{background:#f0f2f5}
+.settings-menu-item .settings-icon{width:34px;height:34px;border-radius:50%;background:#e4e6eb;display:grid;place-items:center;font-size:18px;flex:none}
+.settings-menu-item .settings-copy{display:flex;flex-direction:column;gap:2px}.settings-menu-item small{font-weight:400;color:#65676b}
+@media(max-width:760px){
+ .topbar{height:56px;min-height:56px;flex-wrap:nowrap;padding:0 8px;gap:5px}
+ .brand-area{flex:1 1 auto;min-width:0;gap:5px}
+ .brand{font-size:18px}.logo{width:32px;height:32px;font-size:19px}
+ .searchbox{width:32px;min-width:32px;max-width:32px;height:32px;flex:0 0 32px;padding:0;justify-content:center}
+ .searchbox input{display:none}
+ .topnav{flex:0 0 auto;gap:0}
+ .topnav button{width:31px;min-width:31px;height:38px;border-radius:8px}
+ .topnav button svg{width:19px;height:19px}
+ .top-actions{gap:3px;min-width:0}
+ .top-actions .circle-btn{width:30px;height:30px;font-size:15px}
+ .top-actions .badge{font-size:8px;padding:0 3px;right:-4px;top:-5px}
+ .top-profile{padding:1px 3px 1px 1px}.top-profile .avatar{width:28px;height:28px}.profile-chevron{font-size:11px}
+ .dg-compose{gap:7px}.dg-compose-field{min-height:43px;padding:0 13px}.dg-compose input{font-size:13px!important;padding:9px 0!important}.dg-send{width:40px;height:40px}
+}
+@media(max-width:390px){.topbar{padding:0 5px}.brand{font-size:16px}.topnav button{width:27px;min-width:27px}.topnav button svg{width:17px;height:17px}.top-actions .circle-btn{width:27px;height:27px}.top-profile .avatar{width:25px;height:25px}}
+</style>
+
+
+<style id="danegram-monochrome-facebook-refresh">
+:root{--blue:#111;--blue2:#000;--bg:#f5f5f5;--card:#fff;--text:#111;--muted:#686868;--line:#e5e5e5;--soft:#ededed;--green:#222;--shadow:0 1px 2px rgba(0,0,0,.10);--radius:12px}
+html,body{background:#f5f5f5!important;color:#111!important}
+/* Clean Facebook-inspired desktop header */
+.topbar{height:60px!important;min-height:60px!important;padding:0 16px!important;gap:14px!important;background:#fff!important;border-bottom:1px solid #e5e5e5!important;box-shadow:0 1px 3px rgba(0,0,0,.08)!important;flex-wrap:nowrap!important}
+.brand-area{flex:0 1 290px!important;min-width:0!important;gap:12px!important}
+.brand-profile-btn{display:flex!important;align-items:center!important;gap:10px!important;background:transparent!important;padding:0!important;min-width:0!important}
+.logo{width:40px!important;height:40px!important;border-radius:50%!important;background:#111!important;color:#fff!important;font-size:24px!important}
+.brand{font-size:23px!important;line-height:1!important;font-weight:900!important;letter-spacing:-1.1px!important;color:#111!important}
+.brand-copy .small,.brand-area .small{display:none!important}
+.searchbox{height:40px!important;width:210px!important;max-width:210px!important;min-width:0!important;flex:1 1 210px!important;background:#f0f0f0!important;border-radius:22px!important;padding:0 13px!important;color:#555!important}
+.searchbox input{display:block!important;font-size:14px!important;color:#111!important}
+.topnav{flex:1 1 auto!important;justify-content:center!important;gap:4px!important;min-width:0!important}
+.topnav button{height:50px!important;min-width:58px!important;width:min(100%,100px)!important;border-radius:8px!important;color:#606060!important;background:transparent!important}
+.topnav button svg{width:23px!important;height:23px!important;fill:none!important;stroke:currentColor!important;stroke-width:1.8!important;stroke-linecap:round!important;stroke-linejoin:round!important}
+.topnav button.active{color:#111!important}
+.topnav button.active:after{background:#111!important;height:3px!important;bottom:-5px!important;left:5px!important;right:5px!important}
+.top-actions{flex:0 0 auto!important;min-width:0!important;gap:7px!important}
+.circle-btn{background:#ededed!important;color:#111!important;width:39px!important;height:39px!important}
+.top-profile{background:#ededed!important;color:#111!important;border-radius:22px!important;padding:3px 7px!important}
+.top-profile .avatar{width:31px!important;height:31px!important;background:#333!important;color:#fff!important}
+.badge{background:#222!important;color:#fff!important;border-color:#fff!important}
+/* Monochrome controls and page surfaces */
+.primary,.dg-newchat,.dg-send,.story.add .addcircle{background:#111!important;color:#fff!important}
+.primary:hover{background:#333!important}
+.secondary,.circle-btn,.close{background:#ededed!important;color:#111!important}
+.sideitem,.bottom-nav button{color:#222!important}
+.sideitem:hover,.bottom-nav button:hover,.bottom-nav button.active{background:#e9e9e9!important;color:#111!important}
+.bottom-nav{background:#fff!important;border-top:1px solid #ddd!important}
+.bottom-nav button small{color:#555!important}
+.bottom-nav button.active:after{background:#111!important}
+.post-actions button.liked,.tabs button.active{color:#111!important}
+.tabs button.active{border-bottom-color:#111!important}
+.profile-cover,.group-art,.call-panel,.auth-gate{background:#222!important;color:#fff!important}
+.auth-gate-card h1{color:#111!important}
+.auth-gate-logo{background:#111!important}
+.story:not(.add){background:linear-gradient(145deg,#333,#888)!important}
+.story:nth-child(n){background:linear-gradient(145deg,#333,#888)!important}
+.story.add{background:#fff!important;color:#111!important}
+.story .story-avatar{border-color:#111!important;color:#111!important}
+.avatar{background:linear-gradient(135deg,#777,#222)!important;color:#fff!important}
+.premium-page-hero{background:linear-gradient(135deg,#111,#555)!important;box-shadow:0 4px 16px rgba(0,0,0,.14)!important}
+.premium-feature-icon{background:#eee!important;color:#111!important}
+.premium-feature-state.live{background:#eee!important;color:#111!important}
+.notice{background:#f4f4f4!important;border-color:#ddd!important;color:#333!important}
+/* Keep the original DANEGRAM inbox layout, but make its colours match */
+.dg-inbox-page{background:#fff!important;color:#111!important;border-color:#e5e5e5!important;box-shadow:0 1px 4px rgba(0,0,0,.06)!important}
+.dg-inbox-title h1,.dg-brandline strong{color:#111!important}
+.dg-mark{background:#111!important;color:#fff!important}
+.dg-brandline>span,.dg-inbox-caption,.dg-conversation-time,.dg-conversation-preview{color:#777!important}
+.dg-search{background:#f3f3f3!important;border-color:#e5e5e5!important}
+.dg-search input{color:#111!important}
+.dg-conversation-avatar,.dg-room-avatar{background:#333!important;color:#fff!important}
+.dg-message.mine{background:#e9e9e9!important;color:#111!important}
+.dg-compose{border-color:#e5e5e5!important}
+.dg-compose input{background:#f4f4f4!important;border-color:#ddd!important;color:#111!important}
+.dg-send{background:#111!important;color:#fff!important}
+/* Compact mobile header: logo/search left, tabs centred, actions right */
+@media(max-width:760px){
+ .topbar{height:auto!important;min-height:54px!important;padding:6px 8px!important;gap:5px!important;flex-wrap:nowrap!important}
+ .brand-area{flex:1 1 auto!important;min-width:0!important;gap:6px!important}
+ .brand-profile-btn{gap:6px!important}
+ .logo{width:32px!important;height:32px!important;font-size:19px!important}
+ .brand{font-size:17px!important;letter-spacing:-.7px!important}
+ .searchbox{width:34px!important;min-width:34px!important;max-width:34px!important;height:34px!important;flex:0 0 34px!important;padding:0!important;justify-content:center!important;font-size:17px!important}
+ .searchbox input{display:none!important}
+ .topnav{flex:1 1 auto!important;gap:0!important;justify-content:space-evenly!important}
+ .topnav button{width:32px!important;min-width:32px!important;height:39px!important;font-size:18px!important}
+ .topnav button svg{width:20px!important;height:20px!important}
+ .top-actions{gap:4px!important}
+ .top-actions .circle-btn{width:32px!important;height:32px!important;font-size:16px!important}
+ .top-profile{padding:2px!important}
+ .top-profile .avatar{width:27px!important;height:27px!important}
+ .profile-chevron{display:none!important}
+}
+@media(max-width:390px){.brand{font-size:15px!important}.topnav button{width:27px!important;min-width:27px!important}.topnav button svg{width:18px!important;height:18px!important}.top-actions .circle-btn{width:29px!important;height:29px!important}}
+</style>
+
+
+<style id="danegram-final-clean-monochrome-header">
+/* One clean Facebook-inspired header: monochrome only */
+:root{--blue:#111!important;--blue2:#000!important;--soft:#ededed!important;--bg:#f5f5f5!important;--card:#fff!important;--text:#111!important;--muted:#666!important;--line:#e5e5e5!important;--green:#222!important}
+.topbar{display:grid!important;grid-template-columns:minmax(220px,1fr) minmax(220px,2fr) minmax(190px,1fr)!important;align-items:center!important;gap:18px!important;height:64px!important;min-height:64px!important;padding:0 18px!important;background:#fff!important;border-bottom:1px solid #dedede!important;box-shadow:0 1px 3px rgba(0,0,0,.08)!important;flex-wrap:nowrap!important}
+.brand-area{display:flex!important;align-items:center!important;gap:12px!important;min-width:0!important;flex:none!important}
+.brand-profile-btn{display:flex!important;align-items:center!important;gap:10px!important;padding:0!important;background:transparent!important;white-space:nowrap!important}
+.logo{width:40px!important;height:40px!important;border-radius:50%!important;background:#111!important;color:#fff!important;font-size:24px!important}
+.brand{display:block!important;color:#111!important;-webkit-text-fill-color:#111!important;background:none!important;font-size:24px!important;line-height:1!important;font-weight:900!important;letter-spacing:-1.1px!important}
+.brand-copy .small,.brand-area .small,.brand-tagline{display:none!important}
+.searchbox{height:40px!important;width:auto!important;max-width:none!important;min-width:0!important;flex:1 1 auto!important;padding:0 14px!important;border-radius:24px!important;background:#f0f0f0!important;color:#555!important}
+.searchbox input{display:block!important;width:100%!important;color:#111!important;font-size:14px!important}
+.topnav{display:flex!important;justify-content:center!important;align-items:center!important;gap:8px!important;min-width:0!important;height:100%!important}
+.topnav button{height:50px!important;min-width:55px!important;max-width:100px!important;flex:1 1 0!important;border-radius:8px!important;color:#555!important;background:transparent!important}
+.topnav button svg{width:23px!important;height:23px!important;fill:none!important;stroke:currentColor!important;stroke-width:1.8!important;stroke-linecap:round!important;stroke-linejoin:round!important}
+.topnav button.active{color:#111!important}.topnav button.active:after{height:3px!important;background:#111!important;bottom:-2px!important;left:8px!important;right:8px!important}
+.top-actions{display:flex!important;align-items:center!important;justify-content:flex-end!important;gap:8px!important;min-width:0!important}
+.circle-btn{width:40px!important;height:40px!important;border-radius:50%!important;background:#ededed!important;color:#111!important}
+.top-profile{display:flex!important;align-items:center!important;gap:5px!important;padding:3px 7px!important;border-radius:22px!important;background:#ededed!important;color:#111!important}
+.top-profile .avatar{width:32px!important;height:32px!important;background:#333!important;color:#fff!important}
+.badge{background:#222!important;color:#fff!important;border-color:#fff!important}
+/* Monochrome site controls; do not recolour the Premium gold star */
+.primary,.dg-newchat,.dg-send,.story.add .addcircle{background:#111!important;color:#fff!important}
+.primary:hover{background:#333!important}.secondary,.circle-btn,.close{background:#ededed!important;color:#111!important}
+.sideitem,.bottom-nav button,.post-actions button,.tabs button{color:#222!important}
+.sideitem:hover,.bottom-nav button:hover,.bottom-nav button.active{background:#ededed!important;color:#111!important}
+.bottom-nav{background:#fff!important;border-top:1px solid #ddd!important}.bottom-nav button.active:after{background:#111!important}
+.post-actions button.liked,.tabs button.active{color:#111!important}.tabs button.active{border-bottom-color:#111!important}
+.profile-cover,.group-art,.call-panel,.auth-gate{background:#222!important;color:#fff!important}
+.story:not(.add),.story:nth-child(n){background:linear-gradient(145deg,#333,#888)!important}
+.story.add{background:#fff!important;color:#111!important}.story .story-avatar{border-color:#111!important;color:#111!important}
+.avatar{background:linear-gradient(135deg,#777,#222)!important;color:#fff!important}
+.premium-page-hero{background:linear-gradient(135deg,#111,#555)!important;box-shadow:0 4px 16px rgba(0,0,0,.14)!important}
+.premium-feature-icon,.premium-feature-state.live{background:#eee!important;color:#111!important}
+.notice{background:#f4f4f4!important;border-color:#ddd!important;color:#333!important}
+.field input,.field textarea,.field select{outline-color:#111!important}
+/* Premium keeps its familiar gold star, not the site accent colour */
+.premium-star{filter:drop-shadow(0 0 5px rgba(218,160,20,.55))!important}
+.premium-star svg{filter:drop-shadow(0 1px 1px rgba(120,80,0,.25))!important}
+@media(max-width:760px){
+ .topbar{display:flex!important;height:56px!important;min-height:56px!important;padding:0 8px!important;gap:6px!important}
+ .brand-area{flex:1 1 auto!important;min-width:0!important;gap:6px!important}
+ .brand-profile-btn{gap:6px!important}.logo{width:32px!important;height:32px!important;font-size:19px!important}
+ .brand{font-size:17px!important;letter-spacing:-.7px!important}
+ .searchbox{width:32px!important;min-width:32px!important;max-width:32px!important;height:32px!important;flex:0 0 32px!important;padding:0!important;justify-content:center!important}
+ .searchbox input{display:none!important}
+ .topnav{flex:1 1 auto!important;gap:0!important;justify-content:space-evenly!important}
+ .topnav button{width:30px!important;min-width:30px!important;height:38px!important;flex:0 1 34px!important}
+ .topnav button svg{width:19px!important;height:19px!important}
+ .top-actions{gap:3px!important}.top-actions .circle-btn{width:30px!important;height:30px!important;font-size:15px!important}
+ .top-profile{padding:1px!important}.top-profile .avatar{width:26px!important;height:26px!important}.profile-chevron{display:none!important}
+}
+@media(max-width:390px){.brand{font-size:15px!important}.topnav button{width:26px!important;min-width:26px!important}.top-actions .circle-btn{width:27px!important;height:27px!important}}
+
+/* Final header refinement: clean Facebook-style alignment, monochrome */
+.topbar{
+  display:grid!important;
+  grid-template-columns:minmax(245px, 1fr) minmax(280px, 1.45fr) minmax(245px, 1fr)!important;
+  align-items:center!important;
+  gap:18px!important;
+  height:76px!important;
+  min-height:76px!important;
+  padding:0 24px!important;
+  background:#fff!important;
+  border-bottom:1px solid #dedede!important;
+  box-shadow:0 1px 3px rgba(0,0,0,.08)!important;
+  flex-wrap:nowrap!important;
+}
+.brand-area{
+  display:flex!important;align-items:center!important;gap:16px!important;
+  min-width:0!important;width:100%!important;
+}
+.brand-profile-btn{
+  display:flex!important;align-items:center!important;gap:12px!important;
+  min-width:0!important;padding:0!important;background:transparent!important;
+}
+.logo{
+  width:54px!important;height:54px!important;flex:0 0 54px!important;
+  display:grid!important;place-items:center!important;border-radius:50%!important;
+  background:#111!important;color:#fff!important;font-size:34px!important;
+}
+.brand-copy{display:block!important;min-width:0!important}
+.brand{
+  display:block!important;color:#111!important;-webkit-text-fill-color:#111!important;
+  background:none!important;font-size:30px!important;line-height:1!important;
+  font-weight:850!important;letter-spacing:-1.2px!important;white-space:nowrap!important;
+}
+.searchbox{
+  width:46px!important;min-width:46px!important;max-width:46px!important;
+  height:46px!important;flex:0 0 46px!important;padding:0!important;
+  display:flex!important;align-items:center!important;justify-content:center!important;
+  border-radius:50%!important;background:#f0f0f0!important;color:#111!important;
+  font-size:25px!important;
+}
+.searchbox input{display:none!important}
+.topnav{
+  display:flex!important;align-items:center!important;justify-content:center!important;
+  gap:12px!important;width:100%!important;min-width:0!important;height:100%!important;
+}
+.topnav button{
+  display:grid!important;place-items:center!important;
+  width:auto!important;min-width:62px!important;height:54px!important;flex:1 1 0!important;
+  max-width:100px!important;border-radius:10px!important;background:transparent!important;
+  color:#222!important;
+}
+.topnav button svg{width:30px!important;height:30px!important;stroke:currentColor!important;fill:none!important;stroke-width:1.9!important}
+.topnav button.active{color:#111!important;background:#f1f1f1!important}
+.topnav button.active:after{background:#111!important;bottom:-8px!important;height:3px!important}
+.top-actions{
+  display:flex!important;align-items:center!important;justify-content:flex-end!important;
+  gap:10px!important;min-width:0!important;width:100%!important;
+}
+.top-actions .circle-btn{
+  width:48px!important;height:48px!important;min-width:48px!important;
+  display:grid!important;place-items:center!important;border-radius:50%!important;
+  background:#ededed!important;color:#111!important;font-size:24px!important;
+}
+.top-actions .badge{background:#111!important;color:#fff!important}
+.top-profile{
+  width:50px!important;height:50px!important;min-width:50px!important;
+  display:grid!important;place-items:center!important;padding:2px!important;
+  border-radius:50%!important;background:#111!important;color:#fff!important;
+}
+.top-profile .avatar{width:44px!important;height:44px!important;background:#111!important;color:#fff!important}
+.top-profile .profile-chevron{display:none!important}
+
+/* Restore the soft, fully rounded message composer */
+.dg-compose{
+  display:flex!important;align-items:center!important;gap:10px!important;
+  padding:10px 0 2px!important;border-top:1px solid #e5e5e5!important;
+}
+.dg-compose-field{
+  flex:1 1 auto!important;min-width:0!important;min-height:50px!important;
+  display:flex!important;align-items:center!important;
+  padding:0 18px!important;border:1px solid #dedede!important;
+  border-radius:28px!important;background:#f2f2f2!important;
+  overflow:hidden!important;
+}
+.dg-compose input{
+  display:block!important;width:100%!important;min-width:0!important;
+  padding:12px 0!important;border:0!important;border-radius:0!important;
+  outline:0!important;background:transparent!important;color:#111!important;
+  font-size:15px!important;box-shadow:none!important;
+}
+.dg-compose input::placeholder{color:#777!important;opacity:1!important}
+.dg-send{
+  width:48px!important;height:48px!important;min-width:48px!important;
+  flex:0 0 48px!important;padding:0!important;border:0!important;
+  border-radius:50%!important;display:grid!important;place-items:center!important;
+  background:#111!important;color:#fff!important;
+}
+.dg-send svg{width:23px!important;height:23px!important;stroke:currentColor!important;fill:none!important;stroke-width:1.8!important}
+.dg-send:disabled{opacity:.45!important}
+
+/* Small-screen layout stays compact without crushing the brand */
+@media(max-width:760px){
+  .topbar{
+    display:flex!important;align-items:center!important;justify-content:space-between!important;
+    height:58px!important;min-height:58px!important;padding:0 9px!important;gap:7px!important;
+  }
+  .brand-area{flex:1 1 auto!important;gap:7px!important}
+  .brand-profile-btn{gap:7px!important}
+  .logo{width:36px!important;height:36px!important;flex:0 0 36px!important;font-size:23px!important}
+  .brand{font-size:18px!important;letter-spacing:-.6px!important}
+  .searchbox{width:35px!important;min-width:35px!important;height:35px!important;flex:0 0 35px!important;font-size:19px!important}
+  .topnav{display:none!important}
+  .top-actions{flex:0 0 auto!important;gap:5px!important}
+  .top-actions .circle-btn{width:34px!important;height:34px!important;min-width:34px!important;font-size:17px!important}
+  .top-profile{width:36px!important;height:36px!important;min-width:36px!important}
+  .top-profile .avatar{width:32px!important;height:32px!important}
+  .dg-compose{gap:8px!important;padding-top:9px!important}
+  .dg-compose-field{min-height:46px!important;padding:0 15px!important;border-radius:25px!important}
+  .dg-compose input{font-size:14px!important;padding:10px 0!important}
+  .dg-send{width:43px!important;height:43px!important;min-width:43px!important;flex-basis:43px!important}
+}
+@media(max-width:380px){
+  .brand{font-size:16px!important}
+  .top-actions .circle-btn{width:31px!important;height:31px!important;min-width:31px!important}
+  .top-actions{gap:3px!important}
+}
+
+
+/* Final requested header: remove top Messages, Alerts and trailing profile avatar.
+   Keep Create and Settings, with the main navigation untouched. */
+.top-actions{justify-content:flex-end!important;gap:10px!important}
+.top-actions #createBtn,
+.top-actions #settingsBtn{
+  display:grid!important;place-items:center!important;
+  width:48px!important;height:48px!important;min-width:48px!important;
+  border-radius:50%!important;background:#ededed!important;color:#111!important;
+}
+.topnav button.active{color:#111!important;background:#f1f1f1!important}
+.topnav button.active:after{background:#111!important}
+
+/* Message input: evenly rounded on both left and right ends. */
+.dg-compose{align-items:center!important;gap:10px!important}
+.dg-compose-field{
+  min-width:0!important;width:auto!important;flex:1 1 auto!important;
+  height:50px!important;min-height:50px!important;
+  box-sizing:border-box!important;
+  border:1px solid #dedede!important;border-radius:999px!important;
+  background:#f2f2f2!important;padding:0 18px!important;
+  display:flex!important;align-items:center!important;overflow:hidden!important;
+}
+.dg-compose-field input{
+  width:100%!important;height:100%!important;min-width:0!important;
+  box-sizing:border-box!important;border:0!important;border-radius:0!important;
+  background:transparent!important;padding:0!important;margin:0!important;
+  outline:0!important;box-shadow:none!important;color:#111!important;
+}
+.dg-send{
+  width:50px!important;height:50px!important;min-width:50px!important;
+  flex:0 0 50px!important;border-radius:50%!important;
+  display:grid!important;place-items:center!important;
+  box-sizing:border-box!important;background:#111!important;color:#fff!important;
+}
+@media(max-width:760px){
+ .top-actions{gap:7px!important}
+ .top-actions #createBtn,.top-actions #settingsBtn{
+   width:36px!important;height:36px!important;min-width:36px!important;
+ }
+ .dg-compose{gap:8px!important}
+ .dg-compose-field{height:46px!important;min-height:46px!important;padding:0 15px!important}
+ .dg-send{width:46px!important;height:46px!important;min-width:46px!important;flex-basis:46px!important}
+}
+
+
+/* Final composer shape: matching rounded ends on the message field */
+.dg-compose{
+  display:flex!important;
+  align-items:center!important;
+  gap:9px!important;
+}
+.dg-compose-field{
+  flex:1 1 auto!important;
+  min-width:0!important;
+  height:50px!important;
+  min-height:50px!important;
+  box-sizing:border-box!important;
+  border:1px solid #dedede!important;
+  border-radius:9999px!important;
+  background:#f2f2f2!important;
+  padding:0 19px!important;
+  display:flex!important;
+  align-items:center!important;
+  overflow:hidden!important;
+}
+.dg-compose-field input{
+  width:100%!important;
+  height:100%!important;
+  min-width:0!important;
+  box-sizing:border-box!important;
+  margin:0!important;
+  padding:0!important;
+  border:0!important;
+  border-radius:0!important;
+  outline:0!important;
+  box-shadow:none!important;
+  background:transparent!important;
+}
+.dg-send{
+  width:50px!important;
+  height:50px!important;
+  min-width:50px!important;
+  flex:0 0 50px!important;
+  box-sizing:border-box!important;
+  border-radius:9999px!important;
+  display:grid!important;
+  place-items:center!important;
+}
+@media(max-width:760px){
+  .dg-compose{gap:8px!important}
+  .dg-compose-field{
+    height:46px!important;
+    min-height:46px!important;
+    padding:0 16px!important;
+    border-radius:9999px!important;
+  }
+  .dg-send{
+    width:46px!important;
+    height:46px!important;
+    min-width:46px!important;
+    flex-basis:46px!important;
+    border-radius:9999px!important;
+  }
+}
+
+
+/* Comment composer: same smooth curve on the left and right ends */
+.comment-box{
+  display:flex!important;
+  align-items:center!important;
+  gap:8px!important;
+  width:100%!important;
+  min-width:0!important;
+}
+.comment-box input{
+  display:block!important;
+  flex:1 1 auto!important;
+  width:0!important;
+  min-width:0!important;
+  height:42px!important;
+  box-sizing:border-box!important;
+  margin:0!important;
+  padding:0 17px!important;
+  border:1px solid #dedede!important;
+  border-radius:9999px!important;
+  outline:0!important;
+  background:#f2f2f2!important;
+  color:#111!important;
+  box-shadow:none!important;
+}
+.comment-box input::placeholder{color:#777!important;opacity:1!important}
+.comment-box button[data-action="sendcomment"]{
+  flex:0 0 auto!important;
+  height:42px!important;
+  min-width:64px!important;
+  padding:0 17px!important;
+  box-sizing:border-box!important;
+  border:0!important;
+  border-radius:9999px!important;
+  background:#111!important;
+  color:#fff!important;
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+}
+@media(max-width:760px){
+  .comment-box{gap:7px!important}
+  .comment-box input{height:40px!important;padding:0 15px!important}
+  .comment-box button[data-action="sendcomment"]{
+    height:40px!important;min-width:58px!important;padding:0 14px!important
+  }
+}
+
+</style>
+
+</head>
+<body>
+<header class="topbar">
+ <div class="brand-area"><button type="button" class="brand-profile-btn" id="brandProfile" aria-label="Open your DANEGRAM profile"><span class="logo">D</span><span class="brand-copy"><span class="brand">DANEGRAM</span></span></button><label class="searchbox">⌕ <input id="globalSearch" placeholder="Search DANEGRAM" aria-label="Search DANEGRAM"></label></div>
+ <nav class="topnav" aria-label="Main navigation">
+  <button class="active" data-page="home" title="Home" aria-label="Home"><svg viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5v10H3z"/></svg></button>
+  <button data-page="groups" title="Groups" aria-label="Groups"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M2.5 20c.4-3.5 2.5-5.5 6.5-5.5s6.1 2 6.5 5.5M16 5a3 3 0 0 1 0 6M17 15c2.8.5 4.3 2.2 4.5 5"/></svg></button>
+ </nav>
+ <div class="top-actions">
+  <button class="circle-btn" id="createBtn" title="Create a post" aria-label="Create a post">＋</button>
+  <button class="circle-btn top-action-icon" data-page="watch" title="DANEGRAM Watch" aria-label="DANEGRAM Watch"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5 20 12 7 19.5Z"/></svg></button>
+  <button class="circle-btn top-action-icon" data-page="marketplace" title="Market" aria-label="Market"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="1"/><path d="M4 10h16M4 16h16M10 4v16M16 4v16"/></svg></button>
+  <button class="circle-btn top-action-icon" id="settingsBtn" title="Settings and privacy" aria-label="Settings and privacy">⚙</button>
+ </div>
+</header>
+<nav class="bottom-nav" aria-label="DANEGRAM navigation">
+ <button data-page="home" title="Home" aria-label="Home"><span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10.8 12 3l9 7.8v9.7h-6v-6h-6v6H3z"/></svg></span><small>Home</small></button>
+ <button data-page="groups" title="Groups" aria-label="Groups"><span><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.2"/><path d="M2.5 20c.4-3.6 2.5-5.5 6.5-5.5s6.1 1.9 6.5 5.5M16 5.2a3 3 0 0 1 0 5.8M17 14.8c2.8.4 4.3 2.1 4.5 5.2"/></svg></span><small>Groups</small></button>
+ <button id="notifyBtn" title="Notifications" aria-label="Notifications"><span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg><i class="badge">3</i></span><small>Alerts</small></button>
+ <button id="messengerBtn" title="Messages" aria-label="Messages"><span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 11.5a8.5 8.5 0 0 1-9 8.5 9.5 9.5 0 0 1-4-.9L3 21l1.7-4.3A8.2 8.2 0 0 1 3 11.5 8.5 8.5 0 0 1 12 3a8.5 8.5 0 0 1 9 8.5Z"/></svg><i class="badge">2</i></span><small>Messages</small></button>
+ <button id="accountBtn" title="Profile" aria-label="Profile"><span class="nav-profile-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c.5-4.2 3.2-6.5 8-6.5s7.5 2.3 8 6.5"/></svg></span><small>Profile</small></button>
+</nav>
+<div class="layout">
+ <aside class="leftcol">
+  <div class="sideitem" data-page="profile"><span class="avatar" id="sideAvatar">DG</span><span id="sideName">DANEGRAM Member</span></div>
+  <div class="sideitem" data-page="premium"><span class="sideicon">⭐</span>DANEGRAM Premium</div>
+  <div class="sideitem" data-page="friends"><span class="sideicon">👥</span>Friends</div>
+  <div class="sideitem" data-page="memories"><span class="sideicon">◷</span>Memories</div>
+  <div class="sideitem" data-page="saved"><span class="sideicon">🔖</span>Saved</div>
+  <div class="sideitem" data-page="groups"><span class="sideicon">♧</span>Groups</div>
+  <div class="sideitem" data-page="calls"><span class="sideicon">📹</span>Voice & video calls</div>
+  <div class="sideitem" data-page="video"><span class="sideicon">▶</span>Video</div>
+  <div class="sideitem" data-page="marketplace"><span class="sideicon">▦</span>Marketplace</div>
+  <div class="sideitem" data-page="events"><span class="sideicon">▣</span>Events</div>
+  <div class="sideitem" data-page="pages"><span class="sideicon">▤</span>Pages</div>
+  <div class="sideitem" data-page="gaming"><span class="sideicon">♟</span>Gaming</div>
+  <div class="side-section"><div class="side-title">Your shortcuts</div>
+   <div class="sideitem" data-page="communities"><span class="sideicon">🌍</span>Community Hub</div>
+   <div class="sideitem" data-page="creators"><span class="sideicon">⭐</span>Creator Connect</div>
+   <div class="sideitem" data-page="business"><span class="sideicon">🏪</span>Business Manager</div>
+   <div class="sideitem" data-page="learn"><span class="sideicon">📚</span>Learn & Earn</div>
+   <div class="sideitem" data-page="booking"><span class="sideicon">📅</span>Booking Manager</div>
+   <div class="sideitem" data-page="support"><span class="sideicon">🎧</span>Support Connect</div>
+   <div class="sideitem" data-page="marketplace"><span class="sideicon">🛍️</span>Digital Marketplace</div>
+  </div>
+  <footer>Privacy · Terms · Help · About DANEGRAM<br>© 2026 DANEGRAM</footer>
+ </aside>
+ <main class="maincol" id="mainContent"></main>
+ <aside class="rightcol">
+  <div class="card right-card"><div class="right-title">Sponsored</div><div style="height:100px;border-radius:9px;background:linear-gradient(120deg,#dceaff,#a8c9f5);display:grid;place-items:center;font-size:34px">📣</div><b>Grow with DANEGRAM</b><div class="small muted">Business promotions and creator opportunities are coming soon.</div></div>
+  <div class="card right-card"><div class="right-title">Contacts <span class="muted" style="float:right">•••</span></div>
+   <div class="contact"><span class="avatar">AM</span>Amara M.</div><div class="contact"><span class="avatar" style="background:#b46d9b">JO</span>Joseph O.</div><div class="contact"><span class="avatar" style="background:#4f947d">FK</span>Fatima K.</div><div class="contact"><span class="avatar" style="background:#b88743">DA</span>Daniel A.</div>
+  </div>
+  <div class="card right-card"><div class="right-title">Community guidelines</div><p class="small muted">Be respectful. Share authentic content. Do not impersonate others, harass people, or post harmful material.</p><button class="secondary full" id="reportHelp">Safety & reporting</button></div>
+ </aside>
+</div>
+<section class="auth-gate" id="authGate" aria-label="DANEGRAM welcome and sign in">
+ <div class="auth-gate-card">
+  <div class="auth-gate-logo">D</div>
+  <h1>DANEGRAM</h1>
+  <p class="auth-tagline">Connect with your world</p>
+  <p class="auth-intro">Share moments, discover creators, meet people and build communities.</p>
+  <button class="primary full" id="gateSignup">Create your account</button>
+  <button class="secondary full" id="gateLogin">Log in</button>
+  <p class="auth-disclaimer">Secure member registration and login are powered by DANEGRAM’s Supabase account service. Posts, likes and comments are connected to your DANEGRAM account.</p>
+ </div>
+</section>
+<div class="modal-backdrop" id="modalBackdrop"><div class="modal" role="dialog" aria-modal="true"><div class="modal-head"><span id="modalTitle">Create post</span><button class="close" id="modalClose">×</button></div><div class="modal-body" id="modalBody"></div></div></div>
+<script>
+(async function(){
+// Load Supabase from more than one CDN. If the SDK cannot load, keep the
+// DANEGRAM interface responsive and show a clear authentication message.
+async function loadSupabaseSdk(){
+  if(window.supabase && typeof window.supabase.createClient === 'function') return true;
+  const sources = [
+    'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2',
+    'https://unpkg.com/@supabase/supabase-js@2'
+  ];
+  for(const src of sources){
+    try{
+      await new Promise((resolve,reject)=>{
+        const script=document.createElement('script');
+        script.src=src; script.async=true;
+        script.onload=resolve; script.onerror=()=>reject(new Error('Could not load '+src));
+        document.head.appendChild(script);
+      });
+      if(window.supabase && typeof window.supabase.createClient === 'function') return true;
+    }catch(error){ console.warn('DANEGRAM Supabase SDK fallback:',error.message); }
+  }
+  return false;
+}
+const SUPABASE_SDK_READY = await loadSupabaseSdk();
+window.addEventListener('error', event => console.error('DANEGRAM interface error:', event.message));
+window.addEventListener('unhandledrejection', event => console.error('DANEGRAM background error:', event.reason));
+const SUPABASE_URL = 'https://sleyfngpotttsfzwlikq.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_98Z4hCVNhz8IOR0YNKuIwQ_NNxmzfby';
+const supabaseClient = SUPABASE_SDK_READY ? window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY) : null;
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const store={get(k,d){try{return JSON.parse(localStorage.getItem('danegram_'+k))??d}catch{return d}},set(k,v){localStorage.setItem('danegram_'+k,JSON.stringify(v))}};
+let user=null, currentSession=null, premiumSubscription=null, premiumLookupFailed=false;
+document.body.classList.add('auth-required');
+let posts=[], currentPage='home', saved=store.get('saved',[]), following=store.get('following',[]), notifications=store.get('notifications',[]), groups=store.get('groups',[]), activeGroup=null;
+function safe(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function name(){return user?.name||'DANEGRAM Member'} function initials(n){return (n||'DG').split(/\s+/).slice(0,2).map(x=>x[0]).join('').toUpperCase()}
+function avatar(n,cl=''){return `<span class="avatar ${cl}">${safe(initials(n))}</span>`}
+function openModal(title,body){$('#modalTitle').textContent=title;$('#modalBody').innerHTML=body;$('#modalBackdrop').classList.add('show')}
+function closeModal(){$('#modalBackdrop').classList.remove('show')}
+window.closeModal=closeModal;
+function postCard(p){return `<article class="card post" data-post="${p.id}"><div class="post-head">${avatar(p.name)}<div><div class="post-author">${safe(p.name)}${(premiumSubscription&&(p.user_id===myId()||p.name===name()))?premiumProfileMark():''}</div><div class="post-meta">${safe(p.time)} · 🌐</div></div><button class="more" data-action="more" data-id="${p.id}">•••</button></div><div class="post-text">${safe(p.text)}</div>${p.media?`<img class="post-media" src="${p.media}" alt="Post media">`:''}<div class="post-stats"><span>👍 ${p.likes} reactions</span><span>${p.comments.length} comments · 0 shares</span></div><div class="post-actions"><button data-action="like" data-id="${p.id}" class="${p.liked?'liked':''}">${p.liked?'👍 Liked':'👍 Like'}</button><button data-action="comment" data-id="${p.id}">▢ Comment</button><button data-action="share" data-id="${p.id}">↗ Share</button><button data-action="save" data-id="${p.id}">🔖 Save</button></div><div class="comment-list">${p.comments.slice(-3).map(c=>`<div class="comment"><b>${safe(c.name)}</b>${safe(c.text)}${c.time?`<div class="small muted">${safe(c.time)}</div>`:''}</div>`).join('')}</div><div class="comment-box">${avatar(name())}<input aria-label="Write a comment" maxlength="2000" placeholder="Write a comment…" data-comment-input="${p.id}"><button class="primary" data-action="sendcomment" data-id="${p.id}">Send</button></div></article>`}
+function homePage(){return `<section class="card stories"><div class="story add" id="addStory"><div class="addcircle">＋</div><strong>Create story</strong></div><div class="story" data-story="Amara M."><span class="story-avatar">AM</span>Amara M.</div><div class="story" data-story="Joseph O."><span class="story-avatar">JO</span>Joseph O.</div><div class="story" data-story="Fatima K."><span class="story-avatar">FK</span>Fatima K.</div><div class="story" data-story="Daniel A."><span class="story-avatar">DA</span>Daniel A.</div></section><section class="card composer"><div class="composer-top">${avatar(name())}<button class="composer-input" id="composerOpen">What's on your mind, ${safe(name().split(' ')[0])}?</button></div><div class="composer-actions"><button id="photoPost">▧ Photo/video</button><button id="livePost">🔴 Live video</button><button id="feelingPost">☺ Feeling/activity</button></div></section><div class="section-heading">Your feed</div>${posts.slice().reverse().map(postCard).join('')}`}
+
+function groupsPage(){
+ return `<div class="section-heading">Groups & Communities</div>
+ <div class="card right-card"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><div><b>Find your people</b><div class="small muted">Create a group or join a community around shared interests.</div></div><button class="primary" id="createGroup">＋ Create group</button></div>
+ <div class="field" style="margin-top:13px;margin-bottom:0"><input id="groupSearch" placeholder="Search groups by name or category…"></div></div>
+ <div id="groupsList">${groups.map(groupCard).join('')}</div>`;
+}
+function groupCard(g){
+ return `<div class="card group-card"><div class="group-art">♧</div><div style="min-width:0;flex:1"><h3>${safe(g.title)}</h3><p>${safe(g.description)}</p><div class="small muted">${safe(g.category)} · ${g.members} members</div></div><div class="group-actions"><button class="secondary" data-group-open="${g.id}">View</button><button class="${g.joined?'secondary':'primary'}" data-group-join="${g.id}">${g.joined?'Joined':'Join'}</button></div></div>`;
+}
+function groupRoomPage(){
+ const g=groups.find(x=>x.id===activeGroup)||groups[0];
+ if(!g)return `<div class="card empty">Choose a group first.</div>`;
+ return `<div class="card group-room"><div class="group-room-head"><div><div class="section-heading" style="margin:0">${safe(g.title)}</div><div class="small muted">${g.members} members · ${safe(g.category)}</div></div><button class="secondary" id="backGroups">← All groups</button></div><p>${safe(g.description)}</p><div class="notice">Group posts, member roles, group chat, files and announcements will become shared real-time features after Supabase is connected. This preview stores group membership only in this browser.</div><button class="${g.joined?'secondary':'primary'}" id="roomJoin">${g.joined?'Leave group':'Join group'}</button></div><div class="card composer"><div class="composer-top">${avatar(name())}<button class="composer-input" id="groupPostOpen">Write something to this group…</button></div></div><div class="card empty">No group posts yet. Be the first to start a conversation.</div>`;
+}
+function callsPage(){
+ return `<div class="section-heading">Voice & Video Calls</div><div class="card right-card"><p class="muted">Start a one-to-one voice or video call. Group calling can be added in the calling phase.</p><div class="gridcards"><div class="card feature-card"><div class="bigicon">📹</div><h3>Video call</h3><p>Camera and microphone call interface.</p><button class="primary full" style="margin-top:12px" id="startVideoCall">Start video call</button></div><div class="card feature-card"><div class="bigicon">📞</div><h3>Voice call</h3><p>Microphone-only call interface.</p><button class="primary full" style="margin-top:12px" id="startVoiceCall">Start voice call</button></div></div><div class="notice">Important: the call screen below can request camera/microphone permission, but a real call between two different users requires a signalling service, STUN/TURN servers and authenticated call invitations. Those backend pieces are not connected in this HTML preview.</div></div>`;
+}
+function startCall(kind){
+ openModal(kind==='video'?'Start video call':'Start voice call',`<div class="call-panel"><div class="call-status" id="callStatus">Ready to start · ${kind==='video'?'Video':'Voice'} call</div><div class="call-avatar">${safe(initials(name()))}</div><h2 style="margin:0">DANEGRAM Call</h2><p class="call-status">Waiting for backend signalling connection</p><div class="call-controls"><button id="toggleMic" title="Microphone">🎙️</button>${kind==='video'?'<button id="toggleCam" title="Camera">📷</button>':''}<button id="endCall" class="end" title="End call">☎</button></div></div><div class="notice">This is a call-interface preview. It does not yet connect to another person. We will implement real WebRTC calling after Supabase signalling and TURN configuration.</div>`);
+ let stream=null, micOn=true, camOn=kind==='video';
+ const status=$('#callStatus');
+ const stop=()=>{if(stream)stream.getTracks().forEach(t=>t.stop());closeModal()};
+ const media=kind==='video'?{audio:true,video:true}:{audio:true};
+ if(navigator.mediaDevices?.getUserMedia){
+  navigator.mediaDevices.getUserMedia(media).then(s=>{stream=s;if(status)status.textContent='Local microphone/camera permission granted · No remote participant connected';}).catch(()=>{if(status)status.textContent='Permission not granted. You can still close this preview.'});
+ }else if(status)status.textContent='Camera/microphone API unavailable in this browser context.';
+ $('#toggleMic')?.addEventListener('click',e=>{micOn=!micOn;if(stream)stream.getAudioTracks().forEach(t=>t.enabled=micOn);e.currentTarget.textContent=micOn?'🎙️':'🔇'});
+ $('#toggleCam')?.addEventListener('click',e=>{camOn=!camOn;if(stream)stream.getVideoTracks().forEach(t=>t.enabled=camOn);e.currentTarget.textContent=camOn?'📷':'🚫'});
+ $('#endCall')?.addEventListener('click',stop);
+}
+
+/* DANEGRAM LIVE PRIVATE MESSAGING — uses the actual DANEGRAM schema */
+let activeConversationId=null, chatChannel=null, chatBusy=false;
+const myId=()=>currentSession?.user?.id||user?.id;
+function chatError(e){return e?.message||'Something went wrong. Please try again.'}
+async function loadChats(){
+ const list=$('#conversationList'); if(!list)return;
+ if(!myId()){list.textContent='Log in to view chats.';return}
+ list.textContent='Loading your conversations…';
+ try{
+  const {data:mine,error}=await supabaseClient.from('conversation_members').select('conversation_id').eq('user_id',myId());
+  if(error)throw error;
+  const ids=[...new Set((mine||[]).map(x=>x.conversation_id))];
+  if(!ids.length){list.innerHTML='<div class="dg-empty">No conversations yet. Tap + to start a new chat.</div>';return}
+  const {data:convs,error:ce}=await supabaseClient.from('conversations').select('id,created_by,is_group,title,created_at').in('id',ids).order('created_at',{ascending:false});
+  if(ce)throw ce;
+  const {data:members,error:me}=await supabaseClient.from('conversation_members').select('conversation_id,user_id').in('conversation_id',ids);
+  if(me)throw me;
+  const others=[...new Set((members||[]).filter(x=>x.user_id!==myId()).map(x=>x.user_id))];
+  let profiles=[]; if(others.length){const q=await supabaseClient.from('profiles').select('id,display_name,username,avatar_url').in('id',others);if(q.error)throw q.error;profiles=q.data||[]}
+  const pm=new Map(profiles.map(x=>[x.id,x]));
+  const {data:msgs,error:msgErr}=await supabaseClient.from('messages').select('conversation_id,sender_id,content,created_at').in('conversation_id',ids).order('created_at',{ascending:false}).limit(300);
+  if(msgErr)throw msgErr;
+  const latest={};(msgs||[]).forEach(m=>{if(!latest[m.conversation_id])latest[m.conversation_id]=m});
+  window.dgConversations=(convs||[]).map(c=>{
+   const peer=(members||[]).filter(x=>x.conversation_id===c.id&&x.user_id!==myId()).map(x=>pm.get(x.user_id)).filter(Boolean)[0];
+   const label=c.is_group?(c.title||'Group chat'):(peer?.display_name||peer?.username||'DANEGRAM member');
+   const msg=latest[c.id];const initials=label.split(/\\s+/).slice(0,2).map(w=>w[0]||'').join('').toUpperCase()||'D';
+   return {...c,label,peer,initials,preview:msg?(msg.sender_id===myId()?'You: ':'')+(msg.content||'Attachment'):'Start a conversation',lastAt:msg?.created_at||c.created_at};
+  });
+  const draw=(rows)=>{list.innerHTML=rows.length?rows.map((c,i)=>`<button type="button" class="dg-conversation" data-open-chat="${c.id}"><span class="dg-conversation-avatar ${i%2?'alt':''}">${safe(c.initials)}</span><span class="dg-conversation-copy"><span class="dg-conversation-name">${safe(c.label)}</span><span class="dg-conversation-preview">${safe(c.preview)}</span></span><time class="dg-conversation-time">${c.lastAt?new Date(c.lastAt).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}):''}</time></button>`).join(''):'<div class="dg-empty">No matching conversations.</div>';
+   list.querySelectorAll('[data-open-chat]').forEach(b=>b.onclick=()=>openChat(b.dataset.openChat));
+  };
+  draw(window.dgConversations);
+  $('#chatListSearch')?.addEventListener('input',e=>{const q=e.target.value.trim().toLowerCase();draw(window.dgConversations.filter(c=>(c.label+' '+c.preview).toLowerCase().includes(q)))});
+  if(activeConversationId&&ids.includes(activeConversationId))await openChat(activeConversationId);
+ }catch(e){list.textContent='Could not load chats: '+chatError(e)}
+}
+async function openChat(id){
+ activeConversationId=id;const c=(window.dgConversations||[]).find(x=>x.id===id);
+ document.querySelector('.dg-inbox-page')?.classList.add('dg-show-room');
+ $('#chatTitle').textContent=c?.label||'Conversation';$('#chatAvatar').textContent=c?.initials||'D';$('#chatMessages').textContent='Loading messages…';$('#messageInput').disabled=false;$('#sendMessage').disabled=false;
+ if(chatChannel){await supabaseClient.removeChannel(chatChannel);chatChannel=null}
+ await fetchChatMessages();
+ chatChannel=supabaseClient.channel('danegram-chat-'+id).on('postgres_changes',{event:'*',schema:'public',table:'messages',filter:'conversation_id=eq.'+id},()=>{if(activeConversationId===id)fetchChatMessages()}).subscribe();
+}
+async function fetchChatMessages(){
+ if(!activeConversationId)return;
+ const box=$('#chatMessages');
+ try{
+  const {data,error}=await supabaseClient.from('messages').select('id,conversation_id,sender_id,content,media_url,created_at').eq('conversation_id',activeConversationId).order('created_at',{ascending:true}).limit(200);
+  if(error)throw error;
+  const rows=data||[];const senderIds=[...new Set(rows.map(x=>x.sender_id))];let names={};
+  if(senderIds.length){const q=await supabaseClient.from('profiles').select('id,display_name,username').in('id',senderIds);if(q.error)throw q.error;(q.data||[]).forEach(x=>names[x.id]=x.display_name||x.username||'Member')}
+  box.innerHTML=rows.length?rows.map(m=>`<div class="bubble ${m.sender_id===myId()?'mine':''}"><b>${safe(m.sender_id===myId()?'You':names[m.sender_id]||'Member')}</b><div>${safe(m.content||'')}</div>${m.media_url?`<a href="${safe(m.media_url)}" target="_blank" rel="noopener">View attachment</a>`:''}<div class="small muted">${new Date(m.created_at).toLocaleString()}</div></div>`).join(''):'<p class="muted">No messages yet. Say hello 👋</p>';
+  box.scrollTop=box.scrollHeight;
+ }catch(e){box.textContent='Could not load messages: '+chatError(e)}
+}
+async function sendChatMessage(e){e.preventDefault();if(chatBusy||!activeConversationId||!myId())return;const input=$('#messageInput'),content=input.value.trim();if(!content)return;chatBusy=true;$('#sendMessage').disabled=true;$('#messageStatus').textContent='Sending…';
+ try{const {error}=await supabaseClient.from('messages').insert({conversation_id:activeConversationId,sender_id:myId(),content});if(error)throw error;input.value='';$('#messageStatus').textContent='Sent';await fetchChatMessages()}
+ catch(err){$('#messageStatus').textContent='Message not sent: '+chatError(err)}finally{chatBusy=false;$('#sendMessage').disabled=false;input.focus()}}
+async function startNewChat(){
+ if(!myId()){openAuth('login');return}
+ openModal('Message a DANEGRAM member',`<div class="field"><label>Search members</label><input id="memberSearchInput" placeholder="Name or username…" autocomplete="off"></div><div id="memberSearchResults" class="small muted">Type at least 2 characters to find members.</div>`);
+ const input=$('#memberSearchInput'),out=$('#memberSearchResults');let timer;
+ input.addEventListener('input',()=>{clearTimeout(timer);timer=setTimeout(async()=>{const term=input.value.trim();if(term.length<2){out.textContent='Type at least 2 characters to find members.';return}out.textContent='Searching…';try{const {data,error}=await supabaseClient.from('profiles').select('id,display_name,username').neq('id',myId()).or(`display_name.ilike.%${term.replace(/[%_,]/g,'')}%,username.ilike.%${term.replace(/[%_,]/g,'')}%`).limit(15);if(error)throw error;out.innerHTML=(data||[]).length?(data||[]).map(p=>`<button class="secondary full" style="margin:5px 0;text-align:left" data-member-id="${p.id}">${safe(p.display_name||p.username)} · @${safe(p.username||'member')}</button>`).join(''):'No matching members found.';out.querySelectorAll('[data-member-id]').forEach(b=>b.onclick=()=>createDirectChat(b.dataset.memberId))}catch(e){out.textContent='Search failed: '+chatError(e)}},250)});
+}
+async function createDirectChat(peerId){
+ try{
+  $('#memberSearchResults').textContent='Opening chat…';
+  const {data:mine,error}=await supabaseClient.from('conversation_members').select('conversation_id').eq('user_id',myId());if(error)throw error;
+  const ids=(mine||[]).map(x=>x.conversation_id);
+  if(ids.length){const {data:directs,error:de}=await supabaseClient.from('conversations').select('id').in('id',ids).eq('is_group',false);if(de)throw de;
+   if(directs?.length){const did=directs.map(x=>x.id);const {data:peer,error:pe}=await supabaseClient.from('conversation_members').select('conversation_id').eq('user_id',peerId).in('conversation_id',did);if(pe)throw pe;if(peer?.length){activeConversationId=peer[0].conversation_id;closeModal();await loadChats();return}}
+  }
+  const {data:conv,error:ce}=await supabaseClient.from('conversations').insert({created_by:myId(),is_group:false,title:null}).select('id').single();if(ce)throw ce;
+  const {error:me}=await supabaseClient.from('conversation_members').insert([{conversation_id:conv.id,user_id:myId()},{conversation_id:conv.id,user_id:peerId}]);if(me)throw me;
+  activeConversationId=conv.id;closeModal();await loadChats();
+ }catch(e){$('#memberSearchResults').textContent='Could not start chat: '+chatError(e)}
+}
+async function loadLiveNotifications(){const status=$('#notificationStatus'),list=$('#notificationList');if(!status||!list)return;if(!myId()){status.textContent='Log in to view notifications.';return}status.textContent='Loading…';try{const {data,error}=await supabaseClient.from('notifications').select('*').eq('user_id',myId()).order('created_at',{ascending:false}).limit(50);if(error)throw error;status.textContent=data?.length?`${data.length} recent notification(s).`:'No notifications yet.';list.innerHTML=(data||[]).map(n=>`<div class="contact" style="padding:12px;border-bottom:1px solid var(--line)">🔔 <span>${safe(n.message||n.content||n.type||'You have a new notification')}</span><div class="small muted">${n.created_at?new Date(n.created_at).toLocaleString():''}</div></div>`).join('')}catch(e){status.textContent='Could not load notifications: '+chatError(e)}}
+
+function premiumPage(){
+ const active=!!premiumSubscription;
+ const status=active?`Premium active · renews/expires ${safe(premiumExpiryText())}`:'Explore Premium · membership required';
+ const features=[
+  ['⭐','Glowing Premium star','Your Premium star appears beside your name on your profile, your posts and your outgoing chat messages.',true],
+  ['🚫','Ad-free experience','Sponsored placements in the DANEGRAM interface are hidden for active Premium members.',true],
+  ['🎞️','Animated profile pictures','Use a short looping video or GIF as your profile picture.',false],
+  ['✨','Emoji statuses','Show an animated emoji status beside your name.',false],
+  ['🧩','Custom animated emoji','Use exclusive animated emoji packs in conversations.',false],
+  ['📱','Special app icons','Choose alternative DANEGRAM icons for your phone home screen.',false],
+  ['📌','Higher usage limits','More pinned chats, groups, public links and saved media.',false],
+  ['📦','Large, fast file transfers','Send and download files up to 4 GB, subject to storage and network capacity.',false],
+  ['🎙️','Voice-to-text','Transcribe voice messages into readable text.',false],
+  ['🌐','Real-time translation','Translate messages and chats without leaving the conversation.',false]
+ ];
+ return `<div class="premium-page-hero"><div class="premium-status-pill">✦ DANEGRAM PREMIUM</div><h1>More ways to express yourself.</h1><p>A richer DANEGRAM experience inspired by Telegram Premium, with exclusive identity styling, smarter messaging and higher limits.</p><div class="premium-page-actions"><button class="primary" id="premiumAccountAction" style="background:#fff;color:#1457b8">${active?'View membership':'Get Premium — ₦2,500/month'}</button><button class="secondary" id="premiumProfileAction">View my profile</button></div></div>
+ <div class="card right-card"><b>${active?'Your membership is active':'DANEGRAM Premium'}</b><p class="small muted">${status}</p>${active?'<div class="small muted">Your Premium star is enabled. Premium is separate from the blue verified checkmark.</div>':'<div class="small muted">Subscribe to activate Premium benefits as they become available. Payment does not grant identity verification.</div>'}</div>
+ <div class="premium-section-title">Premium features</div><div class="premium-feature-grid">${features.map(f=>`<article class="premium-feature"><div class="premium-feature-top"><span class="premium-feature-icon">${f[0]}</span><h3>${f[1]}</h3></div><p>${f[2]}</p><span class="premium-feature-state ${f[3]?'live':''}">${f[3]?'Available in this build':'Coming in a future rollout'}</span></article>`).join('')}</div>
+ <div class="premium-note"><b>Feature rollout:</b> Your membership and payment are active, but several advanced benefits still need secure storage, database support and messaging services. They will be enabled only when they genuinely work. The blue verified check remains reserved for approved accounts.</div>`;
+}
+function pageTemplate(title,sub,items){return `<div class="section-heading">${title}</div><div class="card right-card"><p class="muted">${sub}</p><div class="gridcards">${items.map(x=>`<div class="card feature-card"><div class="bigicon">${x[0]}</div><h3>${x[1]}</h3><p>${x[2]}</p></div>`).join('')}</div></div>`}
+function render(){let m=$('#mainContent');if(currentPage==='home')m.innerHTML=homePage();else if(currentPage==='premium')m.innerHTML=premiumPage();else if(currentPage==='profile')m.innerHTML=`<div class="card"><div class="profile-cover"></div><div class="profile-info">${avatar(name())}<h2>${safe(name())}${premiumProfileMark()}</h2><div class="muted">@${safe((user?.username||'danegrammember'))}</div><p>${safe(user?.bio||'Welcome to my DANEGRAM profile.')}</p><div class="profile-stats"><span><b>${posts.length}</b> posts</span><span><b>${following.length}</b> following</span><span><b>0</b> followers</span></div><button class="primary" id="editProfile">Edit profile</button></div></div><div class="section-heading">Your posts</div>${posts.filter(p=>p.name===name()).map(postCard).join('')||'<div class="card empty">Your posts will appear here.</div>'}`;
+else if(currentPage==='friends')m.innerHTML=pageTemplate('Friends','Find people, follow their updates and build real connections.',[['👥','Friend requests','Review connection requests.'],['🔎','Find friends','Discover people you may know.'],['➕','Suggested people','Meet members with shared interests.']]);
+else if(['groups','communities'].includes(currentPage))m.innerHTML=groupsPage();
+else if(currentPage==='group-room')m.innerHTML=groupRoomPage(); 
+else if(currentPage==='calls')m.innerHTML=callsPage();
+else if(['watch','video'].includes(currentPage))m.innerHTML=pageTemplate('DANEGRAM Watch','Discover short videos and video posts from the community.',[['▶','Short videos','A dedicated vertical video experience will connect here.'],['🎬','Following','Videos from creators you follow.'],['🔥','Trending','Popular videos and topics.']]);
+else if(currentPage==='marketplace')m.innerHTML=pageTemplate('Marketplace','Discover products and services from businesses and community sellers.',[['🛍️','Browse items','Explore products listed by sellers.'],['＋','Create listing','Seller tools will be enabled after backend setup.'],['📦','Your orders','Track purchases and sales.'],['🏪','Business Manager','Manage your business presence.']]);
+else if(currentPage==='events')m.innerHTML=pageTemplate('Events','Discover online and local events and manage your invitations.',[['📅','Upcoming events','See events from your communities.'],['＋','Create event','Create an event for your audience.']]);
+else if(currentPage==='pages')m.innerHTML=pageTemplate('Pages','Follow public figures, creators, organisations and businesses.',[['⭐','Creator pages','Discover creators and their work.'],['🏢','Business pages','Connect with brands and services.']]);
+else if(currentPage==='gaming')m.innerHTML=pageTemplate('Gaming','A place for game communities, streams and friendly competition.',[['🎮','Game communities','Join gaming conversations.'],['🏆','Tournaments','Competition features are planned.']]);
+else if(currentPage==='saved')m.innerHTML=`<div class="section-heading">Saved</div><div class="card empty">Saved posts will appear here. Use Save on any post to keep it for later.</div>`;
+else if(currentPage==='memories')m.innerHTML=pageTemplate('Memories','Look back on moments and posts you choose to revisit.',[['◷','On this day','Your memories will appear here.']]);
+else if(currentPage==='creators')m.innerHTML=pageTemplate('Creator Connect','Creator profiles, brand collaborations and monetization tools.',[['⭐','Creator profile','Build your public creator presence.'],['🤝','Collaboration opportunities','Connect with brands and other creators.'],['💰','Creator earnings','Gifts, subscriptions and payouts will require secure payment integration.']]);
+else if(currentPage==='business')m.innerHTML=pageTemplate('Business Manager','Manage customers, orders, promotions and business activities.',[['🏪','Business profile','Create and manage your business page.'],['📣','Promotions','Reach audiences with sponsored content.'],['📊','Insights','Understand your audience and performance.']]);
+else if(currentPage==='learn')m.innerHTML=pageTemplate('Learn & Earn','Courses, learning paths and progress tracking. Rewards will only apply to funded, approved activities.',[['📚','Courses','Learn useful skills at your own pace.'],['🎓','Learning progress','Track your course progress.'],['🏅','Eligible rewards','Clear rules and genuine funding required.']]);
+else if(currentPage==='booking')m.innerHTML=pageTemplate('Booking Manager','Manage appointments, reservations and service availability.',[['📅','My bookings','View and manage appointments.'],['🗓️','Availability','Set available booking times.']]);
+else if(currentPage==='support')m.innerHTML=pageTemplate('Support Connect','Get help, receive important updates and track support requests.',[['🎧','Help centre','Find answers and contact support.'],['📩','My requests','Track your support cases.']]);
+else if(currentPage==='notifications')m.innerHTML=`<div class="section-heading">Notifications</div><div class="card right-card"><div id="notificationStatus" class="small muted">Loading notifications…</div><div id="notificationList"></div></div>`;
+else if(currentPage==='messages')m.innerHTML=`<section class="dg-inbox-page"><header class="dg-inbox-head"><div class="dg-brandline"><div class="dg-mark">D</div><strong>DANEGRAM</strong><span>DIRECT</span></div><div class="dg-inbox-title"><h1>Your messages</h1><button class="dg-newchat" id="newChat" aria-label="Start a new conversation">＋</button></div><label class="dg-search"><span>⌕</span><input id="chatListSearch" type="search" placeholder="Find a conversation…" autocomplete="off"></label></header><div class="dg-inbox-caption">Recent conversations</div><div id="conversationList" class="dg-chat-list"><div class="dg-empty">Loading your conversations…</div></div><section class="dg-room" id="chatRoom"><header class="dg-room-head"><button type="button" class="dg-back-inbox" id="backToChats" aria-label="Back to conversations">‹</button><div class="dg-room-avatar" id="chatAvatar">D</div><div class="dg-room-heading"><div class="dg-room-name" id="chatTitle">Conversation</div><div class="dg-room-sub">Private conversation · DANEGRAM</div></div></header><div id="chatMessages" class="dg-chat-body"><p class="muted">Choose a conversation to begin.</p></div><form id="messageForm" class="dg-compose"><label class="dg-compose-field"><input id="messageInput" maxlength="5000" placeholder="Write a message…" disabled></label><button class="dg-send" id="sendMessage" aria-label="Send message" title="Send message" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11.5 21 3l-6.8 18-3.1-7.1L3 11.5Z"/><path d="m11.1 13.9 4.5-4.5"/></svg></button></form><div id="messageStatus" class="dg-status"></div></section></section>`;
+else m.innerHTML=pageTemplate('DANEGRAM','Connect, share and grow together.',[['🌍','Community','Find your people.']]);
+$$('[data-page]').forEach(b=>b.classList.toggle('active',b.dataset.page===currentPage));$('#messengerBtn')?.classList.toggle('active',currentPage==='messages');$('#notifyBtn')?.classList.toggle('active',currentPage==='notifications');$('#accountBtn')?.classList.toggle('active',currentPage==='profile');bindPage()}
+function bindPage(){
+$('#premiumAccountAction')?.addEventListener('click',()=>{if(premiumSubscription){showAccount()}else startPremiumCheckout()});
+$('#premiumProfileAction')?.addEventListener('click',()=>go('profile'));
+$('#createGroup')?.addEventListener('click',createGroup);
+$('#newChat')?.addEventListener('click',startNewChat);$('#messageForm')?.addEventListener('submit',sendChatMessage);$('#backToChats')?.addEventListener('click',()=>{document.querySelector('.dg-inbox-page')?.classList.remove('dg-show-room');activeConversationId=null;if(chatChannel){supabaseClient.removeChannel(chatChannel);chatChannel=null;}});if(currentPage==='messages')loadChats();if(currentPage==='notifications')loadLiveNotifications();
+$('#groupSearch')?.addEventListener('input',e=>{let q=e.target.value.toLowerCase();$('#groupsList').innerHTML=groups.filter(g=>(g.title+' '+g.category+' '+g.description).toLowerCase().includes(q)).map(groupCard).join('')||'<div class="card empty">No matching groups found.</div>';bindGroupButtons()});
+bindGroupButtons();
+$('#backGroups')?.addEventListener('click',()=>go('groups'));
+$('#roomJoin')?.addEventListener('click',()=>{let g=groups.find(x=>x.id===activeGroup);if(g){g.joined=!g.joined;g.members+=g.joined?1:-1;store.set('groups',groups);render()}});
+$('#groupPostOpen')?.addEventListener('click',()=>openModal('Group post','<p class="muted">Group posting will be enabled when shared group data is connected.</p>'));
+$('#startVideoCall')?.addEventListener('click',()=>startCall('video'));
+$('#startVoiceCall')?.addEventListener('click',()=>startCall('voice'));
+$('#composerOpen')?.addEventListener('click',()=>createPost());$('#photoPost')?.addEventListener('click',()=>createPost(true));$('#addStory')?.addEventListener('click',()=>openModal('Create a story','<p class="muted">Stories will be enabled when media storage is connected.</p><button class="primary full" onclick="closeModal()">Got it</button>'));
+$('#editProfile')?.addEventListener('click',editProfile);
+$$('[data-action]').forEach(b=>b.addEventListener('click',()=>postAction(b.dataset.action,b.dataset.id)));
+$$('[data-comment-input]').forEach(i=>i.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();postAction('sendcomment',i.dataset.commentInput)}}));
+$$('[data-story]').forEach(s=>s.addEventListener('click',()=>openModal('Story',`<p>${safe(s.dataset.story)}'s story viewer will be available when stories are connected.</p>`)));
+}
+function bindGroupButtons(){
+ $$('[data-group-open]').forEach(b=>b.addEventListener('click',()=>{activeGroup=+b.dataset.groupOpen;go('group-room')}));
+ $$('[data-group-join]').forEach(b=>b.addEventListener('click',()=>{let g=groups.find(x=>x.id===+b.dataset.groupJoin);if(g){g.joined=!g.joined;g.members+=g.joined?1:-1;store.set('groups',groups);render()}}));
+}
+function createGroup(){
+ openModal('Create a group',`<div class="field"><label>Group name</label><input id="newGroupName" maxlength="60" placeholder="e.g. DANEGRAM Creators"></div><div class="field"><label>Description</label><textarea id="newGroupDescription" maxlength="240" placeholder="What is this group about?"></textarea></div><div class="field"><label>Category</label><select id="newGroupCategory"><option>General</option><option>Creators</option><option>Learning</option><option>Business</option><option>Sports</option><option>Arts & culture</option><option>Technology</option></select></div><div class="notice">Demo groups are stored in this browser only. Real public/private groups, roles, moderation and member lists will use Supabase.</div><button class="primary full" id="saveNewGroup">Create group</button>`);
+ $('#saveNewGroup').onclick=()=>{let title=$('#newGroupName').value.trim();if(!title){alert('Enter a group name.');return}let g={id:Date.now(),title,description:$('#newGroupDescription').value.trim()||'A new DANEGRAM community.',category:$('#newGroupCategory').value,members:1,joined:true};groups.unshift(g);store.set('groups',groups);activeGroup=g.id;closeModal();go('group-room')};
+}
+function createPost(){
+ if(!user || !currentSession){openModal('Sign in required','<p>Please log in to publish a post.</p>');return}
+ openModal('Create post',`<div class="composer-top" style="margin-bottom:12px">${avatar(name())}<b>${safe(name())}</b></div><div class="field"><textarea id="postText" maxlength="5000" placeholder="What's on your mind? Share an update with your community…"></textarea></div><div class="notice">Text posts are saved to your DANEGRAM account and shared feed. Photo and video posting will be connected separately.</div><div id="postMessage" class="small muted" role="status"></div><div class="modal-actions"><button class="primary" id="publishPost">Publish post</button></div>`);
+ $('#publishPost').onclick=publishPost;
+}
+async function publishPost(){
+ const text=$('#postText')?.value.trim()||'';
+ const message=$('#postMessage'),button=$('#publishPost');
+ if(!text){message.textContent='Write something before publishing.';return}
+ if(!supabaseClient || !currentSession || !user){message.textContent='Your secure session is unavailable. Please log in again.';return}
+ button.disabled=true;button.textContent='Publishing…';message.textContent='Saving your post…';
+ try{
+  const {error}=await supabaseClient.from('posts').insert({user_id:user.id,content:text,media_type:'text',visibility:'public'});
+  if(error) throw error;
+  await loadSharedPosts();
+  closeModal();currentPage='home';render();
+ }catch(error){message.textContent=error.message||'Could not publish your post. Please try again.';button.disabled=false;button.textContent='Publish post'}
+}
+async function loadSharedPosts(){
+ if(!supabaseClient || !currentSession || !user){posts=[];return}
+ const {data,error}=await supabaseClient.from('posts').select('id,user_id,content,media_url,media_type,created_at').order('created_at',{ascending:false}).limit(50);
+ if(error){console.error('DANEGRAM feed load:',error.message);posts=[];return}
+ const rows=data||[];
+ const postIds=rows.map(row=>row.id);
+ let reactions=[], commentRows=[];
+ if(postIds.length){
+  const reactionResult=await supabaseClient.from('post_reactions').select('id,post_id,user_id,reaction_type').in('post_id',postIds);
+  if(reactionResult.error) console.warn('DANEGRAM reactions could not be loaded:',reactionResult.error.message);
+  else reactions=reactionResult.data||[];
+  const commentResult=await supabaseClient.from('comments').select('id,post_id,user_id,content,created_at').in('post_id',postIds).order('created_at',{ascending:true});
+  if(commentResult.error) console.warn('DANEGRAM comments could not be loaded:',commentResult.error.message);
+  else commentRows=commentResult.data||[];
+ }
+ const ids=[...new Set([...rows.map(row=>row.user_id),...commentRows.map(row=>row.user_id)].filter(Boolean))];
+ let profiles=[];
+ if(ids.length){const result=await supabaseClient.from('profiles').select('id,display_name,username').in('id',ids);if(!result.error)profiles=result.data||[];else console.warn('DANEGRAM profile lookup:',result.error.message)}
+ const byId=new Map(profiles.map(profile=>[profile.id,profile]));
+ const commentsByPost=new Map();
+ for(const comment of commentRows){
+  const profile=byId.get(comment.user_id)||{};
+  const author=profile.display_name||profile.username||'DANEGRAM Member';
+  const entry=commentsByPost.get(comment.post_id)||[];
+  entry.push({id:comment.id,userId:comment.user_id,name:author,text:comment.content||'',time:comment.created_at?new Date(comment.created_at).toLocaleString():''});
+  commentsByPost.set(comment.post_id,entry);
+ }
+ const byPost=new Map();
+ for(const reaction of reactions){
+  if((reaction.reaction_type||'like')!=='like') continue;
+  const entry=byPost.get(reaction.post_id)||{count:0,liked:false};
+  entry.count++;
+  if(reaction.user_id===user.id) entry.liked=true;
+  byPost.set(reaction.post_id,entry);
+ }
+ posts=rows.map((row,index)=>{
+  const profile=byId.get(row.user_id)||{};
+  const author=profile.display_name||profile.username||'DANEGRAM Member';
+  const date=row.created_at?new Date(row.created_at):new Date();
+  const reaction=byPost.get(row.id)||{count:0,liked:false};
+  return {id:index+1,dbId:row.id,userId:row.user_id,name:author,initial:initials(author),time:date.toLocaleString(),text:row.content||'',likes:reaction.count,liked:reaction.liked,comments:commentsByPost.get(row.id)||[],media:'',mediaType:row.media_type||'text'};
+ });
+}
+async function postAction(action,id){
+ const p=posts.find(x=>String(x.id)===String(id));if(!p)return;
+ if(action==='like'){
+  const button=document.querySelector(`[data-action="like"][data-id="${id}"]`);
+  if(!supabaseClient||!currentSession||!user||!p.dbId){alert('Please log in again before reacting.');return}
+  if(button)button.disabled=true;
+  try{
+   const {data:existing,error:readError}=await supabaseClient.from('post_reactions').select('id').eq('post_id',p.dbId).eq('user_id',user.id).eq('reaction_type','like').maybeSingle();
+   if(readError)throw readError;
+   if(existing){
+    const {error}=await supabaseClient.from('post_reactions').delete().eq('id',existing.id).eq('user_id',user.id);
+    if(error)throw error;
+   }else{
+    const {error}=await supabaseClient.from('post_reactions').insert({post_id:p.dbId,user_id:user.id,reaction_type:'like'});
+    if(error)throw error;
+   }
+   await loadSharedPosts();render();
+  }catch(error){if(button)button.disabled=false;alert('DANEGRAM could not save your reaction: '+(error.message||'Please try again.'));}
+  return;
+ }
+ if(action==='comment'){document.querySelector(`[data-comment-input="${id}"]`)?.focus();return}
+ if(action==='sendcomment'){let input=document.querySelector(`[data-comment-input="${id}"]`);await sendComment(id,input?.value||'');return}
+ if(action==='save'){if(!saved.includes(p.id))saved.push(p.id);store.set('saved',saved);alert('Saved to your list.');return}
+ if(action==='share'){if(navigator.share)navigator.share({title:'DANEGRAM post',text:p.text}).catch(()=>{});else{navigator.clipboard?.writeText(p.text);alert('Post text copied (if clipboard access is available).')}return}
+ if(action==='more')openModal('Post options',`<p>Choose an action for this post.</p><button class="secondary full" id="reportPost">Report post</button><br><br><button class="secondary full" id="hidePost">Hide post</button>`);
+}
+async function sendComment(id,text){
+ const clean=String(text||'').trim();
+ if(!clean)return;
+ const p=posts.find(x=>String(x.id)===String(id));
+ if(!p||!p.dbId||!supabaseClient||!currentSession||!user){alert('Please log in again before commenting.');return}
+ if(clean.length>2000){alert('Comments must be 2,000 characters or fewer.');return}
+ const button=document.querySelector(`[data-action="sendcomment"][data-id="${id}"]`);
+ if(button){button.disabled=true;button.textContent='Sending…'}
+ try{
+  const {error}=await supabaseClient.from('comments').insert({post_id:p.dbId,user_id:user.id,content:clean});
+  if(error)throw error;
+  await loadSharedPosts();
+  render();
+ }catch(error){
+  if(button){button.disabled=false;button.textContent='Send'}
+  alert('DANEGRAM could not save your comment: '+(error.message||'Please try again.'));
+ }
+}
+function editProfile(){
+ openModal('Edit profile',`<div class="field"><label>Full name</label><input id="editName" maxlength="80" value="${safe(user?.name||'')}"></div><div class="field"><label>Username</label><input id="editUsername" minlength="3" maxlength="24" value="${safe(user?.username||'')}"><div class="small muted">3–24 letters, numbers or underscores.</div></div><div class="field"><label>Bio</label><textarea id="editBio" maxlength="300">${safe(user?.bio||'')}</textarea></div><button class="primary full" id="saveProfile">Save changes</button><div id="profileSaveMessage" class="small muted" style="margin-top:8px"></div>`);
+ $('#saveProfile').onclick=async()=>{
+   const display_name=$('#editName').value.trim(),username=$('#editUsername').value.trim().toLowerCase(),bio=$('#editBio').value.trim();
+   const message=$('#profileSaveMessage'),button=$('#saveProfile');
+   if(!display_name){message.textContent='Enter your full name.';return}
+   if(!/^[a-z0-9_]{3,24}$/.test(username)){message.textContent='Username must contain 3–24 letters, numbers or underscores.';return}
+   if(!supabaseClient){message.textContent='The secure profile service is not available. Refresh and try again.';return}
+   button.disabled=true;message.textContent='Saving your profile…';
+   const {data,error}=await supabaseClient.from('profiles').update({display_name,username,bio})
+     .eq('id',user.id).select('id,username,display_name,bio,avatar_url,cover_url').single();
+   if(error){message.textContent=error.message;button.disabled=false;return}
+   user={...user,name:data.display_name,username:data.username,bio:data.bio||''};
+   $('#sideName').textContent=name();closeModal();render();
+ };
+}
+
+async function startPremiumCheckout(){
+  if(!supabaseClient){alert('DANEGRAM sign-in service is unavailable. Refresh and try again.');return}
+  const button=$('#premiumGo');
+  if(button){button.disabled=true;button.textContent='Preparing secure checkout…'}
+  try{
+    const {data:{session},error:sessionError}=await supabaseClient.auth.getSession();
+    if(sessionError) throw sessionError;
+    if(!session?.access_token) throw new Error('Your DANEGRAM session has expired. Please log in again.');
+    const idempotencyKey='premium_'+crypto.randomUUID().replace(/-/g,'');
+    const response=await fetch('https://sleyfngpotttsfzwlikq.supabase.co/functions/v1/danegram-payment-init',{
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'apikey':SUPABASE_PUBLISHABLE_KEY,
+        'Authorization':'Bearer '+session.access_token
+      },
+      body:JSON.stringify({
+        product_code:'premium_monthly',
+        billing_interval:'monthly',
+        idempotency_key:idempotencyKey
+      })
+    });
+    const result=await response.json().catch(()=>({}));
+    if(!response.ok||!result.authorization_url){
+      throw new Error(result.error||'Could not start Premium checkout. Please try again.');
+    }
+    const checkoutUrl=new URL(result.authorization_url);
+    if(checkoutUrl.protocol!=='https:'||checkoutUrl.hostname!=='checkout.paystack.com'){
+      throw new Error('The checkout address could not be verified. Please contact DANEGRAM support.');
+    }
+    openModal('DANEGRAM Premium checkout',`<p>Your Premium order is ready.</p><p><b>₦2,500 / month</b></p><p class="small muted">Continue to Paystack's secure checkout to complete payment. Your Premium membership will only be activated after payment is verified by DANEGRAM.</p><a class="primary full" style="display:block;text-align:center" href="${safe(result.authorization_url)}" target="_blank" rel="noopener noreferrer">Continue to Paystack</a><p class="small muted">Order reference: ${safe(result.reference||'')}</p>`);
+  }catch(error){
+    alert(error.message||'Unable to start checkout. Please try again.');
+  }finally{
+    if(button){button.disabled=false;button.textContent='Get DANEGRAM Premium — ₦2,500/month'}
+  }
+}
+
+async function loadPremiumSubscription(){
+ premiumSubscription=null;premiumLookupFailed=false;document.body.classList.remove('premium-active');
+ if(!supabaseClient||!user?.id)return null;
+ const {data,error}=await supabaseClient.from('user_subscriptions')
+  .select('product_code,status,billing_interval,currency,amount_minor_units,started_at,expires_at')
+  .eq('user_id',user.id).eq('status','active')
+  .gt('expires_at',new Date().toISOString())
+  .order('expires_at',{ascending:false}).limit(1).maybeSingle();
+ if(error){premiumLookupFailed=true;console.error('DANEGRAM Premium status lookup:',error.message);return null}
+ premiumSubscription=data||null;
+ document.body.classList.toggle('premium-active',!!premiumSubscription);
+ return premiumSubscription;
+}
+function premiumProfileMark(){
+ if(!premiumSubscription)return '';
+ return `<span class="premium-star" title="DANEGRAM Premium member" aria-label="DANEGRAM Premium member"><svg viewBox="0 0 24 24" role="img" aria-hidden="true"><defs><linearGradient id="dngPremiumGradient" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffd76a"/><stop offset="1" stop-color="#d99a00"/></linearGradient></defs><path fill="url(#dngPremiumGradient)" d="M12 1.7l2.55 6.05 6.55.55-4.98 4.28 1.5 6.42L12 15.6l-5.62 3.4 1.5-6.42L2.9 8.3l6.55-.55L12 1.7z"/><path fill="#fff" d="M12 5.2l1.55 3.65 3.95.33-3 2.58.9 3.87L12 13.58l-3.4 2.05.9-3.87-3-2.58 3.95-.33L12 5.2z" opacity=".96"/></svg></span>`;
+}
+function premiumExpiryText(){
+ if(!premiumSubscription?.expires_at)return '';
+ return new Date(premiumSubscription.expires_at).toLocaleDateString(undefined,{day:'numeric',month:'long',year:'numeric'});
+}
+async function showAccount(){
+ if(user)await loadPremiumSubscription();
+ const premiumPanel=premiumSubscription
+  ? `<div style="background:#fff8df;border:1px solid #efd27a;border-radius:10px;padding:13px;margin:12px 0"><div style="font-weight:900;color:#805b00;font-size:16px">⭐ DANEGRAM Premium is ACTIVE</div><div class="small" style="color:#705b16;margin-top:4px">Monthly membership · ${safe(premiumSubscription.currency||'NGN')} · Expires ${safe(premiumExpiryText())}</div></div>`
+  : premiumLookupFailed
+   ? `<div class="notice">We couldn't verify your Premium status just now. Please refresh and try again. Your payment record has not been changed.</div>`
+   : `<button class="primary full" id="premiumGo">Get DANEGRAM Premium — ₦2,500/month</button><br><br>`;
+ openModal('Your account',`${user?`<p>Signed in as <b>${safe(name())}</b>.</p><p class="small muted">${safe(user.email||'')}</p>${premiumPanel}<button class="secondary full" id="premiumFeaturesGo">⭐ Explore Premium features</button><br><br><button class="secondary full" id="profileGo">View profile</button><br><br><button class="secondary full" id="securityGo">Security & privacy</button><br><br>${premiumSubscription?'':premiumLookupFailed?'':' '}<button class="secondary full" id="logoutBtn">Log out</button>`:`<p>Join DANEGRAM to create a profile and start connecting.</p><button class="primary full" id="signupOpen">Create account</button><br><br><button class="secondary full" id="loginOpen">Log in</button>`}<div class="notice">Your DANEGRAM account is managed by Supabase Authentication. Feed, messaging and other shared social features are being connected in stages.</div>`);
+ $('#signupOpen')?.addEventListener('click',()=>authForm('signup'));
+ $('#loginOpen')?.addEventListener('click',()=>authForm('login'));
+ $('#premiumFeaturesGo')?.addEventListener('click',()=>{closeModal();go('premium')});
+ $('#profileGo')?.addEventListener('click',()=>{closeModal();go('profile')});
+ $('#securityGo')?.addEventListener('click',securityModal);
+ $('#premiumGo')?.addEventListener('click',startPremiumCheckout);
+ $('#logoutBtn')?.addEventListener('click',async()=>{
+   if(!supabaseClient){alert('The secure sign-in service is not available. Refresh and try again.');return}
+   const {error}=await supabaseClient.auth.signOut();
+   if(error){alert('Could not log out: '+error.message);return}
+   user=null;currentSession=null;premiumSubscription=null;premiumLookupFailed=false;document.body.classList.remove('premium-active');
+   document.body.classList.add('auth-required');
+   $('#sideName').textContent='DANEGRAM Member';closeModal();render();
+ });
+}
+async function syncMemberProfile(authUser){
+ const metadata=authUser.user_metadata||{};
+ let {data:profile,error:readError}=await supabaseClient.from('profiles')
+   .select('id,username,display_name,bio,avatar_url,cover_url')
+   .eq('id',authUser.id).maybeSingle();
+ if(readError) console.warn('DANEGRAM profile lookup:',readError.message);
+ const fallbackUsername=('member_'+authUser.id.replace(/-/g,'').slice(0,10)).toLowerCase();
+ const wantedUsername=(profile?.username||metadata.username||fallbackUsername).toLowerCase();
+ const wantedName=profile?.display_name||metadata.display_name||metadata.full_name||
+   (authUser.email?authUser.email.split('@')[0]:'DANEGRAM Member');
+ if(profile && (!profile.username || !profile.display_name)){
+   const updates={};
+   if(!profile.username) updates.username=wantedUsername;
+   if(!profile.display_name) updates.display_name=wantedName;
+   const {data:updated,error:updateError}=await supabaseClient.from('profiles')
+     .update(updates).eq('id',authUser.id)
+     .select('id,username,display_name,bio,avatar_url,cover_url').maybeSingle();
+   if(updateError) console.warn('DANEGRAM profile update:',updateError.message);
+   if(updated) profile=updated;
+ }
+ return {
+   id:authUser.id,
+   name:profile?.display_name||wantedName,
+   username:profile?.username||wantedUsername,
+   email:authUser.email||'',
+   bio:profile?.bio||'',
+   avatar_url:profile?.avatar_url||'',
+   cover_url:profile?.cover_url||''
+ };
+}
+async function applyAuthSession(session){
+ currentSession=session||null;
+ if(session?.user){
+   user=await syncMemberProfile(session.user);
+   await loadPremiumSubscription();
+   document.body.classList.remove('auth-required');
+   $('#sideName').textContent=name();
+   await loadSharedPosts();
+ }else{
+   user=null;posts=[];premiumSubscription=null;premiumLookupFailed=false;document.body.classList.remove('premium-active');
+   document.body.classList.add('auth-required');
+   $('#sideName').textContent='DANEGRAM Member';
+ }
+ render();
+}
+async function initializeSupabaseAuth(){
+ if(!supabaseClient){
+   document.body.classList.add('auth-required');
+   render();
+   console.error('DANEGRAM could not load the Supabase library. Check your internet connection and try again.');
+   return;
+ }
+ const {data,error}=await supabaseClient.auth.getSession();
+ if(error) console.error('DANEGRAM session check:',error.message);
+ await applyAuthSession(data?.session||null);
+ supabaseClient.auth.onAuthStateChange((_event,session)=>{
+   setTimeout(()=>applyAuthSession(session),0);
+ });
+}
+function authForm(type){
+ const isSignup=type==='signup';
+ openModal(isSignup?'Create your DANEGRAM account':'Log in to DANEGRAM',
+ `<form id="authForm" novalidate>
+  ${isSignup?`<div class="field"><label for="authName">Full name</label><input id="authName" autocomplete="name" maxlength="80" placeholder="Your full name" required></div>
+  <div class="field"><label for="authUser">Username</label><input id="authUser" autocomplete="username" minlength="3" maxlength="24" pattern="[A-Za-z0-9_]+" placeholder="Choose a username" required><div class="small muted">Use 3–24 letters, numbers or underscores.</div></div>`:''}
+  <div class="field"><label for="authEmail">Email address</label><input id="authEmail" type="email" autocomplete="email" placeholder="name@example.com" required></div>
+  <div class="field"><label for="authPass">Password</label><input id="authPass" type="password" autocomplete="${isSignup?'new-password':'current-password'}" minlength="8" placeholder="${isSignup?'At least 8 characters':'Your password'}" required></div>
+  <button class="primary full" id="authSubmit" type="submit">${isSignup?'Create DANEGRAM account':'Log in'}</button>
+  <div id="authMessage" class="notice" role="status">Use an email address you can access. ${isSignup?'Email confirmation may be required before your first login.':''}</div>
+ </form>`);
+ $('#authForm').addEventListener('submit',async e=>{
+   e.preventDefault();
+   if(!supabaseClient){ $('#authMessage').textContent='DANEGRAM could not load its secure sign-in service. Check your internet connection, refresh, and try again.'; return; }
+   const button=$('#authSubmit'),message=$('#authMessage');
+   const email=$('#authEmail').value.trim().toLowerCase();
+   const password=$('#authPass').value;
+   const fullName=$('#authName')?.value.trim()||'';
+   const username=$('#authUser')?.value.trim().toLowerCase()||'';
+   if(!email||!password){message.textContent='Enter your email address and password.';return}
+   if(password.length<8){message.textContent='Your password must contain at least 8 characters.';return}
+   if(isSignup){
+     if(!fullName){message.textContent='Enter your full name.';return}
+     if(!/^[a-z0-9_]{3,24}$/.test(username)){message.textContent='Choose a username using 3–24 letters, numbers or underscores.';return}
+   }
+   button.disabled=true;button.textContent=isSignup?'Creating account…':'Logging in…';
+   message.textContent='Please wait while DANEGRAM securely checks your account.';
+   try{
+     if(isSignup){
+       const {data,error}=await supabaseClient.auth.signUp({
+         email,password,
+         options:{
+           data:{display_name:fullName,full_name:fullName,username},
+           emailRedirectTo:'https://danegram.pages.dev'
+         }
+       });
+       if(error) throw error;
+       if(data.session){
+         await applyAuthSession(data.session);
+         closeModal();
+         alert('Your DANEGRAM account has been created and you are signed in.');
+       }else{
+         message.textContent='Your registration was submitted. Check your email for the confirmation link. After confirming, return to DANEGRAM and log in. Keep your password private.';
+         button.disabled=false;button.textContent='Create DANEGRAM account';
+       }
+     }else{
+       const {data,error}=await supabaseClient.auth.signInWithPassword({email,password});
+       if(error) throw error;
+       await applyAuthSession(data.session);
+       closeModal();
+     }
+   }catch(error){
+     message.textContent=error.message||'We could not complete that request. Please check your details and try again.';
+     button.disabled=false;button.textContent=isSignup?'Create DANEGRAM account':'Log in';
+   }
+ });
+}
+function settingsModal(){openModal('Settings & privacy',`<button class="settings-menu-item" onclick="go('premium');closeModal()"><span class="settings-icon">⭐</span><span class="settings-copy">DANEGRAM Premium<small>Membership, benefits and billing</small></span></button><button class="settings-menu-item" onclick="go('profile');closeModal()"><span class="settings-icon">👤</span><span class="settings-copy">Profile settings<small>Edit your name, photo and details</small></span></button><button class="settings-menu-item" onclick="securityModal()"><span class="settings-icon">🛡️</span><span class="settings-copy">Security and account protection<small>Password and account safety</small></span></button><button class="settings-menu-item" onclick="openModal('Privacy settings', '<p>Privacy controls and audience settings will be connected to your account preferences.</p>')"><span class="settings-icon">🔒</span><span class="settings-copy">Privacy and audience<small>Control who can see your activity</small></span></button><button class="settings-menu-item" onclick="openModal('Notifications settings', '<p>Choose which alerts you want to receive. Notification preferences will be saved to your account when connected.</p>')"><span class="settings-icon">🔔</span><span class="settings-copy">Notifications<small>Choose the alerts you receive</small></span></button><button class="settings-menu-item" onclick="openModal('Accessibility', '<p>Display, text size and accessibility preferences.</p>')"><span class="settings-icon">♿</span><span class="settings-copy">Accessibility and display<small>Text and display preferences</small></span></button><button class="settings-menu-item" onclick="openModal('Help & support', '<p>Get help with your DANEGRAM account and report a problem.</p>')"><span class="settings-icon">❔</span><span class="settings-copy">Help and support<small>Help centre and report a problem</small></span></button><div class="notice">Some settings are previews; controls that change account data will be connected and tested before launch.</div>`)}
+function securityModal(){openModal('Security & Trust Centre',`<div class="contact">🛡️ Fake-account detection <span class="muted small">Planned</span></div><div class="contact">🚩 Impersonation reporting <span class="muted small">Planned</span></div><div class="contact">⛔ Account blocking <span class="muted small">Planned</span></div><div class="contact">🔐 Two-factor authentication <span class="muted small">Planned</span></div><div class="contact">🔔 Suspicious-login alerts <span class="muted small">Planned</span></div><div class="contact">🧑 Human verification appeals <span class="muted small">Planned</span></div><div class="contact">📱 Active session management <span class="muted small">Planned</span></div><div class="notice">These protections require server-side authentication, database policies, risk checks and human moderation workflows. A front-end switch alone cannot secure an account.</div>`)}
+function go(p){currentPage=p;render();window.scrollTo({top:0,behavior:'smooth'})}
+$$('[data-page]').forEach(b=>b.addEventListener('click',()=>go(b.dataset.page)));
+$('#brandProfile')?.addEventListener('click',()=>go('profile'));
+$('#createBtn')?.addEventListener('click',()=>createPost());
+$('#messengerBtn')?.addEventListener('click',()=>go('messages'));
+$('#notifyBtn')?.addEventListener('click',()=>go('notifications'));
+$('#accountBtn')?.addEventListener('click',()=>go('profile'));
+$('#settingsBtn')?.addEventListener('click',()=>settingsModal());
+$('#gateSignup')?.addEventListener('click',()=>authForm('signup'));
+$('#gateLogin')?.addEventListener('click',()=>authForm('login'));
+$('#modalClose')?.addEventListener('click',closeModal);$('#modalBackdrop').addEventListener('click',e=>{if(e.target.id==='modalBackdrop')closeModal()});
+$('#globalSearch').addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.value.trim()){openModal('Search DANEGRAM',`<p>Search for <b>${safe(e.target.value.trim())}</b></p><p class="muted">People, posts, pages, groups and marketplace search will be connected to Supabase.</p>`)}});
+$('#reportHelp').onclick=()=>openModal('Safety & reporting',`<p>Report impersonation, harassment, scams, harmful content or suspicious accounts.</p><div class="field"><label>What would you like to report?</label><select><option>Impersonation</option><option>Harassment or bullying</option><option>Scam or fraud</option><option>Harmful content</option><option>Other safety concern</option></select></div><div class="field"><label>Details</label><textarea placeholder="Tell us what happened…"></textarea></div><div class="notice">Report submission and human review will be connected to the secure backend.</div><button class="primary full" onclick="closeModal()">Close preview</button>`);
+render();
+initializeSupabaseAuth();
+})().catch(error=>{console.error('DANEGRAM startup error:',error);document.body.classList.add('auth-required');const gate=document.querySelector('.auth-gate');if(gate){const note=document.createElement('p');note.className='auth-disclaimer';note.textContent='DANEGRAM could not finish loading. Please refresh and try again.';gate.querySelector('.auth-card')?.appendChild(note);}});
+</script>
+</body>
+</html>
