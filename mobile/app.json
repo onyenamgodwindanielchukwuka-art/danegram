@@ -1,0 +1,35 @@
+{
+  "expo": {
+    "name": "DANEGRAM",
+    "slug": "danegram-mobile",
+    "version": "1.0.0",
+    "scheme": "danegram",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "icon": "../danegram-512.png",
+    "splash": {
+      "image": "../danegram-512.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.danegram.app"
+    },
+    "android": {
+      "package": "com.danegram.app",
+      "adaptiveIcon": {
+        "foregroundImage": "../danegram-512.png",
+        "backgroundColor": "#ffffff"
+      },
+      "permissions": []
+    },
+    "plugins": [
+      "expo-router",
+      "expo-sqlite"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}
