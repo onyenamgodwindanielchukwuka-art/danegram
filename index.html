@@ -894,6 +894,19 @@ html,body{background:#f5f5f5!important;color:#111!important}
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <script src="/danegram-push-config.js"></script>
+<style>
+.dg-delete-menu{position:absolute;right:5px;top:4px;z-index:8;font-size:15px}
+.dg-delete-menu summary{list-style:none;cursor:pointer;border-radius:16px;width:25px;height:25px;display:flex;align-items:center;justify-content:center;color:var(--muted,#667085);font-weight:900;background:rgba(255,255,255,.75)}
+.dg-delete-menu summary::-webkit-details-marker{display:none}
+.dg-delete-menu[open] summary{background:#eaf1ff;color:#174ea6}
+.dg-delete-menu-items{position:absolute;right:0;top:27px;min-width:178px;padding:5px;background:#fff;border:1px solid #dfe4ee;border-radius:12px;box-shadow:0 8px 28px rgba(20,35,65,.18);display:grid;gap:3px}
+.dg-delete-menu-items button{border:0;background:transparent;text-align:left;padding:10px 12px;border-radius:8px;color:#26334b;font-size:13px;font-weight:650;white-space:nowrap}
+.dg-delete-menu-items button:hover{background:#f0f4fc}
+.dg-delete-menu-items button[data-dg-action$="-both"]{color:#b42318}
+.bubble{position:relative;padding-right:32px}
+.dg-deleted-message{font-style:italic;color:#7b8495;font-size:13px}
+.dg-call-event .dg-delete-menu{top:4px;right:4px}
+</style>
 </head>
 <body>
 <header class="topbar">
@@ -1700,17 +1713,17 @@ async function dgFetchChatMessagesNow(){
   }
   let callRows=[];
   try{
-   const {data:callData,error:callError}=await supabaseClient.from('danegram_calls').select('*').eq('conversation_id',requestedConversationId).order('created_at',{ascending:false}).limit(100);
+   const {data:callData,error:callError}=await supabaseClient.from('danegram_calls').select('*').eq('conversation_id',requestedConversationId).is('deleted_for_everyone_at',null).order('created_at',{ascending:false}).limit(100);
    if(callError)console.warn('DANEGRAM chat call history:',callError.message);else callRows=(callData||[]).slice().reverse();
   }catch(callReadError){console.warn('DANEGRAM chat call history unavailable:',callReadError.message)}
-  const {data:voicemails,error:voicemailError}=await supabaseClient.from('danegram_voicemails').select('id,call_id,conversation_id,caller_id,recipient_id,media_url,duration_seconds,created_at,listened_at').eq('conversation_id',requestedConversationId).order('created_at',{ascending:false}).limit(100);
+  const {data:voicemails,error:voicemailError}=await supabaseClient.from('danegram_voicemails').select('id,call_id,conversation_id,caller_id,recipient_id,media_url,duration_seconds,created_at,listened_at,deleted_for_everyone_at').eq('conversation_id',requestedConversationId).is('deleted_for_everyone_at',null).order('created_at',{ascending:false}).limit(100);
   if(voicemailError)console.warn('DANEGRAM voicemail list:',voicemailError.message);
   const voicemailRows=(voicemails||[]).slice().reverse();
   const voicemailTimeline=await Promise.all(voicemailRows.map(async v=>{
    const {data:signed,error:signedError}=await supabaseClient.storage.from('danegram-media').createSignedUrl(v.media_url,3600);
    const url=!signedError?signed?.signedUrl||'':'';
    const mine=v.caller_id===myId();
-   const html=`<div class="bubble ${mine?'mine':''}"><b>${mine?'You':'Voicemail'}</b><div class="dg-audio-label">📞 Voicemail · ${Number(v.duration_seconds)||0}s</div>${url?`<audio class="dg-audio-player" controls preload="none" src="${safe(url)}" data-voicemail-id="${v.id}">Audio playback is not supported.</audio>`:'<div class="small muted">Voicemail recording unavailable.</div>'}<div class="dg-message-meta"><time class="small muted">${new Date(v.created_at).toLocaleString()}</time>${!mine&&!v.listened_at?'<span class="small muted dg-voicemail-new">New voicemail</span>':''}</div></div>`;
+   const html=`<div class="bubble ${mine?'mine':''}"><b>${mine?'You':'Voicemail'}</b><div class="dg-audio-label">📞 Voicemail · ${Number(v.duration_seconds)||0}s</div>${url?`<audio class="dg-audio-player" controls preload="none" src="${safe(url)}" data-voicemail-id="${v.id}">Audio playback is not supported.</audio>`:'<div class="small muted">Voicemail recording unavailable.</div>'}<div class="dg-message-meta"><time class="small muted">${new Date(v.created_at).toLocaleString()}</time>${!mine&&!v.listened_at?'<span class="small muted dg-voicemail-new">New voicemail</span>':''}</div><details class="dg-delete-menu"><summary aria-label="Voicemail options">⋮</summary><div class="dg-delete-menu-items"><button type="button" data-dg-action="delete-voicemail-self" data-dg-id="${v.id}">Delete for me</button><button type="button" data-dg-action="delete-voicemail-both" data-dg-id="${v.id}">Delete for both sides</button></div></details></div>`;
    return {at:new Date(v.created_at).getTime(),html};
   }));
   const timeline=rows.map(m=>({at:new Date(m.created_at).getTime(),html:(()=>{
@@ -1723,8 +1736,12 @@ async function dgFetchChatMessagesNow(){
    else if(m.media_type==='image')media=url?`<img class="dg-chat-image" src="${safe(url)}" alt="Photo attachment" loading="lazy" style="display:block;max-width:min(100%,320px);max-height:360px;object-fit:contain;border-radius:12px;margin-top:8px">`:'<div class="small muted">Photo unavailable. Check attachment access.</div>';
    else if(m.media_type==='video')media=url?`<video class="dg-chat-video" controls playsinline preload="metadata" style="display:block;width:min(100%,340px);max-height:380px;border-radius:12px;margin-top:8px;background:#111"><source src="${safe(url)}"></video>`:'<div class="small muted">Video unavailable. Check attachment access.</div>';
    else if(m.media_url)media=`<a class="small muted" href="${safe(url)}" target="_blank" rel="noopener">📎 ${safe(m.content||'Open attachment')}</a>`;
-   const body=m.media_type==='audio'?'<div class="dg-audio-label">🎙️ Voice message</div>':(m.media_type==='image'||m.media_type==='video')?`<div>${safe(m.content||'')}</div>`:`<div>${safe(m.content||'')}</div>`;
-   return `<div class="bubble ${mine?'mine':''}"><b>${safe(mine?'You':names[m.sender_id]||'Member')}</b>${body}${media}<div class="dg-message-meta"><time class="small muted">${new Date(m.created_at).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}</time>${mine?`<span class="dg-message-ticks ${tickClass}" aria-label="${tickLabel}" title="${tickLabel}">${tick}</span>`:''}</div></div>`;
+   const deleted=!!m.deleted_for_everyone_at;
+   const body=deleted?'<div class="dg-deleted-message">This message was deleted</div>':(m.media_type==='audio'?'<div class="dg-audio-label">🎙️ Voice message</div>':(m.media_type==='image'||m.media_type==='video')?`<div>${safe(m.content||'')}</div>`:`<div>${safe(m.content||'')}</div>`);
+   if(deleted)media='';
+   const canDeleteBoth=mine&&!deleted&&(Date.now()-sentAt)<=60*60*60*1000;
+   const actions=deleted?'':`<details class="dg-delete-menu"><summary aria-label="Message options">⋮</summary><div class="dg-delete-menu-items"><button type="button" data-dg-action="delete-message-self" data-dg-id="${m.id}">Delete for me</button>${canDeleteBoth?`<button type="button" data-dg-action="delete-message-both" data-dg-id="${m.id}">Delete for everyone</button>`:''}</div></details>`;
+   return `<div class="bubble ${mine?'mine':''}">${actions}<b>${safe(mine?'You':names[m.sender_id]||'Member')}</b>${body}${media}<div class="dg-message-meta"><time class="small muted">${new Date(m.created_at).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}</time>${mine?`<span class="dg-message-ticks ${tickClass}" aria-label="${tickLabel}" title="${tickLabel}">${tick}</span>`:''}</div></div>`;
   })()}));
   const callMarkup=callRows.map(c=>{
    const mine=c.caller_id===myId();
@@ -1734,12 +1751,46 @@ async function dgFetchChatMessagesNow(){
    const duration=Number(c.duration_seconds||c.call_duration_seconds||0);
    const when=c.created_at?new Date(c.created_at).getTime():Date.now();
    const icon=type==='Video call'?'📹':'📞';
-   return {at:when,html:`<div class="dg-call-event ${mine?'mine':''}" style="display:flex;justify-content:center;margin:10px 0"><div style="max-width:90%;padding:9px 14px;border:1px solid var(--line,#ddd);border-radius:14px;text-align:center;background:var(--surface-soft,#f5f5f5)"><div style="font-weight:700">${icon} ${safe(label)}</div><div class="small muted">${safe(type)} · ${c.created_at?new Date(c.created_at).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}):''}${duration>0?' · '+Math.floor(duration/60)+'m '+(duration%60)+'s':''}</div></div></div>`};
+   return {at:when,html:`<div class="dg-call-event ${mine?'mine':''}" style="display:flex;justify-content:center;margin:10px 0"><div style="position:relative;max-width:90%;padding:9px 34px 9px 14px;border:1px solid var(--line,#ddd);border-radius:14px;text-align:center;background:var(--surface-soft,#f5f5f5)"><div style="font-weight:700">${icon} ${safe(label)}</div><div class="small muted">${safe(type)} · ${c.created_at?new Date(c.created_at).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}):''}${duration>0?' · '+Math.floor(duration/60)+'m '+(duration%60)+'s':''}</div><details class="dg-delete-menu"><summary aria-label="Call options">⋮</summary><div class="dg-delete-menu-items"><button type="button" data-dg-action="delete-call-self" data-dg-id="${c.id}">Delete for me</button><button type="button" data-dg-action="delete-call-both" data-dg-id="${c.id}">Delete for both sides</button></div></details></div></div>`};
   });
   timeline.push(...callMarkup,...voicemailTimeline);
   if(activeConversationId!==requestedConversationId)return;
   box.innerHTML=timeline.length?timeline.sort((a,b)=>a.at-b.at).map(x=>x.html).join(''):'<p class="muted">No messages yet. Say hello 👋</p>';
   box.dataset.conversationId=requestedConversationId;
+  box.onclick=async event=>{
+   const action=event.target.closest?.('[data-dg-action]');
+   if(!action)return;
+   event.preventDefault();event.stopPropagation();
+   const id=action.dataset.dgId,kind=action.dataset.dgAction;
+   if(!id||action.disabled)return;
+   const both=kind.endsWith('-both');
+   const label=kind.includes('message')?'message':kind.includes('voicemail')?'voice message':'call record';
+   if(both&&!window.confirm('Delete this '+label+' for everyone? This cannot be undone.'))return;
+   action.disabled=true;
+   try{
+    let mediaPath='';
+    if(kind.startsWith('delete-message')){
+     if(both){
+      const {data,error}=await supabaseClient.functions.invoke('danegram-delete-chat-media',{body:{kind:'message',id}});
+      if(error)throw error;if(data?.error)throw new Error(data.error);
+      if(data?.storageDeleted===false)alert('The message was removed, but its stored attachment still needs administrator cleanup.');
+     }else{
+      const {error}=await supabaseClient.rpc('danegram_hide_message_for_self',{p_message_id:id});if(error)throw error;
+     }
+    }else if(kind.startsWith('delete-voicemail')){
+     if(both){
+      const {data,error}=await supabaseClient.functions.invoke('danegram-delete-chat-media',{body:{kind:'voicemail',id}});
+      if(error)throw error;if(data?.error)throw new Error(data.error);
+      if(data?.storageDeleted===false)alert('The voice message was removed, but its stored recording still needs administrator cleanup.');
+     }else{
+      const {error}=await supabaseClient.rpc('danegram_delete_voicemail_for_self',{p_voicemail_id:id});if(error)throw error;
+     }
+    }else{
+     const {error}=await supabaseClient.rpc(both?'danegram_delete_call_for_everyone':'danegram_delete_call_for_self',{p_call_id:id});if(error)throw error;
+    }
+    await fetchChatMessages();
+   }catch(error){console.error('DANEGRAM delete action failed:',error);alert('Could not delete '+label+': '+(error.message||'Please try again.'));action.disabled=false;}
+  };
   const voicePlayers=[...box.querySelectorAll('.dg-voice-player')];
   voicePlayers.forEach((player,index)=>{const audio=player.querySelector('audio'),btn=player.querySelector('.dg-voice-play'),wave=player.querySelector('.dg-voice-wave'),progress=player.querySelector('.dg-voice-progress'),time=player.querySelector('.dg-voice-time'),speed=player.querySelector('.dg-voice-speed');const fmt=n=>{if(!Number.isFinite(n))return '0:00';const v=Math.max(0,Math.floor(n));return Math.floor(v/60)+':'+String(v%60).padStart(2,'0')};
    btn?.addEventListener('click',async()=>{if(audio.paused){voicePlayers.forEach(other=>{const a=other.querySelector('audio'),b=other.querySelector('.dg-voice-play');if(a!==audio){a.pause();if(b){b.textContent='▶';b.setAttribute('aria-label','Play voice message');}}});try{await audio.play();btn.textContent='Ⅱ';btn.setAttribute('aria-label','Pause voice message')}catch(e){console.warn('Voice playback failed:',e);}}else{audio.pause();btn.textContent='▶';btn.setAttribute('aria-label','Play voice message')}});
