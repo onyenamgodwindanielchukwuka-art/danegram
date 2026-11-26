@@ -3606,15 +3606,14 @@ function authForm(type,presetEmail=''){
   <div class="field"><label for="authUser">Username</label><input id="authUser" autocomplete="username" minlength="3" maxlength="24" pattern="[A-Za-z0-9_]+" placeholder="Choose a username" required><div class="small muted">Use 3–24 letters, numbers or underscores.</div></div>`:''}
   <div class="field"><label for="authEmail">Email address</label><input id="authEmail" type="email" autocomplete="email" value="${safe(presetEmail)}" placeholder="name@example.com" required></div>
   <div class="field"><label for="authPass">Password</label><div class="dg-password-wrap"><input id="authPass" type="password" autocomplete="${isSignup?'new-password':'current-password'}" minlength="8" placeholder="${isSignup?'At least 8 characters':'Your password'}" required><button class="dg-password-toggle" id="dgPasswordToggle" type="button" aria-label="Show password" aria-pressed="false" title="Show password"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg></button></div></div>
-  <div class="dg-turnstile-wrap"><div id="dgTurnstileWidget" aria-label="Cloudflare security check"></div></div>
+  ${isSignup?`<div class="dg-turnstile-wrap"><div id="dgTurnstileWidget" aria-label="Cloudflare security check"></div></div>
   <div class="dg-turnstile-help">Complete the security check to continue securely.</div>
-  <button class="secondary full" id="dgTurnstileRetry" type="button">Reload security check</button>
+  <button class="secondary full" id="dgTurnstileRetry" type="button">Reload security check</button>`:''}
   ${!isSignup?`<button class="secondary full" id="dgForgotPassword" type="button">Forgot password?</button>`:''}
   <button class="primary full" id="authSubmit" type="submit">${isSignup?'Create DANEGRAM account':'Log in'}</button>
   <div id="authMessage" class="notice" role="status">${isSignup?'We will email you a six-digit verification code before activating your account.':'Log in with your email and password. No code is required for normal login.'}</div>
  </form>`);
- dgRenderAuthTurnstile();
- $('#dgTurnstileRetry')?.addEventListener('click',()=>dgRenderAuthTurnstile(true));
+ if(isSignup){dgRenderAuthTurnstile();$('#dgTurnstileRetry')?.addEventListener('click',()=>dgRenderAuthTurnstile(true));}
  $('#dgForgotPassword')?.addEventListener('click',()=>dgForgotPasswordForm($('#authEmail')?.value.trim().toLowerCase()||''));
  const passwordInput=$('#authPass'),passwordToggle=$('#dgPasswordToggle');
  passwordToggle?.addEventListener('click',()=>{
@@ -3631,8 +3630,8 @@ function authForm(type,presetEmail=''){
   if(!email||!password){message.textContent='Enter your email address and password.';return}
   if(password.length<8){message.textContent='Your password must contain at least 8 characters.';return}
   if(isSignup){if(!fullName){message.textContent='Enter your full name.';return}if(!/^[a-z0-9_]{3,24}$/.test(username)){message.textContent='Choose a username using 3–24 letters, numbers or underscores.';return}}
-  const captchaToken=$('#dgTurnstileWidget')?.dataset.token||'';
-  if(!captchaToken){message.textContent='Please complete the Cloudflare security check before continuing.';return}
+  const captchaToken=isSignup?($('#dgTurnstileWidget')?.dataset.token||''):'';
+  if(isSignup&&!captchaToken){message.textContent='Please complete the Cloudflare security check before creating your account.';return}
   button.disabled=true;button.textContent=isSignup?'Creating account…':'Logging in…';message.textContent='Please wait while DANEGRAM securely checks your account.';
   try{
    if(isSignup){
@@ -3641,14 +3640,15 @@ function authForm(type,presetEmail=''){
     if(data.session){await applyAuthSession(data.session);closeModal();alert('Your DANEGRAM account has been created and verified.');}
     else{dgShowEmailOtpForm(email,'signup');}
    }else{
-    const {data,error}=await supabaseClient.auth.signInWithPassword({email,password,options:{captchaToken}});
+    // Preserve the former working DANEGRAM login flow: Turnstile is required for signup, not routine sign-in.
+    const {data,error}=await supabaseClient.auth.signInWithPassword({email,password});
     if(error)throw error;
     if(!data?.session)throw new Error('DANEGRAM did not receive a sign-in session. Please try again.');
     currentSession=data.session;user={id:data.session.user.id,email:data.session.user.email||email,...(data.session.user.user_metadata||{})};
     document.body.classList.remove('auth-required');closeModal();render();
     applyAuthSession(data.session).catch(error=>{console.error('DANEGRAM post-login account loading failed:',error);const note=document.createElement('div');note.className='dg-live-toast';note.innerHTML='<b>Signed in</b><small>Your account is signed in, but some profile data could not load. Refresh DANEGRAM to retry.</small>';document.body.appendChild(note);setTimeout(()=>note.remove(),8000);});
    }
-  }catch(error){message.textContent=error.message||'We could not complete that request. Check your details and try again.';dgResetAuthTurnstile();button.disabled=false;button.textContent=isSignup?'Create DANEGRAM account':'Log in';}
+  }catch(error){message.textContent=error.message||'We could not complete that request. Check your details and try again.';if(isSignup)dgResetAuthTurnstile();button.disabled=false;button.textContent=isSignup?'Create DANEGRAM account':'Log in';}
  });
 }
 function dgSetSoundPreference(enabled){localStorage.setItem(dgSoundKey,enabled?'on':'off');if(enabled)dgPlayMessageSound()}
