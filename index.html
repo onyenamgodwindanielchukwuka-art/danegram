@@ -1276,7 +1276,33 @@ async function dgSetupPeerConnection(callId,peerId,kind,role,stream){
  const iceServers=await dgGetIceServers();
  const pc=new RTCPeerConnection({iceServers,bundlePolicy:"max-bundle",iceTransportPolicy:"all"});
  dgCall={...dgCall,id:callId,peerId,kind,role,pc,stream,pendingCandidates:[],remoteStream:new MediaStream(),cleaning:false,facingMode:'user'};
- dgCallStateChannel=supabaseClient.channel('danegram-call-state-'+callId).on('postgres_changes',{event:'UPDATE',schema:'public',table:'danegram_calls',filter:'id=eq.'+callId},payload=>{const st=payload.new?.status;if(['rejected','missed','failed','ended'].includes(st)&&dgCall?.id===callId){const oldCall=dgCall;dgCallStatus(st==='rejected'?'Call declined':st==='missed'?'Call was not answered':st==='failed'?'Call failed':'Call ended');setTimeout(async()=>{if(dgCall?.id===callId){await dgCleanupCall(false);if(st==='missed'&&oldCall.role==='caller')dgOfferVoicemail({id:callId,conversation_id:payload.new.conversation_id,caller_id:payload.new.caller_id,callee_id:payload.new.callee_id});}},900);}}).subscribe();
+ dgCallStateChannel=supabaseClient.channel('danegram-call-state-'+callId)
+   .on('postgres_changes',{event:'UPDATE',schema:'public',table:'danegram_calls',filter:'id=eq.'+callId},payload=>{
+    const updated=payload.new||{},st=updated.status;
+    // Refresh chat history for every transition so the call event never stays
+    // stuck on "Calling…" after the live call has connected or ended.
+    if(updated.conversation_id&&activeConversationId===updated.conversation_id)fetchChatMessages();
+    if(dgCall?.id!==callId)return;
+    if(st==='accepted'){
+     if(dgCall.role==='caller')dgCallStatus('Call answered · connecting…');
+     return;
+    }
+    if(['rejected','missed','failed','ended'].includes(st)){
+     const oldCall=dgCall;
+     dgCallStatus(st==='rejected'?'Call declined':st==='missed'?'Call was not answered':st==='failed'?'Call failed':'Call ended');
+     setTimeout(async()=>{
+      if(dgCall?.id===callId){
+       await dgCleanupCall(false);
+       if(st==='missed'&&oldCall.role==='caller')dgOfferVoicemail({id:callId,conversation_id:updated.conversation_id,caller_id:updated.caller_id,callee_id:updated.callee_id});
+      }
+     },900);
+    }
+   }).subscribe(status=>{
+    if(status==='CHANNEL_ERROR'||status==='TIMED_OUT'||status==='CLOSED'){
+     console.warn('DANEGRAM call-state listener disconnected:',status);
+     if(dgCall?.id===callId)dgCallStatus('Call status sync interrupted · reconnecting…');
+    }
+   });
  stream.getTracks().forEach(track=>pc.addTrack(track,stream));
  pc.ontrack=e=>{
   // Keep one stable remote stream. Some mobile browsers deliver audio and
