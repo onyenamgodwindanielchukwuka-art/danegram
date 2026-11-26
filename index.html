@@ -1077,7 +1077,7 @@ function renderDgComment(comment,postId){
 function postCard(p){
  const mediaMarkup=p.media?(String(p.mediaType||'').startsWith('video')?`<video class="post-media" controls playsinline preload="metadata"><source src="${safe(p.media)}"></video>`:`<img class="post-media" src="${safe(p.media)}" alt="Post media" loading="lazy">`):((p.mediaType==='image'||p.mediaType==='video')?'<div class="small muted">Media could not be loaded. Check DANEGRAM media access.</div>':'');
  const comments=(p.comments||[]).map(c=>renderDgComment(c,p.id)).join('');
- return `<article class="card post" data-post="${p.id}" data-post-db-id="${safe(p.dbId||"")}"><div class="post-head"><button type="button" class="post-author-profile" data-post-profile="${safe(p.user_id||'')}" aria-label="Open ${safe(p.name)} profile" style="display:flex;align-items:center;gap:10px;min-width:0;background:transparent;padding:0;text-align:left;color:inherit;cursor:pointer">${avatar(p.name,'',p.avatarUrl)}<span><span class="post-author">${safe(p.name)}${(premiumSubscription&&String(p.user_id)===String(myId()))?premiumProfileMark():''}</span><span class="post-meta" style="display:block">${safe(p.time)} · 🌐</span></span></button><button class="more" data-action="more" data-id="${p.id}">•••</button></div><div class="post-text">${safe(p.text)}</div>${mediaMarkup}<div class="post-stats"><button class="comment-count-link" type="button" data-reaction-list="${p.id}" aria-label="View people who liked this post">👍 ${p.likes} likes</button><button class="comment-count-link" type="button" data-action="togglecomments" data-id="${p.id}">${p.commentCount??p.comments.length} comments</button><span>Share with others</span></div><div class="post-actions"><button data-action="like" data-id="${p.id}" class="${p.liked?'liked':''}">${p.liked?'👍 Liked':'👍 Like'}</button><button data-action="comment" data-id="${p.id}">▢ Comment</button><button data-action="share" data-id="${p.id}">↗ Share</button><button data-action="save" data-id="${p.id}">🔖 Save</button></div><div class="comment-list" data-comment-list="${p.id}" hidden>${comments||'<div class="small muted">No comments yet. Be the first to comment.</div>'}</div><div class="comment-box" data-comment-box="${p.id}" hidden>${avatar(name())}<input aria-label="Write a comment" maxlength="2000" placeholder="Write a comment…" data-comment-input="${p.id}"><button class="primary" data-action="sendcomment" data-id="${p.id}">Send</button></div></article>`;
+ return `<article class="card post" data-post="${p.id}" data-post-db-id="${safe(p.dbId||"")}"><div class="post-head"><button type="button" class="post-author-profile" data-post-profile="${safe(p.user_id||'')}" aria-label="Open ${safe(p.name)} profile" style="display:flex;align-items:center;gap:10px;min-width:0;background:transparent;padding:0;text-align:left;color:inherit;cursor:pointer">${avatar(p.name,'',p.avatarUrl)}<span><span class="post-author">${safe(p.name)}${(premiumSubscription&&String(p.user_id)===String(myId()))?premiumProfileMark():''}</span><span class="post-meta" style="display:block">${safe(p.time)} · 🌐</span></span></button><button class="more" type="button" data-action="more" data-id="${p.id}" aria-label="Post options">•••</button></div><div class="post-text">${safe(p.text)}</div>${mediaMarkup}<div class="post-stats"><button class="comment-count-link" type="button" data-reaction-list="${p.id}" aria-label="View people who liked this post">👍 ${p.likes} likes</button><button class="comment-count-link" type="button" data-action="togglecomments" data-id="${p.id}">${p.commentCount??p.comments.length} comments</button><span>Share with others</span></div><div class="post-actions"><button data-action="like" data-id="${p.id}" class="${p.liked?'liked':''}">${p.liked?'👍 Liked':'👍 Like'}</button><button data-action="comment" data-id="${p.id}">▢ Comment</button><button data-action="share" data-id="${p.id}">↗ Share</button><button data-action="save" data-id="${p.id}">🔖 Save</button></div><div class="comment-list" data-comment-list="${p.id}" hidden>${comments||'<div class="small muted">No comments yet. Be the first to comment.</div>'}</div><div class="comment-box" data-comment-box="${p.id}" hidden>${avatar(name())}<input aria-label="Write a comment" maxlength="2000" placeholder="Write a comment…" data-comment-input="${p.id}"><button class="primary" data-action="sendcomment" data-id="${p.id}">Send</button></div></article>`;
 }
 async function dgShowPostReactions(postId){
  const post=posts.find(x=>String(x.id)===String(postId));
@@ -2928,7 +2928,7 @@ async function loadSharedPosts(){
   const tree=commentsByPost.get(row.id)||[];
   const sortNewest=list=>{list.sort((a,b)=>new Date(b.time||0)-new Date(a.time||0));list.forEach(c=>sortNewest(c.replies||[]));};sortNewest(tree);
   const countTree=list=>list.reduce((n,c)=>n+1+countTree(c.replies||[]),0);
-  return {id:index+1,dbId:row.id,user_id:row.user_id,userId:row.user_id,createdAt:row.created_at||null,name:profile.display_name||profile.username||'DANEGRAM Member',avatarUrl:profile.avatarDisplay||'',initial:initials(profile.display_name||profile.username||'DANEGRAM Member'),time:date.toLocaleString(),text:row.content||'',likes:reaction.count,liked:reaction.liked,reactionPeople:reaction.people||[],comments:tree,commentCount:countTree(tree),media:mediaUrl,mediaType:row.media_type||'text'};
+  return {id:index+1,dbId:row.id,user_id:row.user_id,userId:row.user_id,createdAt:row.created_at||null,name:profile.display_name||profile.username||'DANEGRAM Member',avatarUrl:profile.avatarDisplay||'',initial:initials(profile.display_name||profile.username||'DANEGRAM Member'),time:date.toLocaleString(),text:row.content||'',likes:reaction.count,liked:reaction.liked,reactionPeople:reaction.people||[],comments:tree,commentCount:countTree(tree),media:mediaUrl,mediaPath:row.media_url||null,mediaType:row.media_type||'text'};
  }));
 }
 
@@ -3024,7 +3024,43 @@ async function postAction(action,id,button=null){
  if(action==='sendcomment'){const input=document.querySelector(`[data-comment-input="${id}"]`);await sendComment(id,input?.value||'',null,button);return}
  if(action==='save'){if(!saved.includes(p.id))saved.push(p.id);store.set('saved',saved);alert('Saved to your list.');return}
  if(action==='share'){if(navigator.share)navigator.share({title:'DANEGRAM post',text:p.text}).catch(()=>{});else{navigator.clipboard?.writeText(p.text);alert('Post text copied (if clipboard access is available).')}return}
- if(action==='more')openModal('Post options',`<p>Choose an action for this post.</p><button class="secondary full" id="reportPost">Report post</button><br><br><button class="secondary full" id="hidePost">Hide post</button>`);
+ if(action==='more'){
+  const isOwner=!!user&&!!myId()&&String(p.user_id)===String(myId())&&!!p.dbId;
+  openModal('Post options','<p>Choose an action for this post.</p>'+(isOwner?'<button type="button" class="secondary full" id="dgEditPost">✏️ Edit post</button><br><br><button type="button" class="secondary full" id="dgDeletePost" style="color:#c62828">🗑️ Delete post</button><br><br>':'')+'<button type="button" class="secondary full" id="reportPost">Report post</button><br><br><button type="button" class="secondary full" id="hidePost">Hide post</button>');
+  $('#dgEditPost')?.addEventListener('click',()=>dgEditPost(p.id));
+  $('#dgDeletePost')?.addEventListener('click',()=>dgDeletePost(p.id));
+  return;
+ }
+}
+async function dgEditPost(postId){
+ const p=posts.find(x=>String(x.id)===String(postId));
+ if(!p?.dbId||!user?.id||String(p.user_id)!==String(user.id)||!currentSession||!supabaseClient){alert('You can only edit a post published by your signed-in account.');return}
+ openModal('Edit post','<div class="field"><label for="dgEditPostText">Post text</label><textarea id="dgEditPostText" maxlength="5000" placeholder="Write your post…">'+safe(p.text||'')+'</textarea></div><p class="small muted">Your existing photo or video will remain attached to this post.</p><div id="dgEditPostMessage" class="small muted" role="status"></div><div class="modal-actions"><button type="button" class="secondary" id="dgCancelEditPost">Cancel</button><button type="button" class="primary" id="dgSavePostEdit">Save changes</button></div>');
+ $('#dgCancelEditPost')?.addEventListener('click',closeModal);
+ $('#dgSavePostEdit')?.addEventListener('click',async()=>{
+  const button=$('#dgSavePostEdit'),message=$('#dgEditPostMessage'),content=$('#dgEditPostText')?.value.trim()||'';
+  if(!content&&!p.media){message.textContent='A post must contain text or media.';return}
+  button.disabled=true;message.textContent='Saving your changes…';
+  try{
+   const {data,error}=await supabaseClient.from('posts').update({content}).eq('id',p.dbId).eq('user_id',user.id).select('id');
+   if(error)throw error;
+   if(!data?.length)throw new Error('The post was not updated. Check ownership and the posts UPDATE policy.');
+   await loadSharedPosts();closeModal();render();
+  }catch(error){message.textContent=error.message||'Could not update this post.';button.disabled=false;}
+ });
+}
+async function dgDeletePost(postId){
+ const p=posts.find(x=>String(x.id)===String(postId));
+ if(!p?.dbId||!user?.id||String(p.user_id)!==String(user.id)||!currentSession||!supabaseClient){alert('You can only delete a post published by your signed-in account.');return}
+ if(!confirm('Delete this post permanently? Its comments and reactions may also be removed according to the database rules.'))return;
+ const button=$('#dgDeletePost');if(button){button.disabled=true;button.textContent='Deleting…'}
+ try{
+  const {data,error}=await supabaseClient.from('posts').delete().eq('id',p.dbId).eq('user_id',user.id).select('id');
+  if(error)throw error;
+  if(!data?.length)throw new Error('The post was not deleted. Check ownership and the posts DELETE policy.');
+  closeModal();await loadSharedPosts();render();
+  if(p.mediaPath){const {error:mediaError}=await supabaseClient.storage.from('danegram-media').remove([p.mediaPath]);if(mediaError)console.warn('Post deleted, but media cleanup failed:',mediaError.message)}
+ }catch(error){if(button){button.disabled=false;button.textContent='🗑️ Delete post'}alert('Could not delete your post: '+(error.message||'Please try again.'))}
 }
 async function sendComment(id,text,parentCommentId=null,button=null){
  const clean=String(text||'').trim();if(!clean)return;
