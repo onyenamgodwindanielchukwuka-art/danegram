@@ -3405,13 +3405,25 @@ async function initializeSupabaseAuth(){
    console.error('DANEGRAM could not load the Supabase library. Check your internet connection and try again.');
    return;
  }
+ // Subscribe BEFORE getSession(): Supabase can emit PASSWORD_RECOVERY while
+ // processing the email link during initialization. Registering afterwards
+ // can miss that one-time event and leave the user on the normal account screen.
+ let recoveryEventPending=false;
+ const {data:authListener}=supabaseClient.auth.onAuthStateChange((event,session)=>{
+   if(event==='PASSWORD_RECOVERY'){
+     recoveryEventPending=true;
+     setTimeout(()=>{
+       if(session)applyAuthSession(session).then(()=>dgShowPasswordRecoveryForm());
+       else dgShowPasswordRecoveryForm();
+     },0);
+     return;
+   }
+   if(event==='INITIAL_SESSION' && recoveryEventPending)return;
+   setTimeout(()=>applyAuthSession(session),0);
+ });
  const {data,error}=await supabaseClient.auth.getSession();
  if(error) console.error('DANEGRAM session check:',error.message);
- await applyAuthSession(data?.session||null);
- supabaseClient.auth.onAuthStateChange((event,session)=>{
-   setTimeout(()=>applyAuthSession(session),0);
-   if(event==='PASSWORD_RECOVERY')setTimeout(dgShowPasswordRecoveryForm,150);
- });
+ if(!recoveryEventPending)await applyAuthSession(data?.session||null);
 }
 
 let dgTurnstileLoadPromise=null;
