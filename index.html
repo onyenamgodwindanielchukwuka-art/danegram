@@ -1777,20 +1777,29 @@ function dgStartMessagingRefresh(){
   if(!inboxChannel)ensureDgInboxRealtime();
  },10000);
 }
-document.addEventListener('visibilitychange',()=>{
- if(document.visibilityState==='hidden')dgStopRingtone();else if(document.querySelector('#dgAcceptCall'))dgStartRingtone('incoming');else if(dgCall?.role==='caller'&&!dgCall?.startedAt)dgStartRingtone('outgoing');
- if(document.visibilityState==='visible'&&currentPage==='messages'){
-  ensureDgInboxRealtime();
+// Recover realtime subscriptions and missed events after a tab/app is backgrounded,
+ // the device wakes, or the network changes (common on mobile browsers).
+function dgRecoverLiveConnections(){
+ if(document.visibilityState!=='visible'||!myId()||!supabaseClient)return;
+ ensureDgInboxRealtime();
+ dgSubscribeIncomingCalls();
+ dgPollIncomingCalls();
+ if(currentPage==='messages'){
   if(activeConversationId)fetchChatMessages();else loadChats();
   refreshTopNotificationBadges();
  }
-});
-window.addEventListener('focus',()=>{
- if(currentPage==='messages'&&document.visibilityState==='visible'){
-  ensureDgInboxRealtime();
-  if(activeConversationId)fetchChatMessages();else loadChats();
+}
+document.addEventListener('visibilitychange',()=>{
+ if(document.visibilityState==='hidden')dgStopRingtone();
+ else{
+  if(document.querySelector('#dgAcceptCall'))dgStartRingtone('incoming');
+  else if(dgCall?.role==='caller'&&!dgCall?.startedAt)dgStartRingtone('outgoing');
+  dgRecoverLiveConnections();
  }
 });
+window.addEventListener('focus',dgRecoverLiveConnections);
+window.addEventListener('online',dgRecoverLiveConnections);
+window.addEventListener('pageshow',dgRecoverLiveConnections);
 dgStartMessagingRefresh();
 if('serviceWorker' in navigator){
  navigator.serviceWorker.addEventListener('message',event=>{
