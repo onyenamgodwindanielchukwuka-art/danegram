@@ -1259,15 +1259,28 @@ async function dgProcessCallSignal(row){
 }
 async function dgReadCallQuality(pc){
  try{
-  const stats=await pc.getStats();let inbound=null,candidate=null,remoteCandidate=null;
-  stats.forEach(r=>{if(r.type==='inbound-rtp'&&r.kind==='audio'&&!r.isRemote)inbound=r;if(r.type==='candidate-pair'&&r.state==='succeeded'&&r.nominated)candidate=r;if(r.type==='remote-candidate')remoteCandidate=r;});
+  const stats=await pc.getStats();let inbound=null,candidate=null;
+  stats.forEach(r=>{if(r.type==='inbound-rtp'&&r.kind==='audio'&&!r.isRemote)inbound=r;if(r.type==='candidate-pair'&&r.state==='succeeded'&&r.nominated)candidate=r;});
   const el=$('#dgCallQuality');if(!el||!inbound)return;
-  const jitterMs=Number(inbound.jitter||0)*1000,loss=Number(inbound.packetsLost||0),received=Number(inbound.packetsReceived||0),lossPct=received+loss?loss/(received+loss)*100:0,rtt=Number(candidate?.currentRoundTripTime||0)*1000;
+  const jitterMs=Number(inbound.jitter||0)*1000,rtt=Number(candidate?.currentRoundTripTime||0)*1000;
+  // WebRTC counters are cumulative for the entire call. Use deltas between
+  // five-second samples so one earlier burst does not label the whole call poor.
+  const previous=pc.__dgLastAudioSample;
+  const current={at:Number(inbound.timestamp||Date.now()),lost:Number(inbound.packetsLost||0),received:Number(inbound.packetsReceived||0)};
+  let lossPct=0;
+  if(previous&&current.received+current.lost>=previous.received+previous.lost){
+   const lostDelta=Math.max(0,current.lost-previous.lost),receivedDelta=Math.max(0,current.received-previous.received);
+   lossPct=receivedDelta+lostDelta?lostDelta/(receivedDelta+lostDelta)*100:0;
+  }else{
+   lossPct=current.received+current.lost?current.lost/(current.received+current.lost)*100:0;
+  }
+  pc.__dgLastAudioSample=current;
   const quality=(lossPct>5||jitterMs>50||rtt>450)?'Poor':(lossPct>2||jitterMs>30||rtt>250)?'Fair':'Good';
   const route=candidate?.localCandidateId?stats.get(candidate.localCandidateId):null;
   const relay=route?.candidateType==='relay'?' · TURN relay':route?.candidateType==='host'?' · direct':'';
-  el.textContent=`Network quality: ${quality} · jitter ${jitterMs.toFixed(0)} ms · loss ${lossPct.toFixed(1)}% · RTT ${rtt.toFixed(0)} ms${relay}`;
+  el.textContent=`Network quality: ${quality} · jitter ${jitterMs.toFixed(0)} ms · loss ${lossPct.toFixed(1)}% (recent) · RTT ${rtt.toFixed(0)} ms${relay}`;
   el.dataset.quality=quality.toLowerCase();
+  el.dataset.packetLoss=lossPct.toFixed(2);
  }catch(e){console.debug('DANEGRAM call quality stats unavailable:',e.message||e);}
 }
 function dgStartCallQualityMonitor(pc){if(dgCallQualityTimer)clearInterval(dgCallQualityTimer);dgReadCallQuality(pc);dgCallQualityTimer=setInterval(()=>{if(dgCall?.pc===pc)dgReadCallQuality(pc);else{clearInterval(dgCallQualityTimer);dgCallQualityTimer=null;}},5000);}
