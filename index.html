@@ -1276,7 +1276,7 @@ async function dgSetupPeerConnection(callId,peerId,kind,role,stream){
  const iceServers=await dgGetIceServers();
  const pc=new RTCPeerConnection({iceServers,bundlePolicy:"max-bundle",iceTransportPolicy:"all"});
  dgCall={...dgCall,id:callId,peerId,kind,role,pc,stream,pendingCandidates:[],remoteStream:new MediaStream(),cleaning:false,facingMode:'user'};
- dgCallStateChannel=supabaseClient.channel('danegram-call-state-'+callId).on('postgres_changes',{event:'UPDATE',schema:'public',table:'danegram_calls',filter:'id=eq.'+callId},payload=>{const st=payload.new?.status;if(['rejected','missed','failed','ended'].includes(st)&&dgCall?.id===callId){const oldCall=dgCall;dgCallStatus(st==='rejected'?'Call declined':st==='missed'?'Call was not answered':st==='failed'?'Call failed':'Call ended');setTimeout(async()=>{if(dgCall?.id===callId){await dgCleanupCall(false);if(st==='missed'&&oldCall.role==='caller')dgOfferVoicemail({id:callId,conversation_id:payload.new.conversation_id,caller_id:payload.new.caller_id,callee_id:payload.new.callee_id});}},900);}}).subscribe();
+ dgCallStateChannel=supabaseClient.channel('danegram-call-state-'+callId).on('postgres_changes',{event:'UPDATE',schema:'public',table:'danegram_calls',filter:'id=eq.'+callId},payload=>{const st=payload.new?.status;if(['rejected','missed','busy','failed','ended'].includes(st)&&dgCall?.id===callId){const oldCall=dgCall;dgCallStatus(st==='rejected'?'Call declined':st==='missed'?'Call was not answered':st==='busy'?'User is busy':st==='failed'?'Call failed':'Call ended');setTimeout(async()=>{if(dgCall?.id===callId){await dgCleanupCall(false);if(st==='missed'&&oldCall.role==='caller')dgOfferVoicemail({id:callId,conversation_id:payload.new.conversation_id,caller_id:payload.new.caller_id,callee_id:payload.new.callee_id});}},900);}}).subscribe();
  stream.getTracks().forEach(track=>pc.addTrack(track,stream));
  pc.ontrack=e=>{
   // Keep one stable remote stream. Some mobile browsers deliver audio and
@@ -1441,7 +1441,13 @@ async function dgOfferVoicemail(call){
 
 async function dgHandleIncomingCall(call){
  if(!call||call.callee_id!==myId()||call.status!=='ringing'||dgCallHandledIds.has(call.id)||dgCallHandlingIds.has(call.id))return;
- if(dgCall)return; // Never replace an existing active call UI.
+ if(dgCall?.id===call.id)return;
+ if(dgCall){
+  // Tell the second caller immediately that this member is already on another call.
+  try{const {error}=await supabaseClient.rpc('danegram_update_call_status',{p_call_id:call.id,p_new_status:'busy'});if(error)throw error;dgCallHandledIds.add(call.id);}
+  catch(e){console.warn('Could not mark incoming call busy:',e.message||e);}
+  return;
+ }
  dgCallHandlingIds.add(call.id);
  try{
   // Re-check the row so a delayed Realtime event cannot display an expired call.
