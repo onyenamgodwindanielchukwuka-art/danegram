@@ -1,0 +1,2 @@
+[functions.danegram-delete-chat-media]
+verify_jwt = true
