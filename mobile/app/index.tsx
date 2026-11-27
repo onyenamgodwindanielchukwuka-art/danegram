@@ -12,7 +12,10 @@ import {
   View
 } from 'react-native';
 import type { Session } from '@supabase/supabase-js';
+import { WebView, type WebViewMessageEvent } from 'react-native-webview';
 import { supabase, supabaseConfigured } from '../src/lib/supabase';
+
+const TURNSTILE_HTML = "<!doctype html><html><head><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"></head><body style=\"margin:0;padding:8px;background:transparent;display:flex;justify-content:center\"><div id=\"turnstile\"></div><script>(function(){function send(data){if(window.ReactNativeWebView)window.ReactNativeWebView.postMessage(JSON.stringify(data));}var script=document.createElement('script');script.src='https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';script.async=true;script.defer=true;script.onload=function(){if(!window.turnstile){send({type:'error',message:'Cloudflare security check did not initialize.'});return;}window.turnstile.render('#turnstile',{sitekey:'0x4AAAAAAGRmTIX3e4SwqYpR',theme:'light',callback:function(token){send({type:'token',token:token});},'expired-callback':function(){send({type:'expired'});},'error-callback':function(){send({type:'error',message:'Cloudflare could not complete the security check. Please retry.'});}});};script.onerror=function(){send({type:'error',message:'Could not load Cloudflare security verification. Check your connection.'});};document.head.appendChild(script);})();</script></body></html>";
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -23,6 +26,9 @@ export default function HomeScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
+  const [captchaToken, setCaptchaToken] = useState('');
+  const [captchaMessage, setCaptchaMessage] = useState('Complete the security check to continue.');
+  const [captchaReload, setCaptchaReload] = useState(0);
 
   useEffect(() => {
     let mounted = true;
@@ -47,6 +53,10 @@ export default function HomeScreen() {
       setMessage('Mobile setup is incomplete. Add the existing DANEGRAM Supabase publishable key to your local environment.');
       return;
     }
+    if (!captchaToken) {
+      setMessage('Complete the Cloudflare security check before continuing.');
+      return;
+    }
     if (!email.trim() || password.length < 8) {
       setMessage('Enter your email and a password with at least 8 characters.');
       return;
@@ -55,9 +65,12 @@ export default function HomeScreen() {
     setMessage('');
     try {
       const result = mode === 'signin'
-        ? await supabase.auth.signInWithPassword({ email: email.trim(), password })
-        : await supabase.auth.signUp({ email: email.trim(), password });
+        ? await supabase.auth.signInWithPassword({ email: email.trim(), password, options: { captchaToken } })
+        : await supabase.auth.signUp({ email: email.trim(), password, options: { captchaToken } });
       if (result.error) throw result.error;
+      setCaptchaToken('');
+      setCaptchaMessage('Please complete the refreshed security check.');
+      setCaptchaReload((value) => value + 1);
       if (mode === 'signup' && !result.data.session) {
         setMessage('Check your email to confirm your account, then sign in.');
       }
@@ -66,6 +79,15 @@ export default function HomeScreen() {
     } finally {
       setBusy(false);
     }
+  }
+
+  function handleCaptchaMessage(event: WebViewMessageEvent) {
+    try {
+      const payload = JSON.parse(event.nativeEvent.data);
+      if (payload.type === 'token' && typeof payload.token === 'string') { setCaptchaToken(payload.token); setCaptchaMessage('Security check completed.'); setMessage(''); }
+      else if (payload.type === 'expired') { setCaptchaToken(''); setCaptchaMessage('Security check expired. Complete it again.'); }
+      else if (payload.type === 'error') { setCaptchaToken(''); setCaptchaMessage(payload.message || 'Security check unavailable. Retry.'); }
+    } catch { setCaptchaToken(''); setCaptchaMessage('Could not read the security check response. Retry.'); }
   }
 
   async function signOut() {
@@ -143,6 +165,11 @@ export default function HomeScreen() {
             value={password}
             onChangeText={setPassword}
           />
+          <View style={styles.captchaBox}>
+            <WebView key={captchaReload} originWhitelist={['*']} source={{ html: TURNSTILE_HTML, baseUrl: 'https://danegram.pages.dev' }} onMessage={handleCaptchaMessage} javaScriptEnabled domStorageEnabled scrollEnabled={false} style={styles.captchaWebView} onError={() => { setCaptchaToken(''); setCaptchaMessage('Could not load Cloudflare security verification. Retry.'); }} />
+            <Text style={captchaToken ? styles.captchaSuccess : styles.captchaStatus}>{captchaMessage}</Text>
+            <Pressable style={styles.captchaRetry} onPress={() => { setCaptchaToken(''); setCaptchaMessage('Refreshing security check…'); setCaptchaReload((value) => value + 1); }}><Text style={styles.captchaRetryText}>Reload security check</Text></Pressable>
+          </View>
           {!!message && <Text style={styles.message}>{message}</Text>}
           <Pressable style={[styles.primaryButton, busy && styles.disabled]} onPress={submitAuth} disabled={busy}>
             <Text style={styles.primaryButtonText}>{busy ? 'Please wait…' : mode === 'signin' ? 'Sign in' : 'Create account'}</Text>
@@ -176,5 +203,11 @@ const styles = StyleSheet.create({
   disabled: { opacity: 0.6 },
   switchText: { color: '#2449c7', fontWeight: '700', textAlign: 'center', padding: 8 },
   message: { color: '#a23a28', fontSize: 13, lineHeight: 19 },
+  captchaBox: { borderWidth: 1, borderColor: '#e1e5ef', borderRadius: 12, padding: 8, backgroundColor: '#fff' },
+  captchaWebView: { height: 76, backgroundColor: 'transparent' },
+  captchaStatus: { color: '#687188', fontSize: 12, textAlign: 'center', paddingVertical: 4 },
+  captchaSuccess: { color: '#217a45', fontSize: 12, textAlign: 'center', paddingVertical: 4 },
+  captchaRetry: { alignSelf: 'center', paddingVertical: 8, paddingHorizontal: 12 },
+  captchaRetryText: { color: '#2449c7', fontWeight: '700', fontSize: 12 },
   warning: { color: '#8a6420', fontSize: 12, textAlign: 'center' }
 });
