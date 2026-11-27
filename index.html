@@ -1670,7 +1670,7 @@ async function loadChats(){
  }catch(e){list.textContent='Could not load chats: '+chatError(e)}
 }
 async function openChat(id){
- activeConversationId=id;dgClearReplyTarget();const c=(window.dgConversations||[]).find(x=>x.id===id);
+ activeConversationId=id;dgClearReplyTarget();$('#dgCancelReply')?.addEventListener('click',dgClearReplyTarget);const c=(window.dgConversations||[]).find(x=>x.id===id);
  document.querySelector('.dg-inbox-page')?.classList.add('dg-show-room');
  $('#chatTitle').textContent=c?.label||'Conversation';const chatAvatar=$('#chatAvatar');if(chatAvatar)chatAvatar.innerHTML=c?.peer?.avatarDisplay?`<img src="${safe(c.peer.avatarDisplay)}" alt="${safe(c.label||'Member')}" loading="lazy" onerror="this.remove()"><span class="avatar-initials">${safe(c?.initials||'D')}</span>`:`<span class="avatar-initials">${safe(c?.initials||'D')}</span>`;$('#chatMessages').textContent='Loading messages…';$('#chatMessages').dataset.conversationId='';const mi=$('#messageInput');if(mi){mi.value='';mi.style.height='30px';mi.disabled=false;}dgResetVoiceComposer();$('#messageInput').disabled=false;$('#sendMessage').disabled=false;$('#chatAttachButton').disabled=false;$('#recordVoiceButton').disabled=false;
  if(chatChannel){await supabaseClient.removeChannel(chatChannel);chatChannel=null}
@@ -1703,7 +1703,7 @@ async function dgFetchChatMessagesNow(){
    if(replyError)throw replyError;
    (parents||[]).forEach(p=>replyParents[p.id]=p);
   }
-  const stickToBottom=(box.scrollHeight-box.scrollTop-box.clientHeight<140)||box.dataset.conversationId!==requestedConversationId;const senderIds=[...new Set(rows.map(x=>x.sender_id))];let names={};
+  const stickToBottom=(box.scrollHeight-box.scrollTop-box.clientHeight<140)||box.dataset.conversationId!==requestedConversationId;const senderIds=[...new Set([...rows.map(x=>x.sender_id),...Object.values(replyParents).map(x=>x.sender_id)])];let names={};
   if(senderIds.length){const q=await supabaseClient.from('profiles').select('id,display_name,username').in('id',senderIds);if(q.error)throw q.error;(q.data||[]).forEach(x=>names[x.id]=x.display_name||x.username||'Member')}
   const {data:members,error:memberError}=await supabaseClient.from('conversation_members').select('user_id,last_read_at,last_delivered_at').eq('conversation_id',requestedConversationId);
   if(memberError)throw memberError;
