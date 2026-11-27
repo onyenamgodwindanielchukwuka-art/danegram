@@ -2004,7 +2004,7 @@ async function startVoiceRecording(){
    if(preview){preview.src=URL.createObjectURL(blob);preview.hidden=false;preview.load();}
    $('#messageStatus').textContent='Preview ready. Send it or discard it. It has not been uploaded.';
   };
-  dgMediaRecorder.start(1000);const panel=$('#dgVoicePanel');if(panel)panel.hidden=false;
+  dgMediaRecorder.start();const panel=$('#dgVoicePanel');if(panel)panel.hidden=false;
   $('#dgVoiceState').textContent=dgVoiceLocked?'Recording locked — speak hands-free':'Recording… keep holding, or slide up to lock';$('#dgVoicePanel').classList.add('is-recording');$('#dgVoiceWaveform')?.querySelectorAll('i').forEach((bar,i)=>bar.style.setProperty('--i',i));$('#dgVoicePause').hidden=false;$('#dgVoicePause').textContent='Ⅱ Pause';$('#dgVoiceFinish').hidden=!dgVoiceLocked;$('#dgVoiceFinish').textContent='Send voice note';$('#dgVoiceSend').hidden=true;$('#dgVoicePreview').hidden=true;
   $('#messageInput').disabled=true;$('#sendMessage').hidden=true;$('#recordVoiceButton').setAttribute('aria-pressed','true');$('#recordVoiceButton').title='Recording in progress';
   $('#messageStatus').textContent='Recording… pause, finish to preview, or discard.';
@@ -2014,7 +2014,7 @@ async function startVoiceRecording(){
  }catch(e){dgResetVoiceComposer();$('#messageStatus').textContent='Microphone unavailable: '+(e.message||'Permission denied');}
 }
 function dgToggleVoicePause(){if(!dgMediaRecorder)return;if(dgMediaRecorder.state==='recording'){dgVoiceElapsed+=(Date.now()-dgVoiceSegmentStarted)/1000;dgMediaRecorder.pause();$('#dgVoicePause').textContent='▶ Resume';$('#dgVoiceState').textContent='Recording paused';}else if(dgMediaRecorder.state==='paused'){dgVoiceSegmentStarted=Date.now();dgMediaRecorder.resume();$('#dgVoicePause').textContent='Ⅱ Pause';$('#dgVoiceState').textContent='Recording voice message…';}dgUpdateVoiceClock();}
-function dgFinishVoiceRecording(){if(!dgMediaRecorder)return;$('#dgVoicePanel')?.classList.remove('is-recording');if(dgMediaRecorder.state==='recording')dgVoiceElapsed+=(Date.now()-dgVoiceSegmentStarted)/1000;if(dgRecordingTimer){clearTimeout(dgRecordingTimer);dgRecordingTimer=null;}if(dgMediaRecorder.state==='paused'||dgMediaRecorder.state==='recording')dgMediaRecorder.stop();}
+function dgFinishVoiceRecording(){if(!dgMediaRecorder)return;$('#dgVoicePanel')?.classList.remove('is-recording');if(dgMediaRecorder.state==='recording')dgVoiceElapsed+=(Date.now()-dgVoiceSegmentStarted)/1000;if(dgRecordingTimer){clearTimeout(dgRecordingTimer);dgRecordingTimer=null;}if(dgMediaRecorder.state==='paused'||dgMediaRecorder.state==='recording'){try{dgMediaRecorder.requestData();}catch(_){}dgMediaRecorder.stop();}}
 function dgDiscardVoiceRecording(){if(dgRecordingTimer){clearTimeout(dgRecordingTimer);dgRecordingTimer=null;}dgVoiceDiscard=true;if(dgMediaRecorder&&(dgMediaRecorder.state==='recording'||dgMediaRecorder.state==='paused')){dgMediaRecorder.stop();}else{dgResetVoiceComposer();$('#messageStatus').textContent='Voice message discarded. Nothing was sent.';}}
 async function dgSendVoiceDraft(){if(!dgVoiceDraftBlob)return;const blob=dgVoiceDraftBlob,mime=dgVoiceDraftMime;dgStopVoiceClock();dgStopVoiceStream();const panel=$('#dgVoicePanel');if(panel)panel.hidden=true;$('#messageStatus').textContent='Sending voice message…';await uploadVoiceMessage(blob,mime);dgResetVoiceComposer();}
 function cleanupVoiceRecording(){dgDiscardVoiceRecording();}
@@ -2816,7 +2816,8 @@ voiceMic?.addEventListener('pointerup',e=>{
 });
 voiceMic?.addEventListener('pointercancel',()=>{
  if(!dgVoicePointer)return;voiceMic.classList.remove('is-holding');
- if(dgMediaRecorder)dgDiscardVoiceRecording();else dgVoiceCancelPending=true;
+ // Mobile browsers can cancel a pointer during an OS gesture; preserve the audio already captured.
+ if(dgMediaRecorder){dgVoiceAutoSendOnFinish=true;dgFinishVoiceRecording();}else dgVoiceReleasePending=true;
  dgVoicePointer=null;
 });
 voiceMic?.addEventListener('click',e=>{if(dgVoicePointerStarted){dgVoicePointerStarted=false;return;}if(!dgMediaRecorder&&!dgVoiceDraftBlob)startVoiceRecording();});
