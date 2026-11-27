@@ -1722,7 +1722,7 @@ async function dgResolveChatMediaUrl(path){
  return '';
 }
 // Shared voice-recorder hand-off flags: startVoiceRecording runs outside bindPage.
-var dgVoiceReleasePending=false,dgVoiceCancelPending=false,dgVoiceLocked=false,dgVoiceAutoSendOnFinish=false;
+var dgVoiceReleasePending=false,dgVoiceCancelPending=false,dgVoiceLocked=false,dgVoiceAutoSendOnFinish=false,dgVoiceStarting=false,dgVoiceReleasedDuringStartup=false;
 async function dgFetchChatMessagesNow(){
  if(!activeConversationId)return;
  // Do not replace message DOM while a message options menu is open.
@@ -1984,20 +1984,21 @@ function dgStopVoiceClock(){if(dgVoiceClockTimer){clearInterval(dgVoiceClockTime
 function dgStopVoiceStream(){if(dgRecordingStream){dgRecordingStream.getTracks().forEach(t=>t.stop());dgRecordingStream=null;}}
 function dgResetVoiceComposer(){dgStopVoiceClock();dgStopVoiceStream();dgMediaRecorder=null;dgAudioChunks=[];dgVoiceDraftBlob=null;dgVoiceElapsed=0;dgVoiceSegmentStarted=0;dgVoiceDiscard=false;const panel=$('#dgVoicePanel'),preview=$('#dgVoicePreview'),mic=$('#recordVoiceButton'),input=$('#messageInput'),send=$('#sendMessage');if(panel){panel.hidden=true;panel.classList.remove('is-recording');}if(preview){preview.pause();preview.removeAttribute('src');preview.load();preview.hidden=true;}if(mic){mic.disabled=false;mic.hidden=false;mic.setAttribute('aria-pressed','false');mic.textContent='🎙';mic.title='Record a voice message';}if(input){input.disabled=false;const hasText=!!input.value.trim();if(send)send.hidden=!hasText;const mic=$('#recordVoiceButton');if(mic)mic.hidden=hasText;}const status=$('#messageStatus');if(status)status.textContent='';}
 async function startVoiceRecording(){
- if(!activeConversationId||!myId()||!supabaseClient||dgMediaRecorder)return;
+ if(!activeConversationId||!myId()||!supabaseClient||dgMediaRecorder||dgVoiceStarting)return;
  if(!navigator.mediaDevices?.getUserMedia||typeof MediaRecorder==='undefined'){alert('Voice recording is not supported in this browser. Use the latest Chrome browser over HTTPS.');return;}
+ dgVoiceStarting=true;dgVoiceReleasedDuringStartup=false;
  try{
   dgVoiceDraftBlob=null;dgAudioChunks=[];dgVoiceElapsed=0;dgVoiceDiscard=false;
   dgRecordingStream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true,channelCount:1}});
   if(dgVoiceCancelPending){dgVoiceCancelPending=false;dgStopVoiceStream();return;}
   let options={};if(MediaRecorder.isTypeSupported('audio/webm;codecs=opus'))options.mimeType='audio/webm;codecs=opus';else if(MediaRecorder.isTypeSupported('audio/webm'))options.mimeType='audio/webm';
-  dgMediaRecorder=new MediaRecorder(dgRecordingStream,options);dgVoiceDraftMime=dgMediaRecorder.mimeType||'audio/webm';dgVoiceSegmentStarted=Date.now();
+  dgMediaRecorder=new MediaRecorder(dgRecordingStream,options);dgVoiceDraftMime=dgMediaRecorder.mimeType||'audio/webm';dgVoiceSegmentStarted=Date.now();dgVoiceStarting=false;
   dgMediaRecorder.ondataavailable=e=>{if(e.data?.size)dgAudioChunks.push(e.data)};
   dgMediaRecorder.onerror=e=>{console.error('Voice recording error:',e.error);dgResetVoiceComposer();$('#messageStatus').textContent='Recording failed. Please try again.';};
   dgMediaRecorder.onstop=async()=>{
    dgStopVoiceClock();dgStopVoiceStream();
    if(dgVoiceDiscard){dgVoiceAutoSendOnFinish=false;dgResetVoiceComposer();$('#messageStatus').textContent='Recording cancelled. Nothing was sent.';return;}
-   const blob=new Blob(dgAudioChunks,{type:dgVoiceDraftMime});if(!blob.size){dgVoiceAutoSendOnFinish=false;dgResetVoiceComposer();$('#messageStatus').textContent='No audio was captured. Hold the microphone while speaking and try again.';return;}
+   const blob=new Blob(dgAudioChunks,{type:dgVoiceDraftMime});if(blob.size<1500){dgVoiceAutoSendOnFinish=false;dgResetVoiceComposer();$('#messageStatus').textContent='No complete audio was captured. Hold until the Recording indicator appears, speak, then release. Nothing was sent.';return;}
    if(dgVoiceAutoSendOnFinish){dgVoiceAutoSendOnFinish=false;$('#messageStatus').textContent='Sending voice message…';try{await uploadVoiceMessage(blob,dgVoiceDraftMime);}finally{dgResetVoiceComposer();}return;}
    dgVoiceDraftBlob=blob;const panel=$('#dgVoicePanel'),state=$('#dgVoiceState'),pause=$('#dgVoicePause'),finish=$('#dgVoiceFinish'),send=$('#dgVoiceSend'),preview=$('#dgVoicePreview'),mic=$('#recordVoiceButton');
    if(panel)panel.hidden=false;if(state)state.textContent='Preview your voice message before sending';if(pause)pause.hidden=true;if(finish)finish.hidden=true;if(send)send.hidden=false;if(mic)mic.hidden=true;
@@ -2009,9 +2010,9 @@ async function startVoiceRecording(){
   $('#messageInput').disabled=true;$('#sendMessage').hidden=true;$('#recordVoiceButton').setAttribute('aria-pressed','true');$('#recordVoiceButton').title='Recording in progress';
   $('#messageStatus').textContent='Recording… pause, finish to preview, or discard.';
   dgVoiceClockTimer=setInterval(dgUpdateVoiceClock,250);
-  if(dgVoiceReleasePending){dgVoiceReleasePending=false;dgFinishVoiceRecording();}
+  if(dgVoiceReleasedDuringStartup){dgVoiceReleasedDuringStartup=false;dgVoiceAutoSendOnFinish=false;dgDiscardVoiceRecording();$('#messageStatus').textContent='The microphone was not ready before you released. Please hold again after the Recording indicator appears.';}else if(dgVoiceReleasePending){dgVoiceReleasePending=false;dgFinishVoiceRecording();}
   dgRecordingTimer=setTimeout(()=>{if(dgMediaRecorder?.state==='recording'||dgMediaRecorder?.state==='paused'){dgVoiceAutoSendOnFinish=true;const status=$('#messageStatus');if(status)status.textContent='30-minute voice-note limit reached. Sending the complete recording…';dgFinishVoiceRecording();}},1800000);
- }catch(e){dgResetVoiceComposer();$('#messageStatus').textContent='Microphone unavailable: '+(e.message||'Permission denied');}
+ }catch(e){dgVoiceStarting=false;dgVoiceReleasedDuringStartup=false;dgResetVoiceComposer();$('#messageStatus').textContent='Microphone unavailable: '+(e.message||'Permission denied');}
 }
 function dgToggleVoicePause(){if(!dgMediaRecorder)return;if(dgMediaRecorder.state==='recording'){dgVoiceElapsed+=(Date.now()-dgVoiceSegmentStarted)/1000;dgMediaRecorder.pause();$('#dgVoicePause').textContent='▶ Resume';$('#dgVoiceState').textContent='Recording paused';}else if(dgMediaRecorder.state==='paused'){dgVoiceSegmentStarted=Date.now();dgMediaRecorder.resume();$('#dgVoicePause').textContent='Ⅱ Pause';$('#dgVoiceState').textContent='Recording voice message…';}dgUpdateVoiceClock();}
 function dgFinishVoiceRecording(){if(!dgMediaRecorder)return;$('#dgVoicePanel')?.classList.remove('is-recording');if(dgMediaRecorder.state==='recording')dgVoiceElapsed+=(Date.now()-dgVoiceSegmentStarted)/1000;if(dgRecordingTimer){clearTimeout(dgRecordingTimer);dgRecordingTimer=null;}if(dgMediaRecorder.state==='paused'||dgMediaRecorder.state==='recording'){try{dgMediaRecorder.requestData();}catch(_){}dgMediaRecorder.stop();}}
@@ -2811,7 +2812,7 @@ voiceMic?.addEventListener('pointerup',e=>{
  voiceMic.classList.remove('is-holding');
  if(st.cancelled){dgVoicePointer=null;return;}
  if(st.locked){const status=$('#messageStatus');if(status)status.textContent='Recording locked. Tap Send voice note when finished, or Discard to cancel.';}
- else{dgVoiceAutoSendOnFinish=true;if(dgMediaRecorder)dgFinishVoiceRecording();else dgVoiceReleasePending=true;}
+ else if(dgMediaRecorder){dgVoiceAutoSendOnFinish=true;dgFinishVoiceRecording();}else if(dgVoiceStarting){dgVoiceReleasedDuringStartup=true;const status=$('#messageStatus');if(status)status.textContent='Microphone is still starting. Please hold until Recording appears, then speak and release.';}else{dgVoiceAutoSendOnFinish=false;}
  dgVoicePointer=null;
 });
 voiceMic?.addEventListener('pointercancel',()=>{
