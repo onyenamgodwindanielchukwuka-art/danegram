@@ -15,7 +15,49 @@ import type { Session } from '@supabase/supabase-js';
 import { WebView, type WebViewMessageEvent } from 'react-native-webview';
 import { supabase, supabaseConfigured } from '../src/lib/supabase';
 
-const TURNSTILE_HTML = "<!doctype html><html><head><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"></head><body style=\"margin:0;padding:8px;background:transparent;display:flex;justify-content:center\"><div id=\"turnstile\"></div><script>(function(){function send(data){if(window.ReactNativeWebView)window.ReactNativeWebView.postMessage(JSON.stringify(data));}var script=document.createElement('script');script.src='https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';script.async=true;script.defer=true;script.onload=function(){if(!window.turnstile){send({type:'error',message:'Cloudflare security check did not initialize.'});return;}window.turnstile.render('#turnstile',{sitekey:'0x4AAAAAAGRmTIX3e4SwqYpR',theme:'light',callback:function(token){send({type:'token',token:token});},'expired-callback':function(){send({type:'expired'});},'error-callback':function(){send({type:'error',message:'Cloudflare could not complete the security check. Please retry.'});}});};script.onerror=function(){send({type:'error',message:'Could not load Cloudflare security verification. Check your connection.'});};document.head.appendChild(script);})();</script></body></html>";
+const TURNSTILE_HTML = `<!doctype html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+  <style>
+    html,body{margin:0;padding:0;width:100%;min-height:76px;background:transparent;overflow:hidden}
+    body{display:flex;justify-content:center;align-items:flex-start}
+    #turnstile{width:100%;min-height:65px;display:flex;justify-content:center}
+  </style>
+</head>
+<body>
+  <div id="turnstile"></div>
+  <script>
+    (function(){
+      var sent=false;
+      function send(data){if(window.ReactNativeWebView)window.ReactNativeWebView.postMessage(JSON.stringify(data));}
+      window.onerror=function(message){send({type:'error',message:'Security check script error: '+String(message)});};
+      var script=document.createElement('script');
+      script.src='https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
+      script.async=true;
+      script.defer=true;
+      script.onload=function(){
+        try{
+          if(!window.turnstile){send({type:'error',message:'Cloudflare loaded but its verification API did not initialize.'});return;}
+          window.turnstile.render('#turnstile',{
+            sitekey:'0x4AAAAAAGRmTIX3e4SwqYpR',
+            theme:'light',
+            size:'flexible',
+            callback:function(token){sent=true;send({type:'token',token:token});},
+            'expired-callback':function(){sent=false;send({type:'expired'});},
+            'unsupported-callback':function(){send({type:'error',message:'This Android WebView is not supported for Cloudflare verification.'});},
+            'error-callback':function(code){send({type:'error',message:'Cloudflare verification failed ('+String(code||'unknown')+'). Check network or retry.'});}
+          });
+          setTimeout(function(){if(!sent)send({type:'waiting',message:'Cloudflare loaded. Waiting for the security check to finish.'});},12000);
+        }catch(error){send({type:'error',message:'Could not start Cloudflare verification: '+String(error&&error.message||error)});}
+      };
+      script.onerror=function(){send({type:'error',message:'Could not download Cloudflare verification script. Check connection, DNS, or content blockers.'});};
+      document.head.appendChild(script);
+      setTimeout(function(){if(!window.turnstile)send({type:'error',message:'Cloudflare verification did not load within 15 seconds.'});},15000);
+    })();
+  </script>
+</body>
+</html>`;
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -93,6 +135,7 @@ export default function HomeScreen() {
       const payload = JSON.parse(event.nativeEvent.data);
       if (payload.type === 'token' && typeof payload.token === 'string') { setCaptchaToken(payload.token); setCaptchaMessage('Security check completed.'); setMessage(''); }
       else if (payload.type === 'expired') { setCaptchaToken(''); setCaptchaMessage('Security check expired. Complete it again.'); }
+      else if (payload.type === 'waiting') { setCaptchaMessage(payload.message || 'Waiting for security verification…'); }
       else if (payload.type === 'error') { setCaptchaToken(''); setCaptchaMessage(payload.message || 'Security check unavailable. Retry.'); }
     } catch { setCaptchaToken(''); setCaptchaMessage('Could not read the security check response. Retry.'); }
   }
@@ -240,7 +283,7 @@ export default function HomeScreen() {
             </View>
           )}
           <View style={styles.captchaBox}>
-            <WebView key={captchaReload} originWhitelist={['*']} source={{ html: TURNSTILE_HTML, baseUrl: 'https://danegram.pages.dev' }} onMessage={handleCaptchaMessage} javaScriptEnabled domStorageEnabled scrollEnabled={false} style={styles.captchaWebView} thirdPartyCookiesEnabled sharedCookiesEnabled onError={() => { setCaptchaToken(''); setCaptchaMessage('Could not load Cloudflare security verification. Retry.'); }} onHttpError={(event) => { setCaptchaToken(''); setCaptchaMessage('Cloudflare security service returned HTTP ' + event.nativeEvent.statusCode + '. Check your connection or retry.'); }} />
+            <WebView key={captchaReload} originWhitelist={['*']} source={{ html: TURNSTILE_HTML, baseUrl: 'https://danegram.pages.dev' }} onMessage={handleCaptchaMessage} javaScriptEnabled domStorageEnabled scrollEnabled={false} cacheEnabled={false} setSupportMultipleWindows={false} style={styles.captchaWebView} thirdPartyCookiesEnabled sharedCookiesEnabled onError={() => { setCaptchaToken(''); setCaptchaMessage('Could not load Cloudflare security verification. Retry.'); }} onHttpError={(event) => { setCaptchaToken(''); setCaptchaMessage('Cloudflare security service returned HTTP ' + event.nativeEvent.statusCode + '. Check your connection or retry.'); }} />
             <Text style={captchaToken ? styles.captchaSuccess : styles.captchaStatus}>{captchaMessage}</Text>
             <Pressable style={styles.captchaRetry} onPress={() => { setCaptchaToken(''); setCaptchaMessage('Refreshing security check…'); setCaptchaReload((value) => value + 1); }}><Text style={styles.captchaRetryText}>Reload security check</Text></Pressable>
           </View>
