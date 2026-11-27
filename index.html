@@ -1721,6 +1721,8 @@ async function dgResolveChatMediaUrl(path){
  }
  return '';
 }
+// Shared voice-recorder hand-off flags: startVoiceRecording runs outside bindPage.
+var dgVoiceReleasePending=false,dgVoiceCancelPending=false;
 async function dgFetchChatMessagesNow(){
  if(!activeConversationId)return;
  // Do not replace message DOM while a message options menu is open.
@@ -1740,8 +1742,8 @@ async function dgFetchChatMessagesNow(){
    if(replyError)throw replyError;
    (parents||[]).forEach(p=>replyParents[p.id]=p);
   }
-  const stickToBottom=(box.scrollHeight-box.scrollTop-box.clientHeight<140)||box.dataset.conversationId!==requestedConversationId;const senderIds=[...new Set([...rows.map(x=>x.sender_id),...Object.values(replyParents).map(x=>x.sender_id)])];let names={};
-  if(senderIds.length){const q=await supabaseClient.from('profiles').select('id,display_name,username,avatar_url').in('id',senderIds);if(q.error)throw q.error;const senderProfiles=await dgResolveProfileAvatars(q.data||[]);const senderAvatarUrls={};senderProfiles.forEach(x=>{names[x.id]=x.display_name||x.username||'Member';senderAvatarUrls[x.id]=x.avatarDisplay||'';})}
+  const stickToBottom=(box.scrollHeight-box.scrollTop-box.clientHeight<140)||box.dataset.conversationId!==requestedConversationId;const senderIds=[...new Set([...rows.map(x=>x.sender_id),...Object.values(replyParents).map(x=>x.sender_id)])];let names={},senderAvatarUrls={};
+  if(senderIds.length){const q=await supabaseClient.from('profiles').select('id,display_name,username,avatar_url').in('id',senderIds);if(q.error)throw q.error;const senderProfiles=await dgResolveProfileAvatars(q.data||[]);senderProfiles.forEach(x=>{names[x.id]=x.display_name||x.username||'Member';senderAvatarUrls[x.id]=x.avatarDisplay||'';})}
   const {data:members,error:memberError}=await supabaseClient.from('conversation_members').select('user_id,last_read_at,last_delivered_at').eq('conversation_id',requestedConversationId);
   if(memberError)throw memberError;
   const recipient=(members||[]).find(x=>x.user_id!==myId());
@@ -2765,7 +2767,7 @@ if(!['groups','communities','group-room'].includes(currentPage))$('#createGroup'
 if(window.visualViewport){const syncChatViewport=()=>document.documentElement.style.setProperty('--dg-chat-vh',window.visualViewport.height+'px');syncChatViewport();window.visualViewport.addEventListener('resize',syncChatViewport);window.visualViewport.addEventListener('scroll',syncChatViewport);}
 $('#newChat')?.addEventListener('click',startNewChat);$('#messageForm')?.addEventListener('submit',sendChatMessage);$('#chatAttachButton')?.addEventListener('click',()=>$('#chatMediaInput')?.click());$('#chatMediaInput')?.addEventListener('change',sendChatMedia);/* WhatsApp-style hold to record: release to finish, swipe left to cancel.
    Keyboard activation remains available through a normal click. */
-let dgVoicePointer=null,dgVoicePointerStarted=false,dgVoiceReleasePending=false,dgVoiceCancelPending=false;
+let dgVoicePointer=null,dgVoicePointerStarted=false;
 const voiceMic=$('#recordVoiceButton');
 voiceMic?.addEventListener('pointerdown',e=>{if(!activeConversationId||dgMediaRecorder)return;e.preventDefault();dgVoicePointer={id:e.pointerId,x:e.clientX,y:e.clientY};dgVoicePointerStarted=true;voiceMic.classList.add('is-holding');voiceMic.setPointerCapture?.(e.pointerId);startVoiceRecording();});
 voiceMic?.addEventListener('pointerup',e=>{if(!dgVoicePointer||e.pointerId!==dgVoicePointer.id)return;const dx=e.clientX-dgVoicePointer.x;voiceMic.classList.remove('is-holding');if(dx < -75){if(dgMediaRecorder)dgDiscardVoiceRecording();else dgVoiceCancelPending=true;}else if(dgMediaRecorder)dgFinishVoiceRecording();else dgVoiceReleasePending=true;dgVoicePointer=null;});
