@@ -90,6 +90,38 @@ export default function HomeScreen() {
     } catch { setCaptchaToken(''); setCaptchaMessage('Could not read the security check response. Retry.'); }
   }
 
+  async function sendPasswordReset() {
+    if (!supabaseConfigured) {
+      setMessage('Mobile setup is incomplete. Please try again later.');
+      return;
+    }
+    if (!email.trim()) {
+      setMessage('Enter your account email address first.');
+      return;
+    }
+    if (!captchaToken) {
+      setMessage('Complete the Cloudflare security check before requesting a password reset.');
+      return;
+    }
+    setBusy(true);
+    setMessage('');
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+        redirectTo: 'danegram://reset-password',
+        captchaToken
+      });
+      if (error) throw error;
+      setMessage('Password reset instructions have been sent if this email belongs to a DANEGRAM account. Check your inbox.');
+      setCaptchaToken('');
+      setCaptchaMessage('Please complete the refreshed security check.');
+      setCaptchaReload((value) => value + 1);
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : 'Could not send the password reset email.');
+    } finally {
+      setBusy(false);
+    }
+  }
+
   async function signOut() {
     setBusy(true);
     const { error } = await supabase.auth.signOut();
@@ -171,6 +203,11 @@ export default function HomeScreen() {
             <Pressable style={styles.captchaRetry} onPress={() => { setCaptchaToken(''); setCaptchaMessage('Refreshing security check…'); setCaptchaReload((value) => value + 1); }}><Text style={styles.captchaRetryText}>Reload security check</Text></Pressable>
           </View>
           {!!message && <Text style={styles.message}>{message}</Text>}
+          {mode === 'signin' && (
+            <Pressable style={styles.forgotButton} onPress={sendPasswordReset} disabled={busy}>
+              <Text style={styles.forgotText}>Forgot password?</Text>
+            </Pressable>
+          )}
           <Pressable style={[styles.primaryButton, busy && styles.disabled]} onPress={submitAuth} disabled={busy}>
             <Text style={styles.primaryButtonText}>{busy ? 'Please wait…' : mode === 'signin' ? 'Sign in' : 'Create account'}</Text>
           </Pressable>
@@ -202,6 +239,8 @@ const styles = StyleSheet.create({
   secondaryButtonText: { color: '#2449c7', fontWeight: '800' },
   disabled: { opacity: 0.6 },
   switchText: { color: '#2449c7', fontWeight: '700', textAlign: 'center', padding: 8 },
+  forgotButton: { alignSelf: 'flex-end', minHeight: 44, justifyContent: 'center', paddingHorizontal: 4 },
+  forgotText: { color: '#2449c7', fontWeight: '700', fontSize: 14 },
   message: { color: '#a23a28', fontSize: 13, lineHeight: 19 },
   captchaBox: { borderWidth: 1, borderColor: '#e1e5ef', borderRadius: 12, padding: 8, backgroundColor: '#fff' },
   captchaWebView: { height: 76, backgroundColor: 'transparent' },
