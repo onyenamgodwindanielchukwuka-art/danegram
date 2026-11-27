@@ -2978,6 +2978,18 @@ async function loadSharedPosts(){
   const who=byId.get(reaction.user_id)||{};entry.people.push({userId:reaction.user_id,name:who.display_name||who.username||'DANEGRAM Member',username:who.username||'',avatarUrl:who.avatarDisplay||''});
   if(reaction.user_id===user.id)entry.liked=true;byPost.set(reaction.post_id,entry);
  }
+async function dgResolveFeedPostMediaUrls(rows){
+ const urls={};const ids=(rows||[]).filter(row=>row.media_url&&!/^https?:\\/\\//i.test(String(row.media_url))).map(row=>row.id).filter(Boolean);
+ for(let i=0;i<ids.length;i+=50){
+  try{
+   const {data,error}=await supabaseClient.functions.invoke('danegram-post-media-access-preview',{body:{post_ids:ids.slice(i,i+50)}});
+   if(error)throw error;
+   Object.assign(urls,data?.media_urls||{});
+  }catch(error){console.warn('DANEGRAM feed media access failed:',error?.message||error);}
+ }
+ (rows||[]).forEach(row=>{if(row.media_url&&/^https:\\/\\//i.test(String(row.media_url)))urls[row.id]=row.media_url;});
+ return urls;
+}
  const feedMediaUrls=await dgResolveFeedPostMediaUrls(rows);
  posts=await Promise.all(rows.map(async(row,index)=>{
   const profile=byId.get(row.user_id)||{},date=row.created_at?new Date(row.created_at):new Date(),reaction=byPost.get(row.id)||{count:0,liked:false,people:[]};
