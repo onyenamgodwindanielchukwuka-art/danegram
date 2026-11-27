@@ -899,7 +899,12 @@ html,body{background:#f5f5f5!important;color:#111!important}
 .dg-delete-menu summary{list-style:none;cursor:pointer;border-radius:16px;width:25px;height:25px;display:flex;align-items:center;justify-content:center;color:var(--muted,#667085);font-weight:900;background:rgba(255,255,255,.75)}
 .dg-delete-menu summary::-webkit-details-marker{display:none}
 .dg-delete-menu[open] summary{background:#eaf1ff;color:#174ea6}
-.dg-delete-menu-items{position:absolute;right:0;top:27px;min-width:178px;padding:5px;background:#fff;border:1px solid #dfe4ee;border-radius:12px;box-shadow:0 8px 28px rgba(20,35,65,.18);display:grid;gap:3px}
+.dg-delete-menu-items{position:absolute;right:0;top:27px;min-width:178px;max-width:min(220px,calc(100vw - 32px));padding:5px;background:#fff;border:1px solid #dfe4ee;border-radius:12px;box-shadow:0 8px 28px rgba(20,35,65,.18);display:grid;gap:3px;z-index:30}
+.dg-chat-body .bubble:not(.mine)>.dg-delete-menu{left:5px;right:auto}
+.dg-chat-body .bubble:not(.mine)>.dg-delete-menu>.dg-delete-menu-items{left:0;right:auto}
+.dg-chat-body .bubble.mine>.dg-delete-menu>.dg-delete-menu-items{right:0;left:auto}
+.dg-chat-body .bubble{overflow:visible}
+.dg-chat-body{overflow-x:hidden;overflow-y:auto}
 .dg-delete-menu-items button{border:0;background:transparent;text-align:left;padding:10px 12px;border-radius:8px;color:#26334b;font-size:13px;font-weight:650;white-space:nowrap}
 .dg-delete-menu-items button:hover{background:#f0f4fc}
 .dg-delete-menu-items button[data-dg-action$="-both"]{color:#b42318}
@@ -1704,6 +1709,9 @@ async function dgResolveChatMediaUrl(path){
 }
 async function dgFetchChatMessagesNow(){
  if(!activeConversationId)return;
+ // Do not replace message DOM while a message options menu is open.
+ // This prevents mobile polling from closing or clipping the menu mid-tap.
+ if($('#chatMessages')?.querySelector('.dg-delete-menu[open]'))return;
  const requestedConversationId=activeConversationId;
  const box=$('#chatMessages');
  try{
@@ -3040,8 +3048,9 @@ async function loadSharedPosts(){
  }
  posts=await Promise.all(rows.map(async(row,index)=>{
   const profile=byId.get(row.user_id)||{},date=row.created_at?new Date(row.created_at):new Date(),reaction=byPost.get(row.id)||{count:0,liked:false,people:[]};
-  let mediaUrl='';
-  if(row.media_url){if(/^https?:\/\//i.test(row.media_url))mediaUrl=row.media_url;else{const cleanPath=String(row.media_url).replace(/^\/?(?:danegram-media|danegram-post-media)\//,'').replace(/^\/+/, '');for(const bucket of ['danegram-media','danegram-post-media']){const signed=await supabaseClient.storage.from(bucket).createSignedUrl(cleanPath,3600);if(!signed.error&&signed.data?.signedUrl){mediaUrl=signed.data.signedUrl;break;}console.warn('Post media URL unavailable in '+bucket+':',signed.error?.message||'No signed URL');}}}
+  // Post uploads in this project are stored in danegram-media. Use the
+  // same normalized, authorized URL resolver as chat attachments.
+  const mediaUrl=row.media_url?await dgResolveChatMediaUrl(row.media_url):'';
   const tree=commentsByPost.get(row.id)||[];
   const sortNewest=list=>{list.sort((a,b)=>new Date(b.time||0)-new Date(a.time||0));list.forEach(c=>sortNewest(c.replies||[]));};sortNewest(tree);
   const countTree=list=>list.reduce((n,c)=>n+1+countTree(c.replies||[]),0);
@@ -3078,6 +3087,9 @@ function ensureDgFeedRealtime(){
  feedRealtimeUserId=uid;
  feedRealtimeChannel=supabaseClient.channel('danegram-feed-'+uid)
   .on('postgres_changes',{event:'*',schema:'public',table:'posts'},()=>dgScheduleFeedRefresh())
+  .on('postgres_changes',{event:'*',schema:'public',table:'post_reactions'},()=>dgScheduleFeedRefresh())
+  .on('postgres_changes',{event:'*',schema:'public',table:'comments'},()=>dgScheduleFeedRefresh())
+  .on('postgres_changes',{event:'*',schema:'public',table:'comment_reactions'},()=>dgScheduleFeedRefresh())
   .subscribe(status=>{
    if(status==='CHANNEL_ERROR'||status==='TIMED_OUT'){
     console.warn('DANEGRAM feed realtime unavailable; automatic polling remains active. Status:',status);
@@ -3094,7 +3106,7 @@ if(!feedPollTimer){
   if(currentSession&&user&&currentPage==='home'&&document.visibilityState!=='hidden'&&!feedLoading&&!feedRefreshInFlight){
    feedRealtimeDirty=true;dgRefreshFeedInBackground();
   }
- },60000);
+ },30000);
 }
 document.addEventListener('visibilitychange',()=>{
  if(document.visibilityState==='visible'&&currentSession&&user&&currentPage==='home')dgScheduleFeedRefresh();
