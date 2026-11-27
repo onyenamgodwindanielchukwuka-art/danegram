@@ -1017,8 +1017,12 @@ async function loadSupabaseSdk(){
     try{
       await new Promise((resolve,reject)=>{
         const script=document.createElement('script');
+        let settled=false;
+        const finish=(fn,value)=>{if(settled)return;settled=true;clearTimeout(timeout);fn(value);};
+        const timeout=setTimeout(()=>{script.remove();finish(reject,new Error('Timed out loading '+src));},3000);
         script.src=src; script.async=true;
-        script.onload=resolve; script.onerror=()=>reject(new Error('Could not load '+src));
+        script.onload=()=>finish(resolve);
+        script.onerror=()=>finish(reject,new Error('Could not load '+src));
         document.head.appendChild(script);
       });
       if(window.supabase && typeof window.supabase.createClient === 'function') return true;
