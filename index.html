@@ -2004,13 +2004,13 @@ async function startVoiceRecording(){
    if(preview){preview.src=URL.createObjectURL(blob);preview.hidden=false;preview.load();}
    $('#messageStatus').textContent='Preview ready. Send it or discard it. It has not been uploaded.';
   };
-  dgMediaRecorder.start(250);const panel=$('#dgVoicePanel');if(panel)panel.hidden=false;
+  dgMediaRecorder.start(1000);const panel=$('#dgVoicePanel');if(panel)panel.hidden=false;
   $('#dgVoiceState').textContent=dgVoiceLocked?'Recording locked — speak hands-free':'Recording… keep holding, or slide up to lock';$('#dgVoicePanel').classList.add('is-recording');$('#dgVoiceWaveform')?.querySelectorAll('i').forEach((bar,i)=>bar.style.setProperty('--i',i));$('#dgVoicePause').hidden=false;$('#dgVoicePause').textContent='Ⅱ Pause';$('#dgVoiceFinish').hidden=!dgVoiceLocked;$('#dgVoiceFinish').textContent='Send voice note';$('#dgVoiceSend').hidden=true;$('#dgVoicePreview').hidden=true;
   $('#messageInput').disabled=true;$('#sendMessage').hidden=true;$('#recordVoiceButton').setAttribute('aria-pressed','true');$('#recordVoiceButton').title='Recording in progress';
   $('#messageStatus').textContent='Recording… pause, finish to preview, or discard.';
   dgVoiceClockTimer=setInterval(dgUpdateVoiceClock,250);
   if(dgVoiceReleasePending){dgVoiceReleasePending=false;dgFinishVoiceRecording();}
-  dgRecordingTimer=setTimeout(()=>{if(dgMediaRecorder?.state==='recording'||dgMediaRecorder?.state==='paused'){dgVoiceAutoSendOnFinish=true;dgFinishVoiceRecording();}},180000);
+  dgRecordingTimer=setTimeout(()=>{if(dgMediaRecorder?.state==='recording'||dgMediaRecorder?.state==='paused'){dgVoiceAutoSendOnFinish=true;const status=$('#messageStatus');if(status)status.textContent='30-minute voice-note limit reached. Sending the complete recording…';dgFinishVoiceRecording();}},1800000);
  }catch(e){dgResetVoiceComposer();$('#messageStatus').textContent='Microphone unavailable: '+(e.message||'Permission denied');}
 }
 function dgToggleVoicePause(){if(!dgMediaRecorder)return;if(dgMediaRecorder.state==='recording'){dgVoiceElapsed+=(Date.now()-dgVoiceSegmentStarted)/1000;dgMediaRecorder.pause();$('#dgVoicePause').textContent='▶ Resume';$('#dgVoiceState').textContent='Recording paused';}else if(dgMediaRecorder.state==='paused'){dgVoiceSegmentStarted=Date.now();dgMediaRecorder.resume();$('#dgVoicePause').textContent='Ⅱ Pause';$('#dgVoiceState').textContent='Recording voice message…';}dgUpdateVoiceClock();}
