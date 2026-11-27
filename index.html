@@ -1969,6 +1969,7 @@ async function startVoiceRecording(){
  try{
   dgVoiceDraftBlob=null;dgAudioChunks=[];dgVoiceElapsed=0;dgVoiceDiscard=false;
   dgRecordingStream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true,channelCount:1}});
+  if(dgVoiceCancelPending){dgVoiceCancelPending=false;dgStopVoiceStream();return;}
   let options={};if(MediaRecorder.isTypeSupported('audio/webm;codecs=opus'))options.mimeType='audio/webm;codecs=opus';else if(MediaRecorder.isTypeSupported('audio/webm'))options.mimeType='audio/webm';
   dgMediaRecorder=new MediaRecorder(dgRecordingStream,options);dgVoiceDraftMime=dgMediaRecorder.mimeType||'audio/webm';dgVoiceSegmentStarted=Date.now();
   dgMediaRecorder.ondataavailable=e=>{if(e.data?.size)dgAudioChunks.push(e.data)};
@@ -1987,6 +1988,7 @@ async function startVoiceRecording(){
   $('#messageInput').disabled=true;$('#sendMessage').hidden=true;$('#recordVoiceButton').setAttribute('aria-pressed','true');$('#recordVoiceButton').title='Recording in progress';
   $('#messageStatus').textContent='Recording… pause, finish to preview, or discard.';
   dgVoiceClockTimer=setInterval(dgUpdateVoiceClock,250);
+  if(dgVoiceReleasePending){dgVoiceReleasePending=false;dgFinishVoiceRecording();}
   dgRecordingTimer=setTimeout(()=>{if(dgMediaRecorder?.state==='recording'||dgMediaRecorder?.state==='paused')dgFinishVoiceRecording();},180000);
  }catch(e){dgResetVoiceComposer();$('#messageStatus').textContent='Microphone unavailable: '+(e.message||'Permission denied');}
 }
@@ -2763,11 +2765,11 @@ if(!['groups','communities','group-room'].includes(currentPage))$('#createGroup'
 if(window.visualViewport){const syncChatViewport=()=>document.documentElement.style.setProperty('--dg-chat-vh',window.visualViewport.height+'px');syncChatViewport();window.visualViewport.addEventListener('resize',syncChatViewport);window.visualViewport.addEventListener('scroll',syncChatViewport);}
 $('#newChat')?.addEventListener('click',startNewChat);$('#messageForm')?.addEventListener('submit',sendChatMessage);$('#chatAttachButton')?.addEventListener('click',()=>$('#chatMediaInput')?.click());$('#chatMediaInput')?.addEventListener('change',sendChatMedia);/* WhatsApp-style hold to record: release to finish, swipe left to cancel.
    Keyboard activation remains available through a normal click. */
-let dgVoicePointer=null,dgVoicePointerStarted=false;
+let dgVoicePointer=null,dgVoicePointerStarted=false,dgVoiceReleasePending=false,dgVoiceCancelPending=false;
 const voiceMic=$('#recordVoiceButton');
 voiceMic?.addEventListener('pointerdown',e=>{if(!activeConversationId||dgMediaRecorder)return;e.preventDefault();dgVoicePointer={id:e.pointerId,x:e.clientX,y:e.clientY};dgVoicePointerStarted=true;voiceMic.classList.add('is-holding');voiceMic.setPointerCapture?.(e.pointerId);startVoiceRecording();});
-voiceMic?.addEventListener('pointerup',e=>{if(!dgVoicePointer||e.pointerId!==dgVoicePointer.id)return;const dx=e.clientX-dgVoicePointer.x;voiceMic.classList.remove('is-holding');if(dx < -75)dgDiscardVoiceRecording();else dgFinishVoiceRecording();dgVoicePointer=null;});
-voiceMic?.addEventListener('pointercancel',()=>{if(dgVoicePointer){voiceMic.classList.remove('is-holding');dgDiscardVoiceRecording();dgVoicePointer=null;}});
+voiceMic?.addEventListener('pointerup',e=>{if(!dgVoicePointer||e.pointerId!==dgVoicePointer.id)return;const dx=e.clientX-dgVoicePointer.x;voiceMic.classList.remove('is-holding');if(dx < -75){if(dgMediaRecorder)dgDiscardVoiceRecording();else dgVoiceCancelPending=true;}else if(dgMediaRecorder)dgFinishVoiceRecording();else dgVoiceReleasePending=true;dgVoicePointer=null;});
+voiceMic?.addEventListener('pointercancel',()=>{if(dgVoicePointer){voiceMic.classList.remove('is-holding');if(dgMediaRecorder)dgDiscardVoiceRecording();else dgVoiceCancelPending=true;dgVoicePointer=null;}});
 voiceMic?.addEventListener('click',e=>{if(dgVoicePointerStarted){dgVoicePointerStarted=false;return;}if(!dgMediaRecorder&&!dgVoiceDraftBlob)startVoiceRecording();});
 $('#dgVoicePause')?.addEventListener('click',dgToggleVoicePause);$('#dgVoiceFinish')?.addEventListener('click',dgFinishVoiceRecording);$('#dgVoiceDiscard')?.addEventListener('click',dgDiscardVoiceRecording);$('#dgVoiceSend')?.addEventListener('click',dgSendVoiceDraft);$('#messageInput')?.addEventListener('input',e=>{const t=e.currentTarget;t.style.height='30px';t.style.height=Math.min(Math.max(t.scrollHeight,30),136)+'px';const hasText=!!t.value.trim();const send=$('#sendMessage'),mic=$('#recordVoiceButton');if(send){send.hidden=!hasText;send.disabled=chatBusy||!activeConversationId}if(mic)mic.hidden=hasText;});$('#messageInput')?.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey&&!e.isComposing){e.preventDefault();const send=$('#sendMessage');if(send&&!send.hidden&&!send.disabled)$('#messageForm')?.requestSubmit();}});$('#backToChats')?.addEventListener('click',()=>{document.querySelector('.dg-inbox-page')?.classList.remove('dg-show-room');activeConversationId=null;if(chatChannel){supabaseClient.removeChannel(chatChannel);chatChannel=null;}loadChats();});if(currentPage==='messages')loadChats();if(currentPage==='notifications'){loadLiveNotifications();$('#dgMarkAllNotificationsRead')?.addEventListener('click',dgMarkAllNotificationsRead);}if(currentPage==='wallet'&&dgCanUseWalletEarnings())loadWalletData();if(currentPage==='wallet'&&dgCanUseWalletEarnings()){loadDgSavedBanks();loadDgMemberBanks();$('#dgBankForm')?.addEventListener('submit',registerDgBankAccount);}if(currentPage==='earnings'&&dgCanUseWalletEarnings())loadEarningsData();if(currentPage==='company-finance'&&dgCompanyOwnerAccess)loadCompanyFinance();$('#walletAccessPremium')?.addEventListener('click',()=>go('premium'));
 $('#groupSearch')?.addEventListener('input',e=>{let q=e.target.value.toLowerCase();$('#groupsList').innerHTML=groups.filter(g=>(g.title+' '+g.category+' '+g.description).toLowerCase().includes(q)).map(groupCard).join('')||'<div class="card empty">No matching groups found.</div>';bindGroupButtons()});
