@@ -25,7 +25,9 @@ export default function HomeScreen() {
   const [mode, setMode] = useState<'signin' | 'signup'>('signin');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [message, setMessage] = useState('');
   const [captchaToken, setCaptchaToken] = useState('');
   const [captchaMessage, setCaptchaMessage] = useState('Complete the security check to continue.');
@@ -60,6 +62,10 @@ export default function HomeScreen() {
     }
     if (!email.trim() || password.length < 8) {
       setMessage('Enter your email and a password with at least 8 characters.');
+      return;
+    }
+    if (mode === 'signup' && password !== confirmPassword) {
+      setMessage('Your passwords do not match. Please check both password fields.');
       return;
     }
     setBusy(true);
@@ -210,8 +216,31 @@ export default function HomeScreen() {
               <Text style={styles.passwordToggleText}>{showPassword ? 'Hide' : 'Show'}</Text>
             </Pressable>
           </View>
+          {mode === 'signup' && (
+            <View style={styles.passwordInputWrap}>
+              <TextInput
+                style={[styles.input, styles.passwordInput]}
+                placeholder="Confirm password"
+                placeholderTextColor="#858b9b"
+                secureTextEntry={!showConfirmPassword}
+                autoCapitalize="none"
+                autoComplete="new-password"
+                value={confirmPassword}
+                onChangeText={setConfirmPassword}
+              />
+              <Pressable
+                style={styles.passwordToggle}
+                onPress={() => setShowConfirmPassword((visible) => !visible)}
+                accessibilityRole="button"
+                accessibilityLabel={showConfirmPassword ? 'Hide confirmation password' : 'Show confirmation password'}
+                hitSlop={8}
+              >
+                <Text style={styles.passwordToggleText}>{showConfirmPassword ? 'Hide' : 'Show'}</Text>
+              </Pressable>
+            </View>
+          )}
           <View style={styles.captchaBox}>
-            <WebView key={captchaReload} originWhitelist={['*']} source={{ html: TURNSTILE_HTML, baseUrl: 'https://danegram.pages.dev' }} onMessage={handleCaptchaMessage} javaScriptEnabled domStorageEnabled scrollEnabled={false} style={styles.captchaWebView} onError={() => { setCaptchaToken(''); setCaptchaMessage('Could not load Cloudflare security verification. Retry.'); }} />
+            <WebView key={captchaReload} originWhitelist={['*']} source={{ html: TURNSTILE_HTML, baseUrl: 'https://danegram.pages.dev' }} onMessage={handleCaptchaMessage} javaScriptEnabled domStorageEnabled scrollEnabled={false} style={styles.captchaWebView} thirdPartyCookiesEnabled sharedCookiesEnabled onError={() => { setCaptchaToken(''); setCaptchaMessage('Could not load Cloudflare security verification. Retry.'); }} onHttpError={(event) => { setCaptchaToken(''); setCaptchaMessage('Cloudflare security service returned HTTP ' + event.nativeEvent.statusCode + '. Check your connection or retry.'); }} />
             <Text style={captchaToken ? styles.captchaSuccess : styles.captchaStatus}>{captchaMessage}</Text>
             <Pressable style={styles.captchaRetry} onPress={() => { setCaptchaToken(''); setCaptchaMessage('Refreshing security check…'); setCaptchaReload((value) => value + 1); }}><Text style={styles.captchaRetryText}>Reload security check</Text></Pressable>
           </View>
@@ -260,7 +289,7 @@ const styles = StyleSheet.create({
   forgotText: { color: '#2449c7', fontWeight: '700', fontSize: 14 },
   message: { color: '#a23a28', fontSize: 13, lineHeight: 19 },
   captchaBox: { borderWidth: 1, borderColor: '#e1e5ef', borderRadius: 12, padding: 8, backgroundColor: '#fff' },
-  captchaWebView: { height: 76, backgroundColor: 'transparent' },
+  captchaWebView: { height: 100, backgroundColor: 'transparent' },
   captchaStatus: { color: '#687188', fontSize: 12, textAlign: 'center', paddingVertical: 4 },
   captchaSuccess: { color: '#217a45', fontSize: 12, textAlign: 'center', paddingVertical: 4 },
   captchaRetry: { alignSelf: 'center', paddingVertical: 8, paddingHorizontal: 12 },
