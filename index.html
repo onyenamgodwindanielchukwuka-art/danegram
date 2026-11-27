@@ -1686,6 +1686,16 @@ async function openChat(id){
   .on('postgres_changes',{event:'*',schema:'public',table:'danegram_calls',filter:'conversation_id=eq.'+id},()=>{if(activeConversationId===id){fetchChatMessages();refreshTopNotificationBadges();}})
   .subscribe(status=>{if(status==='CHANNEL_ERROR'||status==='TIMED_OUT')console.warn('DANEGRAM chat realtime unavailable; automatic refresh will continue:',status);});
 }
+async function dgGetPrivateChatMediaUrl(kind,id){
+ try{
+  const {data,error}=await supabaseClient.functions.invoke('danegram-chat-media-access-preview',{body:{kind,id}});
+  if(error)throw error;
+  return data?.signed_url||'';
+ }catch(error){
+  console.warn('DANEGRAM private chat media access failed:',kind,id,error?.message||error);
+  return '';
+ }
+}
 async function dgFetchChatMessagesNow(){
  if(!activeConversationId)return;
  const requestedConversationId=activeConversationId;
@@ -1702,15 +1712,12 @@ async function dgFetchChatMessagesNow(){
   const recipient=(members||[]).find(x=>x.user_id!==myId());
   const peerReadAt=recipient?.last_read_at?new Date(recipient.last_read_at).getTime():0;
   const peerDeliveredAt=recipient?.last_delivered_at?new Date(recipient.last_delivered_at).getTime():0;
-  // Generate recipient-authorized signed URLs for every private chat attachment.
+  // Sign private chat media server-side after verifying the authenticated conversation participant.
   const attachmentUrls={};
-  for(const m of rows){
-   if(m.media_url){
-    const {data:sd,error:se}=await supabaseClient.storage.from('danegram-media').createSignedUrl(m.media_url,3600);
-    if(!se&&sd?.signedUrl)attachmentUrls[m.id]=sd.signedUrl;
-    else console.warn('Chat attachment URL unavailable:',m.id,se?.message||'No signed URL');
-   }
-  }
+  await Promise.all(rows.filter(m=>m.media_url&&!m.deleted_for_everyone_at).map(async m=>{
+   const signedUrl=await dgGetPrivateChatMediaUrl('message',m.id);
+   if(signedUrl)attachmentUrls[m.id]=signedUrl;
+  }));
   let callRows=[];
   try{
    const {data:callData,error:callError}=await supabaseClient.from('danegram_calls').select('*').eq('conversation_id',requestedConversationId).is('deleted_for_everyone_at',null).order('created_at',{ascending:false}).limit(100);
@@ -1720,8 +1727,7 @@ async function dgFetchChatMessagesNow(){
   if(voicemailError)console.warn('DANEGRAM voicemail list:',voicemailError.message);
   const voicemailRows=(voicemails||[]).slice().reverse();
   const voicemailTimeline=await Promise.all(voicemailRows.map(async v=>{
-   const {data:signed,error:signedError}=await supabaseClient.storage.from('danegram-media').createSignedUrl(v.media_url,3600);
-   const url=!signedError?signed?.signedUrl||'':'';
+   const url=await dgGetPrivateChatMediaUrl('voicemail',v.id);
    const mine=v.caller_id===myId();
    const html=`<div class="bubble ${mine?'mine':''}"><b>${mine?'You':'Voicemail'}</b><div class="dg-audio-label">📞 Voicemail · ${Number(v.duration_seconds)||0}s</div>${url?`<audio class="dg-audio-player" controls preload="none" src="${safe(url)}" data-voicemail-id="${v.id}">Audio playback is not supported.</audio>`:'<div class="small muted">Voicemail recording unavailable.</div>'}<div class="dg-message-meta"><time class="small muted">${new Date(v.created_at).toLocaleString()}</time>${!mine&&!v.listened_at?'<span class="small muted dg-voicemail-new">New voicemail</span>':''}</div><details class="dg-delete-menu"><summary aria-label="Voicemail options">⋮</summary><div class="dg-delete-menu-items"><button type="button" data-dg-action="delete-voicemail-self" data-dg-id="${v.id}">Delete for me</button><button type="button" data-dg-action="delete-voicemail-both" data-dg-id="${v.id}">Delete for both sides</button></div></details></div>`;
    return {at:new Date(v.created_at).getTime(),html};
