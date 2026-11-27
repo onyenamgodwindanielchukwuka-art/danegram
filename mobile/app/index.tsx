@@ -25,6 +25,7 @@ export default function HomeScreen() {
   const [mode, setMode] = useState<'signin' | 'signup'>('signin');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [message, setMessage] = useState('');
   const [captchaToken, setCaptchaToken] = useState('');
   const [captchaMessage, setCaptchaMessage] = useState('Complete the security check to continue.');
@@ -187,16 +188,28 @@ export default function HomeScreen() {
             value={email}
             onChangeText={setEmail}
           />
-          <TextInput
-            style={styles.input}
-            placeholder="Password (at least 8 characters)"
-            placeholderTextColor="#858b9b"
-            secureTextEntry
-            autoCapitalize="none"
-            autoComplete={mode === 'signin' ? 'current-password' : 'new-password'}
-            value={password}
-            onChangeText={setPassword}
-          />
+          <View style={styles.passwordInputWrap}>
+            <TextInput
+              style={[styles.input, styles.passwordInput]}
+              placeholder="Password (at least 8 characters)"
+              placeholderTextColor="#858b9b"
+              secureTextEntry={!showPassword}
+              autoCapitalize="none"
+              autoComplete={mode === 'signin' ? 'current-password' : 'new-password'}
+              value={password}
+              onChangeText={setPassword}
+            />
+            <Pressable
+              style={styles.passwordToggle}
+              onPress={() => setShowPassword((visible) => !visible)}
+              accessibilityRole="button"
+              accessibilityLabel={showPassword ? 'Hide password' : 'Show password'}
+              accessibilityState={{ selected: showPassword }}
+              hitSlop={8}
+            >
+              <Text style={styles.passwordToggleText}>{showPassword ? 'Hide' : 'Show'}</Text>
+            </Pressable>
+          </View>
           <View style={styles.captchaBox}>
             <WebView key={captchaReload} originWhitelist={['*']} source={{ html: TURNSTILE_HTML, baseUrl: 'https://danegram.pages.dev' }} onMessage={handleCaptchaMessage} javaScriptEnabled domStorageEnabled scrollEnabled={false} style={styles.captchaWebView} onError={() => { setCaptchaToken(''); setCaptchaMessage('Could not load Cloudflare security verification. Retry.'); }} />
             <Text style={captchaToken ? styles.captchaSuccess : styles.captchaStatus}>{captchaMessage}</Text>
@@ -233,6 +246,10 @@ const styles = StyleSheet.create({
   body: { color: '#39435a', fontSize: 15 },
   note: { color: '#687188', fontSize: 13, lineHeight: 20 },
   input: { backgroundColor: '#f6f7fb', borderColor: '#e1e5ef', borderWidth: 1, borderRadius: 13, paddingHorizontal: 15, paddingVertical: 14, color: '#17213b', fontSize: 15 },
+  passwordInputWrap: { position: 'relative', justifyContent: 'center' },
+  passwordInput: { paddingRight: 68 },
+  passwordToggle: { position: 'absolute', right: 8, minWidth: 52, minHeight: 44, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 8 },
+  passwordToggleText: { color: '#2449c7', fontSize: 13, fontWeight: '800' },
   primaryButton: { backgroundColor: '#2449c7', paddingVertical: 15, borderRadius: 13, alignItems: 'center' },
   primaryButtonText: { color: '#fff', fontWeight: '800', fontSize: 15 },
   secondaryButton: { borderColor: '#d8deec', borderWidth: 1, paddingVertical: 13, borderRadius: 13, alignItems: 'center' },
