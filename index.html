@@ -2979,7 +2979,7 @@ async function loadSharedPosts(){
   if(reaction.user_id===user.id)entry.liked=true;byPost.set(reaction.post_id,entry);
  }
 async function dgResolveFeedPostMediaUrls(rows){
- const urls={};const ids=(rows||[]).filter(row=>row.media_url&&!/^https?:\\/\\//i.test(String(row.media_url))).map(row=>row.id).filter(Boolean);
+ const urls={};const ids=(rows||[]).filter(row=>row.media_url&&!String(row.media_url).toLowerCase().startsWith('https://')).map(row=>row.id).filter(Boolean);
  for(let i=0;i<ids.length;i+=50){
   try{
    const {data,error}=await supabaseClient.functions.invoke('danegram-post-media-access-preview',{body:{post_ids:ids.slice(i,i+50)}});
@@ -2987,7 +2987,7 @@ async function dgResolveFeedPostMediaUrls(rows){
    Object.assign(urls,data?.media_urls||{});
   }catch(error){console.warn('DANEGRAM feed media access failed:',error?.message||error);}
  }
- (rows||[]).forEach(row=>{if(row.media_url&&/^https:\\/\\//i.test(String(row.media_url)))urls[row.id]=row.media_url;});
+ (rows||[]).forEach(row=>{if(row.media_url&&String(row.media_url).toLowerCase().startsWith('https://'))urls[row.id]=row.media_url;});
  return urls;
 }
  const feedMediaUrls=await dgResolveFeedPostMediaUrls(rows);
