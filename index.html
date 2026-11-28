@@ -1691,10 +1691,19 @@ async function refreshTopNotificationBadges(){
  try{const {data,error}=await supabaseClient.from('notifications').select('*').eq('user_id',myId()).order('created_at',{ascending:false}).limit(200);if(error)throw error;const unread=(data||[]).filter(n=>('is_read'in n&&n.is_read===false)||('read'in n&&n.read===false)||('read_at'in n&&!n.read_at)).length;setTopBadge('alertsBadge',unread);}catch(e){console.warn('Could not refresh notification badge:',e.message)}
 }
 
+let dgInboxLoadInFlight=false;
 async function loadChats(){
  const list=$('#conversationList'); if(!list)return;
  if(!myId()||!currentSession){list.innerHTML='<div class="dg-empty">Your secure sign-in session has expired. Please log in again to view your conversations.</div>';return}
- list.textContent='Loading your conversations…';
+ // WhatsApp-style opening: keep the inbox on screen immediately and refresh
+ // its contents quietly. Reuse the last in-memory inbox while the network runs.
+ if(dgInboxLoadInFlight)return;
+ if(Array.isArray(window.dgConversations)&&window.dgConversations.length){
+  const cached=window.dgConversations;
+  list.innerHTML=cached.map((c,i)=>`<button type="button" class="dg-conversation ${c.unreadCount?'dg-unread':''}" data-open-chat="${c.id}"><span class="dg-conversation-avatar ${i%2?'alt':''}">${c.peer?.avatarDisplay?`<img src="${safe(c.peer.avatarDisplay)}" alt="${safe(c.label)}">`:safe(c.initials||'D')}</span><span class="dg-conversation-copy"><span class="dg-conversation-name">${safe(c.label)}</span><span class="dg-conversation-preview">${safe(c.preview)}</span></span><span class="dg-conversation-meta"><time class="dg-conversation-time">${c.lastAt?new Date(c.lastAt).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}):''}</time>${c.unreadCount?`<span class="dg-unread-badge">${c.unreadCount>99?'99+':c.unreadCount}</span>`:''}</span></button>`).join('');
+  list.querySelectorAll('[data-open-chat]').forEach(button=>button.onclick=()=>openChat(button.dataset.openChat));
+ }
+ dgInboxLoadInFlight=true;
  try{
   const {data:mine,error}=await supabaseClient.from('conversation_members').select('conversation_id,last_read_at').eq('user_id',myId());
   if(error)throw error;
@@ -1742,7 +1751,8 @@ async function loadChats(){
   if($('#chatListSearch'))$('#chatListSearch').oninput=e=>{const q=e.target.value.trim().toLowerCase();draw(window.dgConversations.filter(c=>(c.label+' '+c.preview).toLowerCase().includes(q)))};
   const targetConversation=new URLSearchParams(location.search).get('openConversation');if(targetConversation&&ids.includes(targetConversation)){history.replaceState({},'',location.pathname);await openChat(targetConversation);return}
   if(activeConversationId&&ids.includes(activeConversationId))await openChat(activeConversationId);
- }catch(e){list.textContent='Could not load chats: '+chatError(e)}
+ }catch(e){console.warn('Inbox refresh failed:',chatError(e));if(!window.dgConversations?.length)list.innerHTML='<div class="dg-empty">Could not refresh conversations. Check your connection and try again.</div>'}
+ finally{dgInboxLoadInFlight=false;}
 }
 async function openChat(id){
  activeConversationId=id;dgClearReplyTarget();$('#dgCancelReply')?.addEventListener('click',dgClearReplyTarget);const c=(window.dgConversations||[]).find(x=>x.id===id);
