@@ -8,41 +8,52 @@
 html,body{margin:0;padding:0;width:100%;min-height:100%;background:#fff;font-family:Arial,sans-serif}
 body{display:flex;align-items:center;justify-content:center;padding:8px;box-sizing:border-box}
 #wrap{width:100%;min-height:82px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px}
-#status{font-size:13px;color:#687188;text-align:center}
+#turnstile{width:300px;max-width:100%;min-height:65px;display:flex;align-items:center;justify-content:center}
+#status{font-size:13px;color:#687188;text-align:center;max-width:100%;overflow-wrap:anywhere}
 </style>
 </head>
 <body>
 <div id="wrap"><div id="turnstile"></div><div id="status">Loading secure verification…</div></div>
 <script>
 (function(){
- var done=false;
+ var done=false,widgetId=null;
  function send(data){
    var payload=JSON.stringify(data);
    try{if(window.ReactNativeWebView&&window.ReactNativeWebView.postMessage){window.ReactNativeWebView.postMessage(payload);}}catch(e){}
-   try{if(window.parent&&window.parent!==window){window.parent.postMessage(data,location.origin);}}catch(e){}
  }
  function status(text){document.getElementById('status').textContent=text;}
- window.onerror=function(msg){status('Security verification script error.');send({type:'error',message:String(msg)});};
+ function fail(message){status(message);send({type:'error',message:message});}
+ window.onerror=function(msg,source,line){fail('Security check script error: '+String(msg)+' ('+String(line||'')+')');};
+ window.onunhandledrejection=function(event){fail('Security check initialization error: '+String(event.reason||'unknown'));};
  var script=document.createElement('script');
  script.src='https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
  script.async=true;script.defer=true;
  script.onload=function(){
-  if(!window.turnstile){status('Cloudflare verification did not initialize.');send({type:'error',message:'Turnstile API unavailable after script load.'});return;}
+  if(!window.turnstile){fail('Cloudflare verification did not initialize.');return;}
   try{
-   window.turnstile.render('#turnstile',{
+   widgetId=window.turnstile.render('#turnstile',{
     sitekey:'0x4AAAAAAGRmTIX3e4SwqYpR',
     theme:'light',
-    size:'flexible',
+    size:'normal',
+    retry:'auto',
+    'refresh-expired':'auto',
     callback:function(token){done=true;status('Security check completed.');send({type:'token',token:token});},
     'expired-callback':function(){done=false;status('Security check expired. Please retry.');send({type:'expired'});},
-    'unsupported-callback':function(){status('This browser component is not supported.');send({type:'error',message:'Turnstile reports this WebView is unsupported.'});},
-    'error-callback':function(code){status('Security check could not complete. Please reload.');send({type:'error',message:'Turnstile error: '+String(code||'unknown')});}
+    'timeout-callback':function(){done=false;status('Security check timed out. Please retry.');send({type:'timeout'});},
+    'unsupported-callback':function(){fail('Cloudflare reports this browser component is unsupported.');},
+    'error-callback':function(code){done=false;fail('Cloudflare security error: '+String(code||'unknown')); }
    });
-  }catch(e){status('Could not start security check.');send({type:'error',message:String(e&&e.message||e)});}
+   send({type:'ready'});
+  }catch(e){fail('Could not start security check: '+String(e&&e.message||e));}
  };
- script.onerror=function(){status('Could not load Cloudflare. Check your connection.');send({type:'error',message:'Failed to load challenges.cloudflare.com/api.js'});};
+ script.onerror=function(){fail('Could not load Cloudflare. Check your connection and reload.');};
  document.head.appendChild(script);
- setTimeout(function(){if(!done&&document.getElementById('status').textContent==='Loading secure verification…'){status('Still waiting for Cloudflare. Check your connection and reload.');send({type:'timeout',message:'No Turnstile callback within 15 seconds.'});}},15000);
+ setTimeout(function(){
+  if(!done&&document.getElementById('status').textContent==='Loading secure verification…'){
+   status('Cloudflare is taking too long to load. Check connection and reload.');
+   send({type:'timeout',message:'Turnstile did not initialize within 20 seconds.'});
+  }
+ },20000);
 })();
 </script>
 </body>
