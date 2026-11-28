@@ -2869,15 +2869,28 @@ async function loadDgStories(){
   if(ids.length){const pr=await supabaseClient.from('profiles').select('id,display_name,username,avatar_url').in('id',ids);if(pr.error)throw pr.error;profiles=pr.data||[];}
   const pmap=new Map(profiles.map(x=>[x.id,x]));
   const groups=new Map();
-  for(const row of list){
-   // The private bucket is accessed through the deployed authorization Edge Function.
-   const {data:signed,error:signedError}=await supabaseClient.functions.invoke('danegram-story-media-access',{body:{story_id:row.id}});
-   if(signedError||!signed?.signed_url){console.warn('DANEGRAM story media unavailable:',signedError?.message||signed?.error||'No signed URL');continue;}
+  // Resolve story access URLs in small parallel batches. Sequential Edge Function
+  // calls made a long story strip appear to hang on slower mobile connections.
+  const signedRows=[];
+  for(let start=0;start<list.length;start+=8){
+   const batch=list.slice(start,start+8);
+   const results=await Promise.all(batch.map(async row=>{
+    try{
+     const {data:signed,error:signedError}=await supabaseClient.functions.invoke('danegram-story-media-access',{body:{story_id:row.id}});
+     if(signedError||!signed?.signed_url){console.warn('DANEGRAM story media unavailable:',signedError?.message||signed?.error||'No signed URL');return null;}
+     return {row,url:signed.signed_url};
+    }catch(e){console.warn('DANEGRAM story media unavailable:',e.message);return null;}
+   }));
+   signedRows.push(...results.filter(Boolean));
+  }
+  for(const {row,url} of signedRows){
    const profile=pmap.get(row.user_id)||{};
    if(!groups.has(row.user_id))groups.set(row.user_id,{userId:row.user_id,name:profile.display_name||profile.username||'DANEGRAM Member',profile:{...profile,avatarDisplay:''},stories:[]});
-   groups.get(row.user_id).stories.push({...row,signedUrl:signed.signed_url});
+   groups.get(row.user_id).stories.push({...row,signedUrl:url});
   }
-  for(const group of groups.values()){group.profile.avatarDisplay=await dgResolveAvatarUrl(group.profile.avatar_url); }
+  await Promise.all([...groups.values()].map(async group=>{
+   group.profile.avatarDisplay=await dgResolveAvatarUrl(group.profile.avatar_url);
+  }));
   dgStoryGroups=[...groups.values()].sort((a,b)=>{if(a.userId===myId())return -1;if(b.userId===myId())return 1;return new Date(b.stories[b.stories.length-1].created_at)-new Date(a.stories[a.stories.length-1].created_at)});
  }catch(e){dgStoryLoadError='Stories could not load. Check the Stories database setup.';console.error('DANEGRAM stories load failed:',e.message);
  }finally{
