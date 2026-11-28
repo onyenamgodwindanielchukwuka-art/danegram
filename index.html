@@ -1666,11 +1666,17 @@ async function loadChats(){
   const {data:members,error:me}=await supabaseClient.from('conversation_members').select('conversation_id,user_id').in('conversation_id',ids);
   if(me)throw me;
   const others=[...new Set((members||[]).filter(x=>x.user_id!==myId()).map(x=>x.user_id))];
-  let profiles=[]; if(others.length){const q=await supabaseClient.from('profiles').select('id,display_name,username,avatar_url').in('id',others);if(q.error)throw q.error;profiles=q.data||[]}
-  profiles=await dgResolveProfileAvatars(profiles);
+  // These independent inbox reads can run together; serial waits made inbox
+  // startup unnecessarily slow on mobile networks.
+  const [profileResult,messageResult]=await Promise.all([
+   others.length?supabaseClient.from('profiles').select('id,display_name,username,avatar_url').in('id',others):Promise.resolve({data:[],error:null}),
+   supabaseClient.from('messages').select('conversation_id,sender_id,content,created_at').in('conversation_id',ids).order('created_at',{ascending:false}).limit(1000)
+  ]);
+  if(profileResult.error)throw profileResult.error;
+  if(messageResult.error)throw messageResult.error;
+  const profiles=await dgResolveProfileAvatars(profileResult.data||[]);
   const pm=new Map(profiles.map(x=>[x.id,x]));
-  const {data:msgs,error:msgErr}=await supabaseClient.from('messages').select('conversation_id,sender_id,content,created_at').in('conversation_id',ids).order('created_at',{ascending:false}).limit(1000);
-  if(msgErr)throw msgErr;
+  const msgs=messageResult.data||[];
   const latest={},unreadCounts={};(msgs||[]).forEach(m=>{if(!latest[m.conversation_id])latest[m.conversation_id]=m;const readAt=readAtByConversation.get(m.conversation_id);if(m.sender_id!==myId()&&readAt&&new Date(m.created_at)>new Date(readAt))unreadCounts[m.conversation_id]=(unreadCounts[m.conversation_id]||0)+1});
   window.dgConversations=(convs||[]).map(c=>{
    const peer=(members||[]).filter(x=>x.conversation_id===c.id&&x.user_id!==myId()).map(x=>pm.get(x.user_id)).filter(Boolean)[0];
