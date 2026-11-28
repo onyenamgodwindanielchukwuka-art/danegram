@@ -1703,6 +1703,21 @@ async function loadChats(){
   list.innerHTML=cached.map((c,i)=>`<button type="button" class="dg-conversation ${c.unreadCount?'dg-unread':''}" data-open-chat="${c.id}"><span class="dg-conversation-avatar ${i%2?'alt':''}">${c.peer?.avatarDisplay?`<img src="${safe(c.peer.avatarDisplay)}" alt="${safe(c.label)}">`:safe(c.initials||'D')}</span><span class="dg-conversation-copy"><span class="dg-conversation-name">${safe(c.label)}</span><span class="dg-conversation-preview">${safe(c.preview)}</span></span><span class="dg-conversation-meta"><time class="dg-conversation-time">${c.lastAt?new Date(c.lastAt).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}):''}</time>${c.unreadCount?`<span class="dg-unread-badge">${c.unreadCount>99?'99+':c.unreadCount}</span>`:''}</span></button>`).join('');
   list.querySelectorAll('[data-open-chat]').forEach(button=>button.onclick=()=>openChat(button.dataset.openChat));
  }
+ // Restore the last inbox snapshot after an app/browser restart. This cache is
+ // scoped to the signed-in user and is only a fast first paint; Supabase below
+ // remains the source of truth and refreshes it immediately in the background.
+ if(!Array.isArray(window.dgConversations)||!window.dgConversations.length){
+  try{
+   const raw=localStorage.getItem('danegram-inbox-v1-'+myId());
+   const saved=raw?JSON.parse(raw):null;
+   if(saved&&Date.now()-Number(saved.savedAt)<7*24*60*60*1000&&Array.isArray(saved.rows)){
+    window.dgConversations=saved.rows;
+    const cached=saved.rows;
+    list.innerHTML=cached.map((c,i)=>`<button type="button" class="dg-conversation ${c.unreadCount?'dg-unread':''}" data-open-chat="${c.id}"><span class="dg-conversation-avatar ${i%2?'alt':''}">${safe(c.initials||'D')}</span><span class="dg-conversation-copy"><span class="dg-conversation-name">${safe(c.label)}</span><span class="dg-conversation-preview">${safe(c.preview)}</span></span><span class="dg-conversation-meta"><time class="dg-conversation-time">${c.lastAt?new Date(c.lastAt).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}):''}</time>${c.unreadCount?`<span class="dg-unread-badge">${c.unreadCount>99?'99+':c.unreadCount}</span>`:''}</span></button>`).join('');
+    list.querySelectorAll('[data-open-chat]').forEach(button=>button.onclick=()=>openChat(button.dataset.openChat));
+   }
+  }catch(cacheError){console.warn('DANEGRAM inbox cache unavailable:',cacheError);}
+ }
  dgInboxLoadInFlight=true;
  try{
   const {data:mine,error}=await supabaseClient.from('conversation_members').select('conversation_id,last_read_at').eq('user_id',myId());
@@ -1739,6 +1754,10 @@ async function loadChats(){
    const msg=latest[c.id];const initials=label.split(/\s+/).slice(0,2).map(w=>w[0]||'').join('').toUpperCase()||'D';
    return {...c,label,peer,initials,preview:msg?(msg.sender_id===myId()?'You: ':'')+(msg.content||'Attachment'):'Start a conversation',lastAt:msg?.created_at||c.created_at,unreadCount:unreadCounts[c.id]||0};
   }).sort((a,b)=>(b.unreadCount>0)-(a.unreadCount>0)||new Date(b.lastAt)-new Date(a.lastAt));
+  try{
+   const cacheRows=window.dgConversations.map(c=>({id:c.id,label:c.label,initials:c.initials,preview:c.preview,lastAt:c.lastAt,unreadCount:c.unreadCount,peer:c.peer?{id:c.peer.id,display_name:c.peer.display_name,username:c.peer.username}:null}));
+   localStorage.setItem('danegram-inbox-v1-'+myId(),JSON.stringify({savedAt:Date.now(),rows:cacheRows}));
+  }catch(cacheError){console.warn('DANEGRAM inbox cache save failed:',cacheError);}
   const draw=(rows)=>{list.innerHTML=rows.length?rows.map((c,i)=>`<button type="button" class="dg-conversation ${c.unreadCount?'dg-unread':''}" data-open-chat="${c.id}"><span class="dg-conversation-avatar ${i%2?'alt':''}">${c.peer?.avatarDisplay?`<img src="${safe(c.peer.avatarDisplay)}" alt="${safe(c.label)}">`:safe(c.initials)}</span><span class="dg-conversation-copy"><span class="dg-conversation-name">${safe(c.label)}</span><span class="dg-conversation-preview">${safe(c.preview)}</span></span><span class="dg-conversation-meta"><time class="dg-conversation-time">${c.lastAt?new Date(c.lastAt).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}):''}</time>${c.unreadCount?`<span class="dg-unread-badge">${c.unreadCount>99?'99+':c.unreadCount}</span>`:''}</span></button>`).join(''):'<div class="dg-empty">No matching conversations.</div>';
    list.querySelectorAll('[data-open-chat]').forEach(b=>b.onclick=()=>openChat(b.dataset.openChat));
   };
