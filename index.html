@@ -1709,7 +1709,9 @@ async function loadChats(){
   ]);
   if(profileResult.error)throw profileResult.error;
   if(messageResult.error)throw messageResult.error;
-  const profiles=await dgResolveProfileAvatars(profileResult.data||[]);
+  // Render the inbox as soon as profile/message rows arrive. Signed
+  // avatar URLs are secondary and must not hold the conversation list hostage.
+  const profiles=profileResult.data||[];
   const pm=new Map(profiles.map(x=>[x.id,x]));
   const msgs=messageResult.data||[];
   const latest={},unreadCounts={};(msgs||[]).forEach(m=>{if(!latest[m.conversation_id])latest[m.conversation_id]=m;const readAt=readAtByConversation.get(m.conversation_id);if(m.sender_id!==myId()&&readAt&&new Date(m.created_at)>new Date(readAt))unreadCounts[m.conversation_id]=(unreadCounts[m.conversation_id]||0)+1});
@@ -1723,6 +1725,14 @@ async function loadChats(){
    list.querySelectorAll('[data-open-chat]').forEach(b=>b.onclick=()=>openChat(b.dataset.openChat));
   };
   draw(window.dgConversations);
+  // Resolve profile photos in the background; names and conversations are
+  // already usable while storage signs image URLs on slower mobile networks.
+  dgResolveProfileAvatars(profiles).then(resolved=>{
+   if(!resolved?.length)return;
+   const resolvedMap=new Map(resolved.map(profile=>[profile.id,profile]));
+   window.dgConversations=(window.dgConversations||[]).map(item=>({...item,peer:item.peer?resolvedMap.get(item.peer.id)||item.peer:null}));
+   if(currentPage==='messages'&&!activeConversationId)draw(window.dgConversations);
+  }).catch(error=>console.warn('Inbox avatar refresh failed:',error));
   ensureDgInboxRealtime();refreshTopNotificationBadges();
   if($('#chatListSearch'))$('#chatListSearch').oninput=e=>{const q=e.target.value.trim().toLowerCase();draw(window.dgConversations.filter(c=>(c.label+' '+c.preview).toLowerCase().includes(q)))};
   const targetConversation=new URLSearchParams(location.search).get('openConversation');if(targetConversation&&ids.includes(targetConversation)){history.replaceState({},'',location.pathname);await openChat(targetConversation);return}
@@ -3628,6 +3638,12 @@ async function syncMemberProfile(authUser){
 async function applyAuthSession(session){
  currentSession=session||null;dgViewedProfile=null;dgFollowSummary=null;
  if(session?.user){
+   // Reveal the authenticated app immediately from the persisted Supabase
+   // session. Profile/media/entitlement reads continue after the gate is gone.
+   user={id:session.user.id,email:session.user.email||'',...(session.user.user_metadata||{})};
+   document.body.classList.remove('auth-required');
+   $('#sideName').textContent=name();
+   render();
    user=await syncMemberProfile(session.user);
    dgRememberAccount();
    await refreshDanegramProfileMedia();
@@ -3677,7 +3693,10 @@ async function initializeSupabaseAuth(){
      },0);
      return;
    }
-   if(event==='INITIAL_SESSION' && recoveryEventPending)return;
+   // INITIAL_SESSION is restored by the awaited getSession() below.
+   // Applying it again asynchronously can race that authoritative result and
+   // briefly overwrite a valid persisted login with a stale null session.
+   if(event==='INITIAL_SESSION')return;
    setTimeout(()=>applyAuthSession(session),0);
  });
  const {data,error}=await supabaseClient.auth.getSession();
