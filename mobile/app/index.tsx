@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, BackHandler, SafeAreaView, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, BackHandler, StyleSheet, Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { StatusBar } from 'expo-status-bar';
 import WebView, { type WebViewNavigation } from 'react-native-webview';
 
 const DANEGRAM_LIVE_URL = 'https://danegram.pages.dev/';
@@ -27,7 +29,8 @@ export default function HomeScreen() {
   }, [canGoBack]);
 
   return (
-    <SafeAreaView style={styles.safe}>
+    <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
+      <StatusBar style="dark" backgroundColor="#ffffff" translucent={false} />
       <WebView
         ref={webView}
         source={{ uri: DANEGRAM_LIVE_URL }}
