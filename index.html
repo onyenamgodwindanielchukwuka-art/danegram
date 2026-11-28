@@ -1660,6 +1660,11 @@ function ensureDgInboxRealtime(){
    if(activeConversationId===row.conversation_id&&row.sender_id!==myId())await supabaseClient.rpc('danegram_mark_conversation_read',{p_conversation_id:row.conversation_id});
   }catch(e){console.warn('Message receipt update failed:',e.message)}
  })
+ .on('postgres_changes',{event:'INSERT',schema:'public',table:'notifications',filter:'user_id=eq.'+myId()},payload=>{
+  const row=payload.new;if(!row)return;
+  refreshTopNotificationBadges();
+  if(document.visibilityState==='visible'&&currentPage!=='messages'&&typeof dgShowNotificationToast==='function')dgShowNotificationToast(row);
+ })
  .subscribe(status=>{
   if(status==='SUBSCRIBED'){refreshTopNotificationBadges();if(currentPage==='messages'){if(activeConversationId)fetchChatMessages();else loadChats();}}
   if(status==='CHANNEL_ERROR'||status==='TIMED_OUT'||status==='CLOSED'){
@@ -1968,16 +1973,18 @@ async function fetchChatMessages(){
 function dgStartMessagingRefresh(){
  if(dgChatPollTimer)clearInterval(dgChatPollTimer);
  if(dgInboxPollTimer)clearInterval(dgInboxPollTimer);
+ // Realtime delivers messages immediately. Polling is only a recovery
+ // fallback for mobile network hand-offs and sleeping WebViews.
  dgChatPollTimer=setInterval(()=>{
   if(currentPage==='messages'&&activeConversationId&&document.visibilityState==='visible'&&!chatBusy)fetchChatMessages();
- },3000);
+ },12000);
  dgInboxPollTimer=setInterval(()=>{
   if(document.visibilityState!=='visible'||!myId())return;
   refreshTopNotificationBadges();
   if(currentPage==='messages'&&!activeConversationId)loadChats();
   if(currentPage==='messages'&&activeConversationId&&!chatBusy)fetchChatMessages();
   if(!inboxChannel)ensureDgInboxRealtime();
- },10000);
+ },30000);
 }
 document.addEventListener('visibilitychange',()=>{
  if(document.visibilityState==='hidden')dgStopRingtone();else if(document.querySelector('#dgAcceptCall'))dgStartRingtone('incoming');else if(dgCall?.role==='caller'&&!dgCall?.startedAt)dgStartRingtone('outgoing');
