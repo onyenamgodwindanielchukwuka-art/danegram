@@ -927,6 +927,41 @@ html,body{background:#f5f5f5!important;color:#111!important}
 .dg-call-event .dg-delete-menu{top:4px;right:4px}
 </style>
 <style id="dg-swipe-reply-styles">.dg-compose{flex-wrap:wrap}.dg-reply-preview{flex:0 0 100%;width:100%;display:none;align-items:center;gap:10px;padding:9px 12px;margin:0 0 8px;border-left:4px solid #1769e0;background:#edf4ff;border-radius:9px;color:#25364a}.dg-reply-preview.is-visible{display:flex}.dg-reply-preview-copy{min-width:0;flex:1}.dg-reply-preview-copy strong{display:block;color:#1769e0;font-size:12px}.dg-reply-preview-copy span{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px;color:#566477}.dg-reply-cancel{width:30px;height:30px;border-radius:50%;background:#e0e8f4;color:#34445a;font-size:19px;flex:none}.dg-message-quote{display:block;margin:0 0 8px;padding:7px 10px;border-left:4px solid #8b75e8;border-radius:7px;background:rgba(0,0,0,.055);text-align:left;max-width:100%;overflow:hidden}.dg-message-quote strong{display:block;font-size:12px;color:#6c5bc4;margin-bottom:2px}.dg-message-quote span{display:block;font-size:13px;color:inherit;opacity:.82;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.dg-chat-body .bubble{touch-action:pan-y;transition:transform .14s ease;position:relative;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}.dg-chat-body .bubble.dg-swipe-ready{box-shadow:0 0 0 2px rgba(23,105,224,.28);will-change:transform}</style>
+<style id="danegram-final-mobile-header-safe-area">
+/* One authoritative mobile header rule, overriding earlier layered experiments. */
+@media(max-width:760px){
+ html{scroll-padding-top:calc(68px + env(safe-area-inset-top,0px))}
+ body{padding-top:env(safe-area-inset-top,0px)!important;padding-bottom:calc(82px + env(safe-area-inset-bottom,0px))!important}
+ .topbar{
+  position:sticky!important;top:env(safe-area-inset-top,0px)!important;z-index:100!important;
+  display:flex!important;flex-wrap:nowrap!important;align-items:center!important;
+  justify-content:space-between!important;gap:6px!important;
+  width:100%!important;height:auto!important;min-height:62px!important;
+  padding:7px 9px!important;box-sizing:border-box!important;
+ }
+ .brand-area{display:flex!important;flex:1 1 0!important;min-width:0!important;width:auto!important;gap:6px!important}
+ .brand-profile-btn{display:flex!important;align-items:center!important;min-width:0!important;max-width:100%!important;gap:6px!important}
+ .brand-copy{min-width:0!important;overflow:hidden!important}
+ .brand{font-size:clamp(15px,4.3vw,19px)!important;line-height:1.1!important;white-space:nowrap!important}
+ .logo{width:34px!important;height:34px!important;min-width:34px!important;flex:0 0 34px!important;font-size:21px!important}
+ .searchbox{width:34px!important;min-width:34px!important;max-width:34px!important;height:34px!important;flex:0 0 34px!important;padding:0!important}
+ .searchbox input{display:none!important}
+ .topnav{display:none!important}
+ .top-actions{display:flex!important;flex:0 0 auto!important;width:auto!important;min-width:0!important;gap:5px!important}
+ .top-actions .circle-btn,.top-actions #createBtn,.top-actions #settingsBtn{width:34px!important;height:34px!important;min-width:34px!important;max-width:34px!important;font-size:16px!important}
+ .top-profile{width:34px!important;height:34px!important;min-width:34px!important}
+ .top-profile .avatar{width:30px!important;height:30px!important}
+ .layout{margin-top:8px!important}
+}
+@media(max-width:360px){
+ .topbar{padding-left:6px!important;padding-right:6px!important;gap:4px!important}
+ .brand-area{gap:4px!important}
+ .brand{font-size:15px!important}
+ .logo{width:31px!important;height:31px!important;min-width:31px!important;flex-basis:31px!important}
+ .top-actions{gap:3px!important}
+ .top-actions .circle-btn,.top-actions #createBtn,.top-actions #settingsBtn{width:31px!important;height:31px!important;min-width:31px!important;max-width:31px!important}
+}
+</style>
 </head>
 <body>
 <header class="topbar">
@@ -1666,11 +1701,17 @@ async function loadChats(){
   const {data:members,error:me}=await supabaseClient.from('conversation_members').select('conversation_id,user_id').in('conversation_id',ids);
   if(me)throw me;
   const others=[...new Set((members||[]).filter(x=>x.user_id!==myId()).map(x=>x.user_id))];
-  let profiles=[]; if(others.length){const q=await supabaseClient.from('profiles').select('id,display_name,username,avatar_url').in('id',others);if(q.error)throw q.error;profiles=q.data||[]}
-  profiles=await dgResolveProfileAvatars(profiles);
+  // These independent inbox reads can run together; serial waits made inbox
+  // startup unnecessarily slow on mobile networks.
+  const [profileResult,messageResult]=await Promise.all([
+   others.length?supabaseClient.from('profiles').select('id,display_name,username,avatar_url').in('id',others):Promise.resolve({data:[],error:null}),
+   supabaseClient.from('messages').select('conversation_id,sender_id,content,created_at').in('conversation_id',ids).order('created_at',{ascending:false}).limit(1000)
+  ]);
+  if(profileResult.error)throw profileResult.error;
+  if(messageResult.error)throw messageResult.error;
+  const profiles=await dgResolveProfileAvatars(profileResult.data||[]);
   const pm=new Map(profiles.map(x=>[x.id,x]));
-  const {data:msgs,error:msgErr}=await supabaseClient.from('messages').select('conversation_id,sender_id,content,created_at').in('conversation_id',ids).order('created_at',{ascending:false}).limit(1000);
-  if(msgErr)throw msgErr;
+  const msgs=messageResult.data||[];
   const latest={},unreadCounts={};(msgs||[]).forEach(m=>{if(!latest[m.conversation_id])latest[m.conversation_id]=m;const readAt=readAtByConversation.get(m.conversation_id);if(m.sender_id!==myId()&&readAt&&new Date(m.created_at)>new Date(readAt))unreadCounts[m.conversation_id]=(unreadCounts[m.conversation_id]||0)+1});
   window.dgConversations=(convs||[]).map(c=>{
    const peer=(members||[]).filter(x=>x.conversation_id===c.id&&x.user_id!==myId()).map(x=>pm.get(x.user_id)).filter(Boolean)[0];
@@ -1694,11 +1735,16 @@ async function openChat(id){
  $('#chatTitle').textContent=c?.label||'Conversation';const chatAvatar=$('#chatAvatar');if(chatAvatar)chatAvatar.innerHTML=c?.peer?.avatarDisplay?`<img src="${safe(c.peer.avatarDisplay)}" alt="${safe(c.label||'Member')}" loading="lazy" onerror="this.remove()"><span class="avatar-initials">${safe(c?.initials||'D')}</span>`:`<span class="avatar-initials">${safe(c?.initials||'D')}</span>`;$('#chatMessages').textContent='Loading messages…';$('#chatMessages').dataset.conversationId='';const mi=$('#messageInput');if(mi){mi.value='';mi.style.height='30px';mi.disabled=false;}dgResetVoiceComposer();$('#messageInput').disabled=false;$('#sendMessage').disabled=false;$('#chatAttachButton').disabled=false;$('#recordVoiceButton').disabled=false;
  if(chatChannel){await supabaseClient.removeChannel(chatChannel);chatChannel=null}
  await fetchChatMessages();
- const {error:deliveredError}=await supabaseClient.rpc('danegram_mark_conversation_delivered',{p_conversation_id:id});
- if(deliveredError)console.warn('Could not mark conversation as delivered:',deliveredError.message);
- const {error:readError}=await supabaseClient.rpc('danegram_mark_conversation_read',{p_conversation_id:id});
- if(readError)console.warn('Could not mark conversation as read:',readError.message);
- else{await fetchChatMessages();const item=(window.dgConversations||[]).find(x=>x.id===id);if(item)item.unreadCount=0;const list=$('#conversationList');if(list){const q=$('#chatListSearch')?.value.trim().toLowerCase()||'';const rows=(window.dgConversations||[]).filter(x=>(x.label+' '+x.preview).toLowerCase().includes(q));list.innerHTML=rows.map((x,i)=>`<button type="button" class="dg-conversation ${x.unreadCount?'dg-unread':''}" data-open-chat="${x.id}"><span class="dg-conversation-avatar ${i%2?'alt':''}">${x.peer?.avatarDisplay?`<img src="${safe(x.peer.avatarDisplay)}" alt="${safe(x.label)}">`:safe(x.initials)}</span><span class="dg-conversation-copy"><span class="dg-conversation-name">${safe(x.label)}</span><span class="dg-conversation-preview">${safe(x.preview)}</span></span><span class="dg-conversation-meta"><time class="dg-conversation-time">${x.lastAt?new Date(x.lastAt).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}):''}</time>${x.unreadCount?`<span class="dg-unread-badge">${x.unreadCount>99?'99+':x.unreadCount}</span>`:''}</span></button>`).join('');list.querySelectorAll('[data-open-chat]').forEach(b=>b.onclick=()=>openChat(b.dataset.openChat));}}
+ // Mark delivery/read in the background so the conversation opens immediately.
+ // Realtime and the next inbox refresh will update receipts without a second
+ // full message fetch blocking the chat screen.
+ Promise.all([
+  supabaseClient.rpc('danegram_mark_conversation_delivered',{p_conversation_id:id}),
+  supabaseClient.rpc('danegram_mark_conversation_read',{p_conversation_id:id})
+ ]).then(results=>{
+  results.forEach((r,i)=>{if(r.error)console.warn(i?'Could not mark conversation as read:':'Could not mark conversation as delivered:',r.error.message)});
+  const item=(window.dgConversations||[]).find(x=>x.id===id);if(item)item.unreadCount=0;
+ }).catch(e=>console.warn('Could not update chat receipts:',e));
  chatChannel=supabaseClient.channel('danegram-chat-'+id)
   .on('postgres_changes',{event:'*',schema:'public',table:'messages',filter:'conversation_id=eq.'+id},()=>{if(activeConversationId===id)fetchChatMessages()})
   .on('postgres_changes',{event:'UPDATE',schema:'public',table:'conversation_members',filter:'conversation_id=eq.'+id},()=>{if(activeConversationId===id)fetchChatMessages()})
@@ -1752,13 +1798,9 @@ async function dgFetchChatMessagesNow(){
   // Resolve private chat media safely, accepting both stored object paths and
   // legacy paths that include their bucket name.
   const attachmentUrls={};
-  for(const m of rows){
-   if(m.media_url){
-    const url=await dgResolveChatMediaUrl(m.media_url);
-    if(url)attachmentUrls[m.id]=url;
-    else console.warn('Chat attachment URL unavailable:',m.id,'No authorized signed URL could be created');
-   }
-  }
+  const mediaRows=rows.filter(m=>m.media_url);
+  const mediaResults=await Promise.all(mediaRows.map(async m=>({id:m.id,url:await dgResolveChatMediaUrl(m.media_url)})));
+  mediaResults.forEach(({id,url})=>{if(url)attachmentUrls[id]=url;else console.warn('Chat attachment URL unavailable:',id,'No authorized signed URL could be created')});
   let callRows=[];
   try{
    const {data:callData,error:callError}=await supabaseClient.from('danegram_calls').select('*').eq('conversation_id',requestedConversationId).is('deleted_for_everyone_at',null).order('created_at',{ascending:false}).limit(100);
@@ -2868,15 +2910,28 @@ async function loadDgStories(){
   if(ids.length){const pr=await supabaseClient.from('profiles').select('id,display_name,username,avatar_url').in('id',ids);if(pr.error)throw pr.error;profiles=pr.data||[];}
   const pmap=new Map(profiles.map(x=>[x.id,x]));
   const groups=new Map();
-  for(const row of list){
-   // The private bucket is accessed through the deployed authorization Edge Function.
-   const {data:signed,error:signedError}=await supabaseClient.functions.invoke('danegram-story-media-access',{body:{story_id:row.id}});
-   if(signedError||!signed?.signed_url){console.warn('DANEGRAM story media unavailable:',signedError?.message||signed?.error||'No signed URL');continue;}
+  // Resolve story access URLs in small parallel batches. Sequential Edge Function
+  // calls made a long story strip appear to hang on slower mobile connections.
+  const signedRows=[];
+  for(let start=0;start<list.length;start+=8){
+   const batch=list.slice(start,start+8);
+   const results=await Promise.all(batch.map(async row=>{
+    try{
+     const {data:signed,error:signedError}=await supabaseClient.functions.invoke('danegram-story-media-access',{body:{story_id:row.id}});
+     if(signedError||!signed?.signed_url){console.warn('DANEGRAM story media unavailable:',signedError?.message||signed?.error||'No signed URL');return null;}
+     return {row,url:signed.signed_url};
+    }catch(e){console.warn('DANEGRAM story media unavailable:',e.message);return null;}
+   }));
+   signedRows.push(...results.filter(Boolean));
+  }
+  for(const {row,url} of signedRows){
    const profile=pmap.get(row.user_id)||{};
    if(!groups.has(row.user_id))groups.set(row.user_id,{userId:row.user_id,name:profile.display_name||profile.username||'DANEGRAM Member',profile:{...profile,avatarDisplay:''},stories:[]});
-   groups.get(row.user_id).stories.push({...row,signedUrl:signed.signed_url});
+   groups.get(row.user_id).stories.push({...row,signedUrl:url});
   }
-  for(const group of groups.values()){group.profile.avatarDisplay=await dgResolveAvatarUrl(group.profile.avatar_url); }
+  await Promise.all([...groups.values()].map(async group=>{
+   group.profile.avatarDisplay=await dgResolveAvatarUrl(group.profile.avatar_url);
+  }));
   dgStoryGroups=[...groups.values()].sort((a,b)=>{if(a.userId===myId())return -1;if(b.userId===myId())return 1;return new Date(b.stories[b.stories.length-1].created_at)-new Date(a.stories[a.stories.length-1].created_at)});
  }catch(e){dgStoryLoadError='Stories could not load. Check the Stories database setup.';console.error('DANEGRAM stories load failed:',e.message);
  }finally{
