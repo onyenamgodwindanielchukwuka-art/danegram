@@ -1694,11 +1694,16 @@ async function openChat(id){
  $('#chatTitle').textContent=c?.label||'Conversation';const chatAvatar=$('#chatAvatar');if(chatAvatar)chatAvatar.innerHTML=c?.peer?.avatarDisplay?`<img src="${safe(c.peer.avatarDisplay)}" alt="${safe(c.label||'Member')}" loading="lazy" onerror="this.remove()"><span class="avatar-initials">${safe(c?.initials||'D')}</span>`:`<span class="avatar-initials">${safe(c?.initials||'D')}</span>`;$('#chatMessages').textContent='Loading messages…';$('#chatMessages').dataset.conversationId='';const mi=$('#messageInput');if(mi){mi.value='';mi.style.height='30px';mi.disabled=false;}dgResetVoiceComposer();$('#messageInput').disabled=false;$('#sendMessage').disabled=false;$('#chatAttachButton').disabled=false;$('#recordVoiceButton').disabled=false;
  if(chatChannel){await supabaseClient.removeChannel(chatChannel);chatChannel=null}
  await fetchChatMessages();
- const {error:deliveredError}=await supabaseClient.rpc('danegram_mark_conversation_delivered',{p_conversation_id:id});
- if(deliveredError)console.warn('Could not mark conversation as delivered:',deliveredError.message);
- const {error:readError}=await supabaseClient.rpc('danegram_mark_conversation_read',{p_conversation_id:id});
- if(readError)console.warn('Could not mark conversation as read:',readError.message);
- else{await fetchChatMessages();const item=(window.dgConversations||[]).find(x=>x.id===id);if(item)item.unreadCount=0;const list=$('#conversationList');if(list){const q=$('#chatListSearch')?.value.trim().toLowerCase()||'';const rows=(window.dgConversations||[]).filter(x=>(x.label+' '+x.preview).toLowerCase().includes(q));list.innerHTML=rows.map((x,i)=>`<button type="button" class="dg-conversation ${x.unreadCount?'dg-unread':''}" data-open-chat="${x.id}"><span class="dg-conversation-avatar ${i%2?'alt':''}">${x.peer?.avatarDisplay?`<img src="${safe(x.peer.avatarDisplay)}" alt="${safe(x.label)}">`:safe(x.initials)}</span><span class="dg-conversation-copy"><span class="dg-conversation-name">${safe(x.label)}</span><span class="dg-conversation-preview">${safe(x.preview)}</span></span><span class="dg-conversation-meta"><time class="dg-conversation-time">${x.lastAt?new Date(x.lastAt).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}):''}</time>${x.unreadCount?`<span class="dg-unread-badge">${x.unreadCount>99?'99+':x.unreadCount}</span>`:''}</span></button>`).join('');list.querySelectorAll('[data-open-chat]').forEach(b=>b.onclick=()=>openChat(b.dataset.openChat));}}
+ // Mark delivery/read in the background so the conversation opens immediately.
+ // Realtime and the next inbox refresh will update receipts without a second
+ // full message fetch blocking the chat screen.
+ Promise.all([
+  supabaseClient.rpc('danegram_mark_conversation_delivered',{p_conversation_id:id}),
+  supabaseClient.rpc('danegram_mark_conversation_read',{p_conversation_id:id})
+ ]).then(results=>{
+  results.forEach((r,i)=>{if(r.error)console.warn(i?'Could not mark conversation as read:':'Could not mark conversation as delivered:',r.error.message)});
+  const item=(window.dgConversations||[]).find(x=>x.id===id);if(item)item.unreadCount=0;
+ }).catch(e=>console.warn('Could not update chat receipts:',e));
  chatChannel=supabaseClient.channel('danegram-chat-'+id)
   .on('postgres_changes',{event:'*',schema:'public',table:'messages',filter:'conversation_id=eq.'+id},()=>{if(activeConversationId===id)fetchChatMessages()})
   .on('postgres_changes',{event:'UPDATE',schema:'public',table:'conversation_members',filter:'conversation_id=eq.'+id},()=>{if(activeConversationId===id)fetchChatMessages()})
@@ -1752,13 +1757,9 @@ async function dgFetchChatMessagesNow(){
   // Resolve private chat media safely, accepting both stored object paths and
   // legacy paths that include their bucket name.
   const attachmentUrls={};
-  for(const m of rows){
-   if(m.media_url){
-    const url=await dgResolveChatMediaUrl(m.media_url);
-    if(url)attachmentUrls[m.id]=url;
-    else console.warn('Chat attachment URL unavailable:',m.id,'No authorized signed URL could be created');
-   }
-  }
+  const mediaRows=rows.filter(m=>m.media_url);
+  const mediaResults=await Promise.all(mediaRows.map(async m=>({id:m.id,url:await dgResolveChatMediaUrl(m.media_url)})));
+  mediaResults.forEach(({id,url})=>{if(url)attachmentUrls[id]=url;else console.warn('Chat attachment URL unavailable:',id,'No authorized signed URL could be created')});
   let callRows=[];
   try{
    const {data:callData,error:callError}=await supabaseClient.from('danegram_calls').select('*').eq('conversation_id',requestedConversationId).is('deleted_for_everyone_at',null).order('created_at',{ascending:false}).limit(100);
