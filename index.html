@@ -3505,7 +3505,9 @@ function dgLoadTurnstile(forceReload=false){
 async function dgRenderAuthTurnstile(forceReload=false){
  const target=$('#dgTurnstileWidget'),message=$('#authMessage');
  if(!target)return;
- target.dataset.token='';target.textContent='Loading security check…';
+ target.dataset.token='';
+ target.dataset.state='loading';
+ target.textContent='Loading Cloudflare security check…';
  try{
   const api=await dgLoadTurnstile(forceReload);
   if(!target.isConnected)return;
@@ -3516,16 +3518,36 @@ async function dgRenderAuthTurnstile(forceReload=false){
    theme:'light',
    size:'normal',
    retry:'auto',
+   'retry-interval':8000,
    'refresh-expired':'auto',
-   callback:token=>{target.dataset.token=token;if(message)message.textContent='Security check completed. You can continue.';},
-   'expired-callback':()=>{target.dataset.token='';if(message)message.textContent='Security check expired. Please complete it again.';},
-   'timeout-callback':()=>{target.dataset.token='';if(message)message.textContent='Security check timed out. Please try again.';},
-   'error-callback':()=>{target.dataset.token='';if(message)message.textContent='Cloudflare could not connect to its security service. Check your connection or open DANEGRAM in Chrome, then retry.';}
+   callback:token=>{
+    target.dataset.token=token;target.dataset.state='success';
+    if(message)message.textContent='Security check completed. You can continue.';
+   },
+   'expired-callback':()=>{
+    target.dataset.token='';target.dataset.state='expired';
+    if(message)message.textContent='Cloudflare security check expired. Reload it and try again.';
+   },
+   'timeout-callback':()=>{
+    target.dataset.token='';target.dataset.state='timeout';
+    if(message)message.textContent='Cloudflare challenge timed out. Tap Reload security check.';
+   },
+   'error-callback':code=>{
+    target.dataset.token='';target.dataset.state='error';
+    const detail='Cloudflare verification error '+String(code||'unknown')+'. ';
+    if(message)message.textContent=detail+'Check network access to challenges.cloudflare.com, then tap Reload security check.';
+    console.error('DANEGRAM Turnstile error:',code);
+    return true;
+   }
   });
   target.dataset.widgetId=String(widgetId);
+  target.dataset.state='rendered';
+  if(message)message.textContent='Cloudflare security check is loading. If it does not finish, reload it to see the error.';
  }catch(error){
+  target.dataset.state='load-error';
   target.textContent='Security check unavailable.';
   if(message)message.textContent=error.message||'Cloudflare security check unavailable. Please try again.';
+  console.error('DANEGRAM Turnstile load error:',error);
  }
 }
 function dgResetAuthTurnstile(){
