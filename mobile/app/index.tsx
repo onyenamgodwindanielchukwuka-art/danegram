@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, BackHandler, SafeAreaView, StyleSheet, Text, View } from 'react-native';
-import { WebView, type WebViewNavigation } from 'react-native-webview';
+import WebView, { type WebViewNavigation } from 'react-native-webview';
 
 const DANEGRAM_LIVE_URL = 'https://danegram.pages.dev/';
 
 export default function HomeScreen() {
-  const webView = useRef<WebView>(null);
+  const webView = useRef<WebView | null>(null);
   const [loading, setLoading] = useState(true);
   const [failed, setFailed] = useState(false);
   const [canGoBack, setCanGoBack] = useState(false);
@@ -45,7 +45,7 @@ export default function HomeScreen() {
         onLoadEnd={() => setLoading(false)}
         onNavigationStateChange={handleNavigation}
         onError={() => { setLoading(false); setFailed(true); }}
-        onHttpError={(event) => {
+        onHttpError={(event: { nativeEvent: { statusCode: number } }) => {
           if (event.nativeEvent.statusCode >= 500) {
             setLoading(false);
             setFailed(true);
