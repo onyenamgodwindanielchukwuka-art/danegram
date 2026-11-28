@@ -1710,16 +1710,20 @@ async function loadChats(){
   const ids=[...new Set((mine||[]).map(x=>x.conversation_id))];
   if(!ids.length){list.innerHTML='<div class="dg-empty">No conversations yet. Tap + to start a new chat.</div>';return}
   const readAtByConversation=new Map((mine||[]).map(x=>[x.conversation_id,x.last_read_at||'1970-01-01T00:00:00.000Z']));
-  const {data:convs,error:ce}=await supabaseClient.from('conversations').select('id,created_by,is_group,title,created_at').in('id',ids).order('created_at',{ascending:false});
-  if(ce)throw ce;
-  const {data:members,error:me}=await supabaseClient.from('conversation_members').select('conversation_id,user_id').in('conversation_id',ids);
-  if(me)throw me;
-  const others=[...new Set((members||[]).filter(x=>x.user_id!==myId()).map(x=>x.user_id))];
-  // These independent inbox reads can run together; serial waits made inbox
-  // startup unnecessarily slow on mobile networks.
+  // Fetch conversation metadata and participant IDs together instead of
+  // waiting for one network round-trip before starting the other.
+  const [conversationResult,memberResult]=await Promise.all([
+   supabaseClient.from('conversations').select('id,created_by,is_group,title,created_at').in('id',ids).order('created_at',{ascending:false}),
+   supabaseClient.from('conversation_members').select('conversation_id,user_id').in('conversation_id',ids)
+  ]);
+  if(conversationResult.error)throw conversationResult.error;
+  if(memberResult.error)throw memberResult.error;
+  const convs=conversationResult.data||[],members=memberResult.data||[];
+  const others=[...new Set(members.filter(x=>x.user_id!==myId()).map(x=>x.user_id))];
+  // Profiles and recent message previews are independent; start both now.
   const [profileResult,messageResult]=await Promise.all([
    others.length?supabaseClient.from('profiles').select('id,display_name,username,avatar_url').in('id',others):Promise.resolve({data:[],error:null}),
-   supabaseClient.from('messages').select('conversation_id,sender_id,content,created_at').in('conversation_id',ids).order('created_at',{ascending:false}).limit(1000)
+   supabaseClient.from('messages').select('conversation_id,sender_id,content,created_at').in('conversation_id',ids).order('created_at',{ascending:false}).limit(250)
   ]);
   if(profileResult.error)throw profileResult.error;
   if(messageResult.error)throw messageResult.error;
